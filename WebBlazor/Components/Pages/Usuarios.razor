@@ -34,19 +34,19 @@
     <Columns>
         <PropertyColumn Property="x => x.Nombre" Title="Usuario" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="text-align:left; cursor:pointer" />
+                        CellStyle="max-width:84px;width:84px;text-align:left; cursor:pointer" />
 
         <PropertyColumn Property="x => x.Email" Title="Email" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="text-align:left" />
+                        CellStyle="max-width:84px;width:84px;text-align:left" />
 
         <PropertyColumn Property="x => x.Grupo" Title="Grupo" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="text-align:left" />
+                        CellStyle="max-width:84px;width:84px;text-align:left" />
 
         <PropertyColumn Property="x => x.Rol" Title="Rol" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="text-align:left" />
+                        CellStyle="max-width:84px;width:84px;text-align:left" />
 
         <TemplateColumn Title="Estado" Field="Activo" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:center; font-size:.95rem; font-weight:600"
@@ -54,7 +54,7 @@
             <CellTemplate>
                 <MudChip Size="Size.Small" Variant="Variant.Outlined"
                          Color="@(context.Item.Activo ? Color.Success : Color.Error)">
-                    @(context.Item.Activo ? "Activo" : "Bloqueado")
+                    @(context.Item.Activo ? "Disponible" : "Baja")
                 </MudChip>
             </CellTemplate>
         </TemplateColumn>
@@ -79,8 +79,19 @@
               Style="width:100%; max-width: 360px; margin: 0 auto;
                          background-color: var(--mud-palette-table-striped);
                          border:1px solid var(--mud-palette-primary);">
+
         <MudText Typo="Typo.h6">@seleccionado.Nombre</MudText>
         <MudText Class="mb-1">@seleccionado.Email</MudText>
+
+        <div class="mb-2">
+            <MudChip T="string"
+                     Size="Size.Small"
+                     Variant="Variant.Outlined"
+                     Color="@(seleccionado.Activo ? Color.Success : Color.Error)">
+                @(seleccionado.Activo ? "Disponible" : "Baja")
+            </MudChip>
+        </div>
+
         <MudText Class="mb-1"><b>Rol:</b> @seleccionado.Rol</MudText>
         <MudText Class="mb-2"><b>Grupo:</b> @($"{seleccionado.Grupo} ({miembrosCount} miembros)")</MudText>
 
@@ -121,11 +132,11 @@
         new("Ana Pérez", "ana.perez@contoso.com", "Marketing", "Editor", true,  DateTime.Now.AddMinutes(-5)),
         new("Carlos Freire", "carlos.freire@contoso.com", "Ventas", "Colaborador", true, DateTime.Now.AddHours(-3)),
         new("Jesús Domínguez", "jesus.dominguez@contoso.com", "IT", "Admin", true, DateTime.Now.AddHours(-20)),
-        new("Logística Bot", "logistica@contoso.com", "Logística", "Servicio", false, DateTime.Today.AddDays(-2)),
+        new("Paco Gil", "logistica@contoso.com", "Logística", "Servicio", false, DateTime.Today.AddDays(-2)),
         new("María López", "maria.lopez@contoso.com", "Marketing", "Colaborador", true, DateTime.Today.AddDays(-1)),
-        new("Soporte N1", "soporte.n1@contoso.com", "IT", "Colaborador", true, DateTime.Today.AddDays(-4)),
-        new("Equipo Ventas", "ventas@contoso.com", "Ventas", "Editor", true, DateTime.Today.AddDays(-2)),
-        new("RRHH Interno", "rrhh@contoso.com", "RRHH", "Editor", false, DateTime.Today.AddDays(-7)),
+        new("Antonio Romeri", "soporte.n1@contoso.com", "IT", "Colaborador", true, DateTime.Today.AddDays(-4)),
+        new("Josefina Rodríguez", "ventas@contoso.com", "Ventas", "Editor", true, DateTime.Today.AddDays(-2)),
+        new("Ricardo García", "rrhh@contoso.com", "RRHH", "Editor", false, DateTime.Today.AddDays(-7)),
     };
 
     private IEnumerable<UsuarioDTO> MiembrosDelGrupo(string grupo)

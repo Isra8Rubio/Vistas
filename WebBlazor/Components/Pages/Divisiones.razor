@@ -1,0 +1,272 @@
+﻿@page "/divisiones"
+@using MudBlazor
+@using WebBlazor.DTO
+
+<MudDataGrid @ref="dataGrid"
+             T="DivisionDTO"
+             ServerData="ServerReload"
+             Filterable="true"
+             Hover="true"
+             Dense="true"
+             Bordered="true"
+             Striped="true"
+             RowClick="OnRowClick"
+             Class="mt-4 pa-2"
+             Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
+
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField T="string"
+                      @bind-Value="Search"
+                      Label="Buscar"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      AdornmentColor="Color.Primary"
+                      Immediate="true"
+                      DebounceInterval="300"
+                      Class="mt-2 mb-1" />
+        <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                       OnClick="ClearFilters"
+                       Class="ml-1 mt-2"
+                       Title="Limpiar búsqueda" />
+    </ToolBarContent>
+
+    <Columns>
+        <PropertyColumn Property="x => x.Nombre" Title="División" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="max-width:84px;width:84px;text-align:left; cursor:pointer" />
+
+        <PropertyColumn Property="x => x.Codigo" Title="Código" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="max-width:84px;width:84px;text-align:left; white-space:nowrap" />
+
+        <PropertyColumn Property="x => x.Region" Title="Región" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="max-width:84px;width:84px;text-align:left;" />
+
+        <TemplateColumn Title="Estado" Field="Activa" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:center; font-size:.95rem; font-weight:600"
+                        CellStyle="max-width:84px;width:84px;text-align:center">
+            <CellTemplate>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                         Color="@(context.Item.Activa ? Color.Success : Color.Error)">
+                    @(context.Item.Activa ? "Activa" : "Archivada")
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <TemplateColumn Title="Campañas" Field="TotalCampanias"
+                        Sortable="true" Filterable="false"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left">
+            <CellTemplate>
+                @{
+                    var camps = context.Item.Campanias ?? new List<CampaniaDTO>();
+                    var preview = camps.Take(3).ToList();
+                    var rest = camps.Count - preview.Count;
+                }
+
+                @foreach (var c in preview)
+                {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Class="mr-1 mb-1"
+                             Color="@(c.Estado switch {
+                                 "Planificada" => Color.Surface,
+                                 "En curso"    => Color.Info,
+                                 "Pausada"     => Color.Secondary,
+                                 "Finalizada"  => Color.Success,
+                                 _             => Color.Default
+                             })"
+                             Title="@($"{c.Titulo} · {c.Estado} · {c.Canal}")">
+                        @c.Titulo
+                    </MudChip>
+                }
+
+                @if (rest > 0)
+                {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Color="Color.Default">
+                        +@rest
+                    </MudChip>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+
+        <PropertyColumn Property="x => x.UltimoCambio" Title="Último cambio" Sortable="true" Filterable="true"
+                        Format="dd/MM/yyyy HH:mm"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
+                        CellStyle="max-width:64px;width:64px;text-align:center" />
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="DivisionDTO" />
+    </PagerContent>
+</MudDataGrid>
+
+@if (seleccionado is not null)
+{
+    var total = seleccionado.TotalCampanias;
+    var porEstado = seleccionado.Campanias
+        .GroupBy(c => c.Estado)
+        .Select(g => new { Estado = g.Key, Count = g.Count() })
+        .OrderByDescending(x => x.Count)
+        .ToList();
+
+    <MudPaper Class="pa-4 mt-4"
+              Style="width:100%; max-width: 420px; margin: 0 auto;
+                     background-color: var(--mud-palette-table-striped);
+                     border:1px solid var(--mud-palette-primary);">
+        <MudText Typo="Typo.h6">@seleccionado.Nombre (@seleccionado.Codigo)</MudText>
+        <MudText Class="mb-1"><b>Región:</b> @seleccionado.Region</MudText>
+
+        <div class="mb-2">
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                     Color="@(seleccionado.Activa ? Color.Success : Color.Error)">
+                @(seleccionado.Activa ? "Activa" : "Archivada")
+            </MudChip>
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Class="ml-1">
+                @($"{total} campañas")
+            </MudChip>
+        </div>
+
+        @if (porEstado.Count > 0)
+        {
+            <MudText Class="mb-1"><b>Resumen por estado:</b></MudText>
+            <div class="mb-2">
+                @foreach (var r in porEstado)
+                {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Class="mr-1 mb-1"
+                             Color="@(r.Estado switch {
+                                 "Planificada" => Color.Warning,
+                                 "En curso"    => Color.Info,
+                                 "Pausada"     => Color.Secondary,
+                                 "Finalizada"  => Color.Success,
+                                 _             => Color.Default
+                             })">
+                        @($"{r.Estado} ({r.Count})")
+                    </MudChip>
+                }
+            </div>
+        }
+
+        <MudDivider Class="my-2" />
+
+        <MudText Typo="Typo.caption">
+            Último cambio: @seleccionado.UltimoCambio.ToString("dd/MM/yyyy HH:mm")
+        </MudText>
+    </MudPaper>
+}
+
+@code {
+    private MudDataGrid<DivisionDTO>? dataGrid;
+    private DivisionDTO? seleccionado;
+
+    private string? _search;
+    private string? Search
+    {
+        get => _search;
+        set { if (_search == value) return; _search = value; _ = dataGrid?.ReloadServerData(); }
+    }
+
+    private Task ClearFilters()
+    {
+        Search = null;
+        seleccionado = null;
+        return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
+    }
+
+    // === datos falsos (Divisiones <-> Campañas) ===
+    private readonly List<DivisionDTO> divisiones = new()
+    {
+        new DivisionDTO(
+            nombre: "División Norte",
+            codigo: "NRT",
+            region: "Norte",
+            activa: true,
+            campanias: new()
+            {
+                new CampaniaDTO("Rebajas Primavera", "En curso",   "Social",  DateTime.Today.AddDays(-10), DateTime.Today.AddDays(20)),
+                new CampaniaDTO("Email Bienvenida",   "Finalizada","Email",   DateTime.Today.AddDays(-40), DateTime.Today.AddDays(-20)),
+                new CampaniaDTO("Lanzamiento A",      "Planificada","Ads",    DateTime.Today.AddDays(5),   DateTime.Today.AddDays(30)),
+                new CampaniaDTO("Evento Bilbao",      "Planificada","Eventos",DateTime.Today.AddDays(15),  DateTime.Today.AddDays(16)),
+            },
+            ultimoCambio: DateTime.Now.AddHours(-3)
+        ),
+
+        new DivisionDTO(
+            "División Sur", "SUR", "Sur", true,
+            new()
+            {
+                new CampaniaDTO("Promo Verano Sur",  "En curso",   "Ads",     DateTime.Today.AddDays(-3),  DateTime.Today.AddDays(25)),
+                new CampaniaDTO("Feria Málaga",      "Planificada","Eventos", DateTime.Today.AddDays(7),   DateTime.Today.AddDays(9)),
+                new CampaniaDTO("Remarketing Sur",   "Pausada",    "Display", DateTime.Today.AddDays(-15), null),
+            },
+            DateTime.Today.AddDays(-1)
+        ),
+
+        new DivisionDTO(
+            "División Online", "ONL", "Online", true,
+            new()
+            {
+                new CampaniaDTO("SEO Sprint Q3",     "En curso",   "SEO",     DateTime.Today.AddDays(-12), DateTime.Today.AddDays(12)),
+                new CampaniaDTO("Display Q2",        "Finalizada", "Display", DateTime.Today.AddDays(-70), DateTime.Today.AddDays(-40)),
+                new CampaniaDTO("Black Friday Prep", "Planificada","Email",   DateTime.Today.AddDays(50),  DateTime.Today.AddDays(60)),
+                new CampaniaDTO("Social UGC",        "Planificada","Social",  DateTime.Today.AddDays(20),  DateTime.Today.AddDays(45)),
+                new CampaniaDTO("CRO Landing",       "Pausada",    "Web",     DateTime.Today.AddDays(-5),  null),
+            },
+            DateTime.Today.AddDays(-2)
+        ),
+
+        new DivisionDTO(
+            "División Export", "EXP", "Internacional", false,
+            new()
+            {
+                new CampaniaDTO("Lanzamiento FF", "Finalizada", "Social",  DateTime.Today.AddDays(-120), DateTime.Today.AddDays(-90)),
+                new CampaniaDTO("Feira Lisboa",      "Pausada", "Eventos", DateTime.Today.AddDays(-200), DateTime.Today.AddDays(-198)),
+            },
+            DateTime.Today.AddDays(-10)
+        ),
+    };
+
+    // === server reload con búsqueda/orden/paginación ===
+    private Task<GridData<DivisionDTO>> ServerReload(GridState<DivisionDTO> state)
+    {
+        IEnumerable<DivisionDTO> data = divisiones;
+
+        if (!string.IsNullOrWhiteSpace(_search))
+        {
+            var q = _search.Trim();
+            data = data.Where(d =>
+                d.Nombre.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                d.Codigo.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                d.Region.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                d.Campanias.Any(c =>
+                    c.Titulo.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                    c.Canal.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                    c.Estado.Contains(q, StringComparison.OrdinalIgnoreCase)
+                )
+            );
+        }
+
+        var sort = state.SortDefinitions.FirstOrDefault();
+        if (sort is not null)
+        {
+            data = sort.SortBy switch
+            {
+                nameof(DivisionDTO.Nombre)        => sort.Descending ? data.OrderByDescending(x => x.Nombre)        : data.OrderBy(x => x.Nombre),
+                nameof(DivisionDTO.Codigo)        => sort.Descending ? data.OrderByDescending(x => x.Codigo)        : data.OrderBy(x => x.Codigo),
+                nameof(DivisionDTO.Region)        => sort.Descending ? data.OrderByDescending(x => x.Region)        : data.OrderBy(x => x.Region),
+                nameof(DivisionDTO.Activa)        => sort.Descending ? data.OrderByDescending(x => x.Activa)        : data.OrderBy(x => x.Activa),
+                nameof(DivisionDTO.UltimoCambio)  => sort.Descending ? data.OrderByDescending(x => x.UltimoCambio)  : data.OrderBy(x => x.UltimoCambio),
+                nameof(DivisionDTO.TotalCampanias)=> sort.Descending ? data.OrderByDescending(x => x.TotalCampanias): data.OrderBy(x => x.TotalCampanias),
+                _ => data
+            };
+        }
+
+        var total = data.Count();
+        var items = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+
+        return Task.FromResult(new GridData<DivisionDTO> { TotalItems = total, Items = items });
+    }
+
+    private void OnRowClick(DataGridRowClickEventArgs<DivisionDTO> args) => seleccionado = args.Item;
+}

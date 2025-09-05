@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  api:
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: .
+      dockerfile: Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+
+  webblazor:
+    image: ${DOCKER_REGISTRY-}webblazor
+    build:
+      context: .
+      dockerfile: WebBlazor/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - Api__BaseUrl=http://api:8080
+    depends_on:
+      - api
