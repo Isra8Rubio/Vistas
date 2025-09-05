@@ -14,6 +14,7 @@
              Class="mt-4 pa-2"
              Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
 
+    <!-- Toolbar: Buscar + Borrar -->
     <ToolBarContent>
         <MudSpacer />
         <MudTextField T="string"
@@ -33,11 +34,13 @@
     </ToolBarContent>
 
     <Columns>
+        <!-- Campaña -->
         <PropertyColumn Property="x => x.Titulo" Title="Campaña" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
                         CellStyle="text-align:left; cursor:pointer" />
 
-        <TemplateColumn Title="Estado" Field="Estado" Sortable="true" Filterable="true"
+        <!-- Estado -->
+        <PropertyColumn Property="x => x.Estado" Title="Estado" Sortable="true" Filterable="false"
                         HeaderStyle="text-align:center; font-size:.95rem; font-weight:600"
                         CellStyle="max-width:120px;width:120px;text-align:center">
             <CellTemplate>
@@ -52,13 +55,15 @@
                     @context.Item.Estado
                 </MudChip>
             </CellTemplate>
-        </TemplateColumn>
+        </PropertyColumn>
 
-        <PropertyColumn Property="x => x.Canal" Title="Canal" Sortable="true" Filterable="true"
+        <!-- Canal -->
+        <PropertyColumn Property="x => x.Canal" Title="Canal" Sortable="true" Filterable="false"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
                         CellStyle="max-width:84px;width:84px;text-align:left" />
 
-        <TemplateColumn Title="División" Field="DivisionCodigo" Sortable="true" Filterable="true"
+        <!-- División -->
+        <PropertyColumn Property="x => x.DivisionCodigo" Title="División" Sortable="true" Filterable="false"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
                         CellStyle="max-width:84px;width:84px;text-align:left">
             <CellTemplate>
@@ -68,20 +73,22 @@
                 </MudChip>
                 <MudText Class="ml-1" Typo="Typo.body2">@context.Item.DivisionNombre</MudText>
             </CellTemplate>
-        </TemplateColumn>
+        </PropertyColumn>
 
-        <PropertyColumn Property="x => x.Inicio" Title="Inicio" Sortable="true" Filterable="true"
+        <!-- Inicio -->
+        <PropertyColumn Property="x => x.Inicio" Title="Inicio" Sortable="true" Filterable="false"
                         Format="dd/MM/yyyy"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
                         CellStyle="max-width:64px;width:64px;text-align:center" />
 
-        <TemplateColumn Title="Fin" Field="Fin" Sortable="true" Filterable="true"
+        <!-- Fin -->
+        <PropertyColumn Property="x => x.Fin" Title="Fin" Sortable="true" Filterable="false"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
                         CellStyle="max-width:64px;width:64px;text-align:center">
             <CellTemplate>
                 @(context.Item.Fin?.ToString("dd/MM/yyyy") ?? "—")
             </CellTemplate>
-        </TemplateColumn>
+        </PropertyColumn>
     </Columns>
 
     <PagerContent>
@@ -132,6 +139,7 @@
     private MudDataGrid<CampaniaListadoDTO>? dataGrid;
     private CampaniaListadoDTO? seleccionada;
 
+    // --- búsqueda global ---
     private string? _search;
     private string? Search
     {
@@ -139,21 +147,9 @@
         set { if (_search == value) return; _search = value; _ = dataGrid?.ReloadServerData(); }
     }
 
-    private string? _estado;
-    private string? _canal;
-    private string? _division;
-    private DateRange? _rangoFechas;
-
-    private IEnumerable<string> Estados => new[] { "Planificada", "En curso", "Pausada", "Finalizada" };
-    private IEnumerable<string> Canales => _all.Select(x => x.Canal).Distinct().OrderBy(x => x);
-    private IEnumerable<(string codigo, string nombre)> Divisiones =>
-        _all.Select(x => (x.DivisionCodigo, x.DivisionNombre)).Distinct().OrderBy(x => x.DivisionCodigo)
-            .Select(t => (t.DivisionCodigo, t.DivisionNombre));
-
     private Task ClearFilters()
     {
-        _search = _estado = _canal = _division = null;
-        _rangoFechas = null;
+        _search = null;
         seleccionada = null;
         return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
     }
@@ -181,10 +177,12 @@
         new("Feira Lisboa","Finalizada","Eventos", DateTime.Today.AddDays(-200), DateTime.Today.AddDays(-198), "EXP", "División Export"),
     };
 
+    // --- recarga server-side: búsqueda + filtro por columna (Titulo) + orden + paginación ---
     private Task<GridData<CampaniaListadoDTO>> ServerReload(GridState<CampaniaListadoDTO> state)
     {
         IEnumerable<CampaniaListadoDTO> data = _all;
 
+        // Búsqueda 
         if (!string.IsNullOrWhiteSpace(_search))
         {
             var q = _search.Trim();
@@ -196,40 +194,66 @@
                 c.DivisionNombre.Contains(q, StringComparison.OrdinalIgnoreCase));
         }
 
-        if (!string.IsNullOrWhiteSpace(_estado))
-            data = data.Where(c => c.Estado.Equals(_estado, StringComparison.OrdinalIgnoreCase));
-
-        if (!string.IsNullOrWhiteSpace(_canal))
-            data = data.Where(c => c.Canal.Equals(_canal, StringComparison.OrdinalIgnoreCase));
-
-        if (!string.IsNullOrWhiteSpace(_division))
-            data = data.Where(c => c.DivisionCodigo.Equals(_division, StringComparison.OrdinalIgnoreCase));
-
-        if (_rangoFechas is not null)
+        // Filtro por columna: Campaña (Titulo)
+        if (state.FilterDefinitions is not null)
         {
-            var desde = _rangoFechas.Start?.Date;
-            var hasta = _rangoFechas.End?.Date;
-            if (desde is not null) data = data.Where(c => c.Inicio.Date >= desde);
-            if (hasta is not null) data = data.Where(c => c.Inicio.Date <= hasta);
+            string? tituloFilter = null;
+
+            foreach (var fd in state.FilterDefinitions)
+            {
+                var colObj   = fd?.GetType().GetProperty("Column")?.GetValue(fd);
+                var propName = colObj?.GetType().GetProperty("PropertyName")?.GetValue(colObj) as string;
+
+                if (string.Equals(propName, nameof(CampaniaListadoDTO.Titulo), StringComparison.OrdinalIgnoreCase))
+                {
+                    tituloFilter = fd?.GetType().GetProperty("Value")?.GetValue(fd)?.ToString();
+                    break;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(tituloFilter))
+            {
+                var f = tituloFilter.Trim();
+                data = data.Where(c => c.Titulo.Contains(f, StringComparison.OrdinalIgnoreCase));
+            }
         }
 
+        // Ordenación
         var sort = state.SortDefinitions.FirstOrDefault();
         if (sort is not null)
         {
             data = sort.SortBy switch
             {
-                nameof(CampaniaListadoDTO.Titulo)         => sort.Descending ? data.OrderByDescending(x => x.Titulo)         : data.OrderBy(x => x.Titulo),
-                nameof(CampaniaListadoDTO.Estado)         => sort.Descending ? data.OrderByDescending(x => x.Estado)         : data.OrderBy(x => x.Estado),
-                nameof(CampaniaListadoDTO.Canal)          => sort.Descending ? data.OrderByDescending(x => x.Canal)          : data.OrderBy(x => x.Canal),
-                nameof(CampaniaListadoDTO.DivisionCodigo) => sort.Descending ? data.OrderByDescending(x => x.DivisionCodigo) : data.OrderBy(x => x.DivisionCodigo),
-                nameof(CampaniaListadoDTO.Inicio)         => sort.Descending ? data.OrderByDescending(x => x.Inicio)         : data.OrderBy(x => x.Inicio),
-                _ => data
+                nameof(CampaniaListadoDTO.Titulo)         => sort.Descending ? data.OrderByDescending(x => x.Titulo)
+                                                                             : data.OrderBy(x => x.Titulo),
+                nameof(CampaniaListadoDTO.Estado)         => sort.Descending ? data.OrderByDescending(x => x.Estado)
+                                                                             : data.OrderBy(x => x.Estado),
+                nameof(CampaniaListadoDTO.Canal)          => sort.Descending ? data.OrderByDescending(x => x.Canal)
+                                                                             : data.OrderBy(x => x.Canal),
+                nameof(CampaniaListadoDTO.DivisionCodigo) => sort.Descending ? data.OrderByDescending(x => x.DivisionCodigo)
+                                                                             : data.OrderBy(x => x.DivisionCodigo),
+                nameof(CampaniaListadoDTO.Inicio)         => sort.Descending ? data.OrderByDescending(x => x.Inicio)
+                                                                             : data.OrderBy(x => x.Inicio),
+
+                nameof(CampaniaListadoDTO.Fin)            => sort.Descending
+                                                                ? data.OrderByDescending(x => x.Fin ?? DateTime.MinValue)
+                                                                      .ThenByDescending(x => x.Inicio)
+                                                                : data.OrderBy(x => x.Fin ?? DateTime.MaxValue)
+                                                                      .ThenBy(x => x.Inicio),
+
+                _                                         => data
             };
         }
 
+        // Paginación
         var total = data.Count();
         var items = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
-        return Task.FromResult(new GridData<CampaniaListadoDTO> { TotalItems = total, Items = items });
+
+        return Task.FromResult(new GridData<CampaniaListadoDTO>
+        {
+            TotalItems = total,
+            Items = items
+        });
     }
 
     private void OnRowClick(DataGridRowClickEventArgs<CampaniaListadoDTO> args) => seleccionada = args.Item;
