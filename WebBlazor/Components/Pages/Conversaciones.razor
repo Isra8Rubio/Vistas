@@ -1,0 +1,207 @@
+﻿@page "/conversaciones"
+@using WebBlazor.DTO
+@using MudBlazor
+
+<MudDataGrid @ref="dataGrid"
+             T="ConversacionDTO"
+             ServerData="ServerReload"
+             Filterable="true"
+             Hover="true"
+             Dense="true"
+             Bordered="true"
+             Striped="true"
+             class="mt-4 pa-2"
+             RowClick="OnRowClick"
+             Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
+
+    <ToolBarContent>
+        <MudDateRangePicker @bind-DateRange="Range"
+                            Label="Fechas"
+                            Dense="true"
+                            CloseOnSelection="true"
+                            DateFormat="dd/MM/yyyy"
+                            Class="mr-0 mb-2" />
+        <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                       OnClick="@(()=>{ Range=null; Search=null; _=dataGrid?.ReloadServerData(); })"
+                       Class="ml-0 mb-4" />
+
+        <MudSpacer />
+        <MudSpacer />
+        <MudSpacer />
+
+        <MudTextField T="string"
+                      @bind-Value="Search"
+                      Label="Buscar contacto o mensaje"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      AdornmentColor="Color.Primary"
+                      Immediate="true"
+                      DebounceInterval="300"
+                      Class="mt-2 mb-4" />
+    </ToolBarContent>
+
+
+    <Columns>
+        <PropertyColumn Property="x => x.Contacto" Title="Contacto" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:1.0rem; font-weight:600; white-space:nowrap"
+                        CellStyle="max-width:64px;width:64px;text-align:left" />
+
+        <PropertyColumn Property="x => x.Mensaje" Title="Mensaje" Sortable="false" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:1.0rem; font-weight:600"
+                        CellStyle="text-align:left" />
+
+        <PropertyColumn Property="x => x.Fecha" Title="Última actividad" Sortable="true" Filterable="true"
+                        Format="dd/MM/yyyy HH:mm"
+                        HeaderStyle="text-align:left; font-size:1.0rem; font-weight:600; white-space:nowrap"
+                        CellStyle="max-width:64px;width:64px;text-align:center" />
+
+            <TemplateColumn Title="Pendientes" Sortable="false" Filterable="true" Field="NoLeidos"
+                        HeaderStyle="text-align:left; font-size:1.0rem; font-weight:600; white-space:nowrap"
+                        CellStyle="max-width:64px;width:64px;text-align:center">
+                <CellTemplate>
+                    <MudChip T="string" Variant="Variant.Outlined" Color="Color.Default">@context.Item.NoLeidos.ToString()</MudChip>
+                </CellTemplate>
+            </TemplateColumn>
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="ConversacionDTO" />
+    </PagerContent>
+</MudDataGrid>
+
+@if (seleccionada is not null)
+{
+    <MudPaper Class="pa-4 mt-4"
+              Style="width:100%; max-width: 360px; margin: 0 auto;
+                     background-color: var(--mud-palette-table-striped);
+                     border:1px solid var(--mud-palette-primary);">
+        <MudText Typo="Typo.h6">@seleccionada.Contacto</MudText>
+        <MudText Class="mb-2 mt-1">@seleccionada.Mensaje</MudText>
+
+        <MudDivider Class="my-2" />
+
+        <MudText Typo="Typo.caption">
+            Última actividad: @seleccionada.Fecha.ToString("dd/MM/yyyy HH:mm")
+        </MudText>
+    </MudPaper>
+}
+
+
+@code {
+    private MudDataGrid<ConversacionDTO>? dataGrid;
+    private string? _search;
+    private string? Search
+    {
+        get => _search;
+        set
+        {
+            if (_search == value) return;
+            _search = value;
+            _ = dataGrid?.ReloadServerData();
+        }
+    }
+    private DateRange? _range;
+    private DateRange? Range
+    {
+        get => _range;
+        set
+        {
+            if (_range == value) return;
+            _range = value;
+            _ = dataGrid?.ReloadServerData();
+        }
+    }
+
+    private ConversacionDTO? seleccionada;
+    private void OnRowClick(DataGridRowClickEventArgs<ConversacionDTO> args)
+        => seleccionada = args.Item;
+
+    private List<ConversacionDTO> lista = new()
+    {
+        new("Compras", "Faltan dos albaranes", DateTime.Today.AddDays(-7), 3),
+        new("Jesús Domínguez", "Lo veo y te digo", DateTime.Now.AddHours(-20), 0),
+        new("Marketing", "Arte final aprobado", DateTime.Today.AddDays(-4), 0),
+        new("Ana Pérez", "¿Puedes llamar?", DateTime.Now.AddMinutes(-5), 4),
+        new("Carlos Freire", "Te paso el PDF", DateTime.Now.AddHours(-3), 0),
+        new("Soporte", "Incidencia cerrada", DateTime.Today.AddDays(-1), 0),
+        new("Equipo Ventas", "Reunión movida al lunes", DateTime.Today.AddDays(-2), 5),
+        new("Logística", "Salida programada mañana a las 09:00.", DateTime.Today.AddHours(11).AddMinutes(20), 0),
+        new("RRHH", "Confirma asistencia a la formación.", DateTime.Now.AddHours(-5), 3),
+        new("Compras", "Faltan dos albaranes", DateTime.Today.AddDays(-7), 3),
+        new("Jesús Domínguez", "Lo veo y te digo", DateTime.Now.AddHours(-20), 0),
+        new("Marketing", "Arte final aprobado", DateTime.Today.AddDays(-4), 0),
+        new("Ana Pérez", "¿Puedes llamar?", DateTime.Now.AddMinutes(-5), 4),
+        new("Carlos Freire", "Te paso el PDF", DateTime.Now.AddHours(-3), 0),
+        new("Soporte", "Incidencia cerrada", DateTime.Today.AddDays(-1), 0),
+        new("Equipo Ventas", "Reunión movida al lunes", DateTime.Today.AddDays(-2), 5),
+        new("Logística", "Salida programada mañana a las 09:00.", DateTime.Today.AddHours(11).AddMinutes(20), 0),
+        new("RRHH", "Confirma asistencia a la formación.", DateTime.Now.AddHours(-5), 3),
+    };
+
+    private Task<GridData<ConversacionDTO>> ServerReload(GridState<ConversacionDTO> state)
+    {
+        IEnumerable<ConversacionDTO> data = lista;
+
+        if (!string.IsNullOrWhiteSpace(_search))
+        {
+            var q = _search.Trim();
+            data = data.Where(x =>
+                (x.Contacto?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (x.Mensaje?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false));
+        }
+
+        if (Range?.Start is DateTime from && Range?.End is DateTime to)
+        {
+            var start = from.Date;
+            var endExcl = to.Date.AddDays(1);
+            data = data.Where(x => x.Fecha >= start && x.Fecha < endExcl);
+        }
+
+        var sort = state.SortDefinitions.FirstOrDefault();
+        if (sort is not null)
+        {
+            data = sort.SortBy switch
+            {
+                nameof(ConversacionDTO.Contacto) => sort.Descending
+                    ? data.OrderByDescending(x => x.Contacto)
+                    : data.OrderBy(x => x.Contacto),
+
+                nameof(ConversacionDTO.Fecha) => sort.Descending
+                    ? data.OrderByDescending(x => x.Fecha)
+                    : data.OrderBy(x => x.Fecha),
+
+                nameof(ConversacionDTO.NoLeidos) => sort.Descending
+                    ? data.OrderByDescending(x => x.NoLeidos)
+                    : data.OrderBy(x => x.NoLeidos),
+
+                _ => data
+            };
+        }
+
+        var total = data.Count();
+        var items = data.Skip(state.Page * state.PageSize)
+                        .Take(state.PageSize)
+                        .ToArray();
+
+        return Task.FromResult(new GridData<ConversacionDTO>
+        {
+            TotalItems = total,
+            Items = items
+        });
+    }
+
+    // Search sin marco / solo linea inferior
+    // <MudTextField T="string" 
+    // Value="@_search" 
+    // ValueChanged="@(s => OnSearch(s))" 
+    // Placeholder="Buscar" 
+    // Adornment="Adornment.Start" 
+    // AdornmentIcon="@Icons.Material.Filled.Search" 
+    // Class="mt-0" />
+    // private Task OnSearch(string text)
+    // {
+    //     _search = text;
+    //     return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
+    // }
+}

@@ -1,0 +1,171 @@
+﻿@page "/usuarios"
+@using MudBlazor
+
+<MudDataGrid @ref="dataGrid"
+             T="UsuarioDTO"
+             ServerData="ServerReload"
+             Filterable="true"
+             Hover="true"
+             Dense="true"
+             Bordered="true"
+             Striped="true"
+             RowClick="OnRowClick"
+             Class="mt-4 pa-2"
+             Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
+
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField T="string"
+                      @bind-Value="Search"
+                      Label="Buscar"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      AdornmentColor="Color.Primary"
+                      Immediate="true"
+                      DebounceInterval="300"
+                      Class="mt-2 mb-1" />
+        <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                       OnClick="ClearFilters"
+                       Class="ml-1 mt-2"
+                       Title="Limpiar búsqueda" />
+    </ToolBarContent>
+
+    <Columns>
+        <PropertyColumn Property="x => x.Nombre" Title="Usuario" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left; cursor:pointer" />
+
+        <PropertyColumn Property="x => x.Email" Title="Email" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left" />
+
+        <PropertyColumn Property="x => x.Grupo" Title="Grupo" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left" />
+
+        <PropertyColumn Property="x => x.Rol" Title="Rol" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left" />
+
+        <TemplateColumn Title="Estado" Field="Activo" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:center; font-size:.95rem; font-weight:600"
+                        CellStyle="max-width:84px;width:84px;text-align:center">
+            <CellTemplate>
+                <MudChip Size="Size.Small" Variant="Variant.Outlined"
+                         Color="@(context.Item.Activo ? Color.Success : Color.Error)">
+                    @(context.Item.Activo ? "Activo" : "Bloqueado")
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <PropertyColumn Property="x => x.UltimoAcceso" Title="Último acceso" Sortable="false" Filterable="true"
+                        Format="dd/MM/yyyy HH:mm"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
+                        CellStyle="max-width:64px;width:64px;text-align:center" />
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="UsuarioDTO" />
+    </PagerContent>
+
+</MudDataGrid>
+
+@if (seleccionado is not null)
+{
+    var miembrosCount = MiembrosDelGrupo(seleccionado.Grupo).Count();
+
+    <MudPaper Class="pa-4 mt-4"
+              Style="width:100%; max-width: 360px; margin: 0 auto;
+                         background-color: var(--mud-palette-table-striped);
+                         border:1px solid var(--mud-palette-primary);">
+        <MudText Typo="Typo.h6">@seleccionado.Nombre</MudText>
+        <MudText Class="mb-1">@seleccionado.Email</MudText>
+        <MudText Class="mb-1"><b>Rol:</b> @seleccionado.Rol</MudText>
+        <MudText Class="mb-2"><b>Grupo:</b> @($"{seleccionado.Grupo} ({miembrosCount} miembros)")</MudText>
+
+        <MudDivider Class="my-2" />
+
+        <MudText Typo="Typo.caption">
+            Último acceso: @seleccionado.UltimoAcceso.ToString("dd/MM/yyyy HH:mm")
+        </MudText>
+    </MudPaper>
+}
+
+
+
+@code {
+    private MudDataGrid<UsuarioDTO>? dataGrid;
+    private UsuarioDTO? seleccionado;
+    private string RowStyle(GrupoDTO _, int __) => "cursor:pointer;";
+
+    private Task ClearFilters()
+    {
+        Search = null;
+        seleccionado = null;
+        return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
+    }
+
+    // Búsqueda
+    private string? _search;
+    private string? Search
+    {
+        get => _search;
+        set { if (_search == value) return; _search = value; _ = dataGrid?.ReloadServerData(); }
+    }
+
+
+    // Datos
+    private readonly List<UsuarioDTO> usuarios = new()
+    {
+        new("Ana Pérez", "ana.perez@contoso.com", "Marketing", "Editor", true,  DateTime.Now.AddMinutes(-5)),
+        new("Carlos Freire", "carlos.freire@contoso.com", "Ventas", "Colaborador", true, DateTime.Now.AddHours(-3)),
+        new("Jesús Domínguez", "jesus.dominguez@contoso.com", "IT", "Admin", true, DateTime.Now.AddHours(-20)),
+        new("Logística Bot", "logistica@contoso.com", "Logística", "Servicio", false, DateTime.Today.AddDays(-2)),
+        new("María López", "maria.lopez@contoso.com", "Marketing", "Colaborador", true, DateTime.Today.AddDays(-1)),
+        new("Soporte N1", "soporte.n1@contoso.com", "IT", "Colaborador", true, DateTime.Today.AddDays(-4)),
+        new("Equipo Ventas", "ventas@contoso.com", "Ventas", "Editor", true, DateTime.Today.AddDays(-2)),
+        new("RRHH Interno", "rrhh@contoso.com", "RRHH", "Editor", false, DateTime.Today.AddDays(-7)),
+    };
+
+    private IEnumerable<UsuarioDTO> MiembrosDelGrupo(string grupo)
+        => usuarios.Where(u => u.Grupo.Equals(grupo, StringComparison.OrdinalIgnoreCase));
+
+    // Carga server-side con filtro de texto, orden y paginación
+    private Task<GridData<UsuarioDTO>> ServerReload(GridState<UsuarioDTO> state)
+    {
+        IEnumerable<UsuarioDTO> data = usuarios;
+
+        if (!string.IsNullOrWhiteSpace(_search))
+        {
+            var q = _search.Trim();
+            data = data.Where(x =>
+                x.Nombre.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                x.Email.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                x.Grupo.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                x.Rol.Contains(q, StringComparison.OrdinalIgnoreCase));
+        }
+
+        var sort = state.SortDefinitions.FirstOrDefault();
+        if (sort is not null)
+        {
+            data = sort.SortBy switch
+            {
+                nameof(UsuarioDTO.Nombre)        => sort.Descending ? data.OrderByDescending(x => x.Nombre)        : data.OrderBy(x => x.Nombre),
+                nameof(UsuarioDTO.Email)         => sort.Descending ? data.OrderByDescending(x => x.Email)         : data.OrderBy(x => x.Email),
+                nameof(UsuarioDTO.Grupo)         => sort.Descending ? data.OrderByDescending(x => x.Grupo)         : data.OrderBy(x => x.Grupo),
+                nameof(UsuarioDTO.Rol)           => sort.Descending ? data.OrderByDescending(x => x.Rol)           : data.OrderBy(x => x.Rol),
+                nameof(UsuarioDTO.Activo)        => sort.Descending ? data.OrderByDescending(x => x.Activo)        : data.OrderBy(x => x.Activo),
+                nameof(UsuarioDTO.UltimoAcceso)  => sort.Descending ? data.OrderByDescending(x => x.UltimoAcceso)  : data.OrderBy(x => x.UltimoAcceso),
+                _ => data
+            };
+        }
+
+        var total = data.Count();
+        var items = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+
+        return Task.FromResult(new GridData<UsuarioDTO> { TotalItems = total, Items = items });
+    }
+
+    private void OnRowClick(DataGridRowClickEventArgs<UsuarioDTO> args) => seleccionado = args.Item;
+}

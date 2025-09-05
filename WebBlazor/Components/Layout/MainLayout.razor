@@ -1,0 +1,155 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+    </MudAppBar>
+    <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent Class="pt-16 pa-4">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private bool _drawerOpen = true;
+    private bool _isDarkMode = true;
+    private MudTheme? _theme = null;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _theme = new()
+        {
+            PaletteLight = _lightPalette,
+            PaletteDark = _darkPalette,
+            LayoutProperties = new LayoutProperties()
+        };
+    }
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private void DarkModeToggle()
+    {
+        _isDarkMode = !_isDarkMode;
+    }
+
+    private readonly PaletteLight _lightPalette = new()
+    {
+        // Base cálida (ligera)
+        Primary = "#DA8B39",
+        Black = "#2B2119",
+        Surface = "#FFF8F1",
+        Background = "#FFF",
+        BackgroundGray = "#F2EEE9",
+
+        // AppBar / Drawer
+        AppbarText = "#5C5149",
+        AppbarBackground = "rgba(255,252,247,0.85)",
+        DrawerBackground = "#FFFFFF",
+        DrawerIcon = "#7A6F64",
+        DrawerText = "#5C5149",
+
+        // Texto
+        TextPrimary = "#2C2620",
+        TextSecondary = "#6E655C",
+        TextDisabled = "rgba(44,38,32,0.38)",
+
+        // Acciones
+        ActionDefault = "#8F897F",
+        ActionDisabled = "rgba(44,38,32,0.26)",
+        ActionDisabledBackground = "rgba(44,38,32,0.12)",
+
+        // Grises / divisores
+        GrayLight = "#E9E2DA",
+        GrayLighter = "#F7F3EE",
+        LinesDefault = "#E3DAD1",
+        TableLines = "#EAE1D8",
+        Divider = "#E8DFD6",
+        OverlayLight = "rgba(245,240,233,0.60)",
+
+        // Estados
+        Info = "#4C8E7C",
+        Success = "#00FF00",
+        Warning = "#D28C2A",
+        Error = "#FF0000",
+
+        // Tablas
+        TableStriped = "rgba(218,139,57,0.08)",
+        TableHover = "#DA8B39"
+    };
+
+
+    private readonly PaletteDark _darkPalette = new()
+    {
+        // Base cálida
+        Primary = "#997667",
+        Surface = "#23211E",
+        Background = "#171513",
+        BackgroundGray = "#1C1A18",
+
+        // AppBar / Drawer
+        AppbarText = "#D9D5CF",
+        AppbarBackground = "rgba(23,21,19,0.80)",
+        DrawerBackground = "#171513",
+        DrawerIcon = "#CFC8BC",
+        DrawerText = "#CFC8BC",
+
+        // Acciones
+        ActionDefault = "#8F897F",
+        ActionDisabled = "rgba(217,209,198,0.30)",
+        ActionDisabledBackground = "rgba(143,137,127,0.30)",
+
+        // Texto
+        TextPrimary = "#F3EEE7",
+        TextSecondary = "#B9B3AA",
+        TextDisabled = "rgba(243,238,231,0.33)",
+
+        // Grises / divisores
+        GrayLight = "#2C2925",
+        GrayLighter = "#1F1D19",
+        LinesDefault = "#3A3530",
+        TableLines = "#3A3530",
+        Divider = "#2A2723",
+        OverlayLight = "rgba(31,29,25,0.50)",
+
+        // Estados
+        Info = "#5FA08C",
+        Success = "#00FF00",
+        Warning = "#E0A140",
+        Error = "#FF0000",
+
+        // Tablas
+        TableStriped = "rgba(218,139,57,0.08)",
+        TableHover = "#997667",
+    };
+
+
+    public string DarkLightModeButtonIcon => _isDarkMode switch
+    {
+        true => Icons.Material.Rounded.AutoMode,
+        false => Icons.Material.Outlined.DarkMode,
+    };
+}
+
+
