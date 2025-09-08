@@ -50,6 +50,10 @@ namespace API.APIService
 
         partial void Initialize();
 
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
+        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
         /// <summary>
         /// Add a new pet to the store
         /// </summary>
@@ -96,12 +100,12 @@ namespace API.APIService
                     // Operation Path: "pet"
                     urlBuilder_.Append("pet");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -116,7 +120,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 405)
@@ -191,12 +195,12 @@ namespace API.APIService
                     // Operation Path: "pet"
                     urlBuilder_.Append("pet");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -211,7 +215,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 400)
@@ -302,12 +306,12 @@ namespace API.APIService
                     urlBuilder_.Append("pet/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(petId, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -322,7 +326,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -406,12 +410,12 @@ namespace API.APIService
                     urlBuilder_.Append("pet/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(petId, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -426,7 +430,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 405)
@@ -499,12 +503,12 @@ namespace API.APIService
                     urlBuilder_.Append("pet/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(petId, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -519,7 +523,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 400)
@@ -596,12 +600,12 @@ namespace API.APIService
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(petId, System.Globalization.CultureInfo.InvariantCulture)));
                     urlBuilder_.Append("/uploadImage");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -616,7 +620,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -694,12 +698,12 @@ namespace API.APIService
                     foreach (var item_ in status) { urlBuilder_.Append(System.Uri.EscapeDataString("status")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -714,7 +718,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -800,12 +804,12 @@ namespace API.APIService
                     foreach (var item_ in tags) { urlBuilder_.Append(System.Uri.EscapeDataString("tags")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -820,7 +824,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -896,12 +900,12 @@ namespace API.APIService
                     // Operation Path: "store/inventory"
                     urlBuilder_.Append("store/inventory");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -916,7 +920,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -989,12 +993,12 @@ namespace API.APIService
                     // Operation Path: "store/order"
                     urlBuilder_.Append("store/order");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1009,7 +1013,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1091,12 +1095,12 @@ namespace API.APIService
                     urlBuilder_.Append("store/order/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(orderId, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1111,7 +1115,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1196,12 +1200,12 @@ namespace API.APIService
                     urlBuilder_.Append("store/order/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(orderId, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1216,7 +1220,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 400)
@@ -1299,12 +1303,12 @@ namespace API.APIService
                     // Operation Path: "store/subscribe"
                     urlBuilder_.Append("store/subscribe");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1319,7 +1323,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
@@ -1397,12 +1401,12 @@ namespace API.APIService
                     // Operation Path: "user"
                     urlBuilder_.Append("user");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1417,7 +1421,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                     }
@@ -1473,12 +1477,12 @@ namespace API.APIService
                     urlBuilder_.Append("user/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(username, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1493,7 +1497,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1587,12 +1591,12 @@ namespace API.APIService
                     urlBuilder_.Append("user/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(username, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1607,7 +1611,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 400)
@@ -1689,12 +1693,12 @@ namespace API.APIService
                     urlBuilder_.Append("user/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(username, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1709,7 +1713,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 400)
@@ -1785,12 +1789,12 @@ namespace API.APIService
                     // Operation Path: "user/createWithArray"
                     urlBuilder_.Append("user/createWithArray");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1805,7 +1809,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                     }
@@ -1858,12 +1862,12 @@ namespace API.APIService
                     // Operation Path: "user/createWithList"
                     urlBuilder_.Append("user/createWithList");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1878,7 +1882,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                     }
@@ -1942,12 +1946,12 @@ namespace API.APIService
                     urlBuilder_.Append(System.Uri.EscapeDataString("password")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(password, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1962,7 +1966,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2031,12 +2035,12 @@ namespace API.APIService
                     // Operation Path: "user/logout"
                     urlBuilder_.Append("user/logout");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2051,7 +2055,7 @@ namespace API.APIService
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                     }
