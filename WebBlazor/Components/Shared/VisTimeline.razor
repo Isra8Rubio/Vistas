@@ -1,0 +1,74 @@
+﻿@namespace WebBlazor.Shared
+@using WebBlazor.DTO
+@inject IJSRuntime JS
+
+<div id="@_id" style="height:@(HeightPx)px"></div>
+
+@code {
+    [Parameter] public IReadOnlyList<string> Lanes { get; set; } = Array.Empty<string>();
+    [Parameter] public IReadOnlyList<SegDTO> Segments { get; set; } = Array.Empty<SegDTO>();
+    [Parameter] public DateTime MinT { get; set; }
+    [Parameter] public DateTime MaxT { get; set; }
+    [Parameter] public int HeightPx { get; set; } = 280;
+
+    private string _id = $"vis-tl-{Guid.NewGuid():N}";
+    private bool _rendered;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_rendered)
+        {
+            _rendered = true;
+
+            var lanesList = Lanes.ToList();
+
+            // Grupos (carriles)
+            var groups = Lanes.Select((l, i) => new { id = i, content = l }).ToList();
+
+            // Items (segmentos)
+            var items = Segments.Select((s, idx) => new
+            {
+                id = idx,
+                group = lanesList.IndexOf(s.Lane),
+                start = s.Start,  // DateTime -> ISO
+                end = s.End,
+                content = "",     // sin texto en barra
+                title = $"{s.Label} · {s.Start:mm}-{s.End:mm}",
+                className = s.Label switch
+                {
+                    "IVR" => "ivr",
+                    "Wait" => "wait",
+                    "Wrapup" => "wrapup",
+                    _ => "call"
+                }
+            }).ToList();
+
+            var options = new
+            {
+                start = MinT,
+                end = MaxT,
+                stack = false,
+                selectable = false,
+                zoomable = false,
+                moveable = false,
+                showCurrentTime = false,
+
+                // Eje solo ARRIBA y sin etiqueta de fecha
+                orientation = "top",
+                showMajorLabels = false,
+                showMinorLabels = true,
+
+                // 1 línea por minuto
+                timeAxis = new { scale = "minute", step = 1 },
+
+                // 👇 pedimos minutos “00..59” (lo resuelve el helper JS)
+                minorFormat = "mm",
+
+                margin = new { item = 8, axis = 12 },
+                groupHeightMode = "fixed"
+            };
+
+            await JS.InvokeVoidAsync("visTl.render", _id, items, groups, options);
+        }
+    }
+}

@@ -1,0 +1,53 @@
+﻿@page "/p2"
+@using WebBlazor.DTO
+
+<MudPaper Class="pa-3" Style="font-family:'Inter',system-ui,-apple-system,Helvetica;">
+    <MudText Typo="Typo.h6" Class="mb-2">Conversation Timeline (vis-timeline)</MudText>
+
+    <VisTimeline
+        Lanes="lanes"
+        Segments="segments"
+        MinT="minT"
+        MaxT="maxT"
+        HeightPx="200" />
+</MudPaper>
+
+@code {
+
+    private List<string> lanes = new()
+    { "Customer", "IVR #1", "Agent (Call)", "IVR #2", "Agent (Wrapup)" };
+
+    private List<SegDTO> segments = default!;
+    private DateTime baseHour = DateTime.Today;
+    private DateTime minT, maxT;
+    private DateTime M(int minute) => baseHour.AddMinutes(minute);
+
+    protected override void OnInitialized()
+    {
+        minT = baseHour;
+        maxT = baseHour.AddMinutes(59);
+
+        var blue="#64B5F6"; var cyan="#4DD0E1"; var yellow="#FFD54F"; var brown="#8D6E63";
+
+        var segs = new List<SegDTO>
+        {
+            // Llamada 1 (3–15) con la nueva lógica
+            new("Customer","Call", M(3),  M(13), blue),
+            new("IVR #1","IVR",    M(3),  M(4),  cyan),
+            new("IVR #2","IVR",    M(4),  M(6),  cyan),
+            new("Agent (Call)","Wait", M(6),  M(7),  yellow),
+            new("Agent (Call)","Call", M(7),  M(13), blue),
+            new("Agent (Wrapup)","Wrapup", M(13), M(15), brown),
+
+            // Llamada 2 (21–35)
+            new("Customer","Call", M(21), M(35), blue),
+            new("IVR #1","IVR",    M(21), M(22), cyan),
+            new("IVR #2","IVR",    M(22), M(24), cyan),
+            new("Agent (Call)","Wait", M(24), M(25), yellow),
+            new("Agent (Call)","Call", M(25), M(33), blue),
+            new("Agent (Wrapup)","Wrapup", M(33), M(35), brown),
+        };
+
+        segments = segs;
+    }
+}

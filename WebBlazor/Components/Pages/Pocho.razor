@@ -1,0 +1,150 @@
+﻿@page "/p8"
+@using MudBlazor
+@using System.Globalization
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudPaper Elevation="2" Class="pa-4" Style="font-family:'Inter',system-ui,-apple-system,Helvetica;">
+        <MudText Typo="Typo.h5" Class="mb-4">Conversation Timeline</MudText>
+
+        <!-- Participantes -->
+        <MudGrid Class="mb-4">
+            <MudItem xs="6">
+                <MudPaper Class="pa-2 d-flex align-center">
+                    <MudAvatar Color="Color.Primary" Size="Size.Small" Class="mr-2">AG</MudAvatar>
+                    <MudText>Agente</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="6">
+                <MudPaper Class="pa-2 d-flex align-center">
+                    <MudAvatar Color="Color.Secondary" Size="Size.Small" Class="mr-2">CL</MudAvatar>
+                    <MudText>Cliente</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        <!-- Leyenda con Chips -->
+        <MudPaper Elevation="0" Class="pa-2 mb-4">
+            <MudChip T="string" Color="Color.Info" Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.HourglassEmpty">Wait</MudChip>
+            <MudChip T="string" Color="Color.Success" Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.Call">Call/Intent</MudChip>
+            <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.Assignment">Wrapup</MudChip>
+            <MudChip T="string" Color="Color.Secondary" Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.SwitchLeft">IVR</MudChip>
+        </MudPaper>
+
+        <!-- Timeline (con estilo de tabla) -->
+        <MudPaper Elevation="10" Class="pa-4" Style="border:1px solid white;">
+            <MudText Typo="Typo.h6" Class="mb-3">Conversation Detail</MudText>
+
+            <MudTable T="string"
+                      Items="@Lanes"
+                      Dense="true"
+                      Striped="true"
+                      Hover="true"
+                      Bordered="true"
+                      Elevation="0"
+                      FixedHeader="true">
+                <HeaderContent>
+                    <MudTh Style="width:220px;">Lane</MudTh>
+                    <MudTh>Timeline</MudTh>
+                </HeaderContent>
+
+                <RowTemplate>
+                    <!-- Columna etiqueta -->
+                    <MudTd DataLabel="Lane">
+                        <MudText Typo="Typo.subtitle2">@context</MudText>
+                    </MudTd>
+
+                    <!-- Columna timeline -->
+                    <MudTd DataLabel="Timeline">
+                        <MudPaper Elevation="0"
+                                  Style="position:relative;height:30px;border-radius:8px;background:var(--mud-palette-surface);overflow:hidden;">
+                            @foreach (var m in Minutes)
+                            {
+                                <MudDivider Vertical="true"
+                                            Style="@($"position:absolute;top:0;bottom:0;left:{Pct(m)};opacity:.15;")" />
+                            }
+                            @foreach (var m in MajorMinutes)
+                            {
+                                <MudDivider Vertical="true"
+                                            Style="@($"position:absolute;top:0;bottom:0;left:{Pct(m)};opacity:.35;")" />
+                            }
+
+                            @foreach (var s in Segments.Where(s => s.Lane == context))
+                            {
+                                var left = Pct(s.StartMin);
+                                var width = Pct(s.EndMin - s.StartMin);
+                                <MudTooltip Text="@($"{s.Kind} · {s.StartMin:00}-{s.EndMin:00}")">
+                                    <MudPaper Elevation="0"
+                                              Style="@($"position:absolute;top:6px;height:18px;left:{left};width:{width};border-radius:10px;{StyleByKind(s.Kind)}")">
+                                    </MudPaper>
+                                </MudTooltip>
+                            }
+                        </MudPaper>
+                    </MudTd>
+                </RowTemplate>
+                <FooterContent>
+                    <MudTd></MudTd>
+                    <MudTd>
+                        <MudPaper Elevation="0" Style="position:relative;height:28px;">
+                            @foreach (var m in MajorMinutes)
+                            {
+                                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center"
+                                          Style="@($"position:absolute;left:{Pct(m)};bottom:0;transform:translateX(-50%);gap:2px;")">
+                                    <MudPaper Elevation="0" Style="width:1px;height:12px;opacity:.8;" />
+                                    <MudText Typo="Typo.caption" Style="font-variant-numeric:tabular-nums;">@m.ToString("00")</MudText>
+                                </MudStack>
+                            }
+                        </MudPaper>
+                    </MudTd>
+                </FooterContent>
+            </MudTable>
+        </MudPaper>
+    </MudPaper>
+
+        <!-- Controles -->
+    <MudGrid Class="mt-4" GutterSize="GutterSize.Small">
+        <MudItem xs="3"><MudButton Variant="Variant.Outlined" Style="border:2px solid white;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.PlayArrow" FullWidth>Play</MudButton></MudItem>
+        <MudItem xs="3"><MudButton Variant="Variant.Outlined" Style="border:2px solid white;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Pause" FullWidth>Pause</MudButton></MudItem>
+        <MudItem xs="3"><MudButton Variant="Variant.Outlined" Style="border:2px solid white;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ZoomIn" FullWidth>Zoom In</MudButton></MudItem>
+        <MudItem xs="3"><MudButton Variant="Variant.Outlined" Style="border:2px solid white;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ZoomOut" FullWidth>Zoom Out</MudButton></MudItem>
+        </MudGrid>
+</MudContainer>
+
+@code {
+    private record Seg(string Lane, string Kind, int StartMin, int EndMin);
+    private List<string> Lanes = new() { "Customer", "IVR #1", "IVR #2", "Agent (Call)", "Agent (Wrapup)" };
+    private List<Seg> Segments = default!;
+
+    private const int Duration = 60;
+    private static readonly CultureInfo CI = CultureInfo.InvariantCulture;
+    private string Pct(int min) => (min * 100.0 / (Duration - 1)).ToString("0.###", CI) + "%";
+    private IEnumerable<int> Minutes => Enumerable.Range(0, Duration);
+    private IEnumerable<int> MajorMinutes => Minutes.Where(m => m % 5 == 0);
+
+    private static string StyleByKind(string k) => k.ToLowerInvariant() switch
+    {
+        "ivr" => "background:var(--mud-palette-secondary);opacity:.85;",
+        "wait" => "background:var(--mud-palette-info);opacity:.85;",
+        "wrapup" => "background:var(--mud-palette-warning);opacity:.9;",
+        _ => "background:var(--mud-palette-success);opacity:.9;"
+    };
+
+    protected override void OnInitialized()
+    {
+        Segments = new()
+        {
+            new("Customer","Call",   3,13),
+            new("IVR #1","IVR",      3,4),
+            new("IVR #2","IVR",      4,6),
+            new("Agent (Call)","Wait",6,7),
+            new("Agent (Call)","Call",7,13),
+            new("Agent (Wrapup)","Wrapup",13,15),
+
+            new("Customer","Call",   21,35),
+            new("IVR #1","IVR",      21,22),
+            new("IVR #2","IVR",      22,24),
+            new("Agent (Call)","Wait",24,25),
+            new("Agent (Call)","Call",25,33),
+            new("Agent (Wrapup)","Wrapup",33,35),
+        };
+    }
+}

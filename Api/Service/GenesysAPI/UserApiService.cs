@@ -13,6 +13,7 @@ namespace Api.Service.GenesysAPI
             _genesysAuthService = authService;
         }
 
+        ///api/v2/users
         public async Task<UserEntityListing?> Users_GetUsersAsync(int pageSize = 25, int pageNumber = 1, string? state = null)
         {
             _logger.LogDebug("Users_GetUserAsync --> pageSize={pagesize}, pageNumber={pageNumber}, state={state}", pageSize, pageNumber, state);

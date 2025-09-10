@@ -1,0 +1,97 @@
+﻿@page "/p3"
+@inject IJSRuntime JS
+
+<MudPaper Class="pa-3" Style="font-family:'Inter',system-ui,-apple-system,Helvetica;">
+    <MudText Typo="Typo.h6" Class="mb-2">Conversation Timeline (Google Charts)</MudText>
+    <div id="@_id" style="height:340px;"></div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:6px;font-size:12px;color:var(--mud-palette-text-secondary)">
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#FFD54F;margin-right:6px"></i>Wait</span>
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#64B5F6;margin-right:6px"></i>Call/Intent</span>
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#8D6E63;margin-right:6px"></i>Wrapup</span>
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#4DD0E1;margin-right:6px"></i>IVR</span>
+    </div>
+
+</MudPaper>
+
+@code {
+    private readonly string _id = $"gchart-{Guid.NewGuid():N}";
+
+    // ---- helpers / modelo ----
+    private DateTime baseHour;                         // se asigna en OnInitialized
+    private DateTime M(int m) => baseHour.AddMinutes(m);
+    private record Seg(string Lane, string Label, DateTime Start, DateTime End);
+
+    private List<Seg> segs = default!;                 // se rellena en OnInitialized
+
+    protected override void OnInitialized()
+    {
+        baseHour = DateTime.Today;
+
+        segs = new()
+      {
+          // Llamada 1 (3–15)
+          new("Customer",      "Call",   M(3),  M(13)),
+          new("IVR #1",        "IVR",    M(3),  M(4)),
+          new("IVR #2",        "IVR",    M(4),  M(6)),
+          new("Agent (Call)",  "Wait",   M(6),  M(7)),
+          new("Agent (Call)",  "Call",   M(7),  M(13)),
+          new("Agent (Wrapup)","Wrapup", M(13), M(15)),
+          // Llamada 2 (21–35)
+          new("Customer",      "Call",   M(21), M(35)),
+          new("IVR #1",        "IVR",    M(21), M(22)),
+          new("IVR #2",        "IVR",    M(22), M(24)),
+          new("Agent (Call)",  "Wait",   M(24), M(25)),
+          new("Agent (Call)",  "Call",   M(25), M(33)),
+          new("Agent (Wrapup)","Wrapup", M(33), M(35)),
+      };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        // filas para Google Charts (tooltips HTML con contraste dark)
+        var rows = segs.Select(s => new
+        {
+            lane = s.Lane,
+            startMs = new DateTimeOffset(s.Start).ToUnixTimeMilliseconds(),
+            endMs = new DateTimeOffset(s.End).ToUnixTimeMilliseconds(),
+            style = s.Label switch
+            {
+                "IVR" => "color: #4DD0E1",
+                "Wait" => "color: #FFD54F",
+                "Wrapup" => "color: #8D6E63",
+                _ => "color: #64B5F6" // Call/Intent
+            },
+            tooltip = $"<div style='padding:6px 8px;border-radius:6px;background:#23211E;border:1px solid #3A3530;color:#EDE7E1;font:12px Inter,system-ui,-apple-system,Helvetica'>{s.Label} · {s.Start:mm}-{s.End:mm}</div>"
+        }).ToList();
+
+        // ticks cada minuto 00..59
+        var ticksMs = Enumerable.Range(0, 60)
+            .Select(m => new DateTimeOffset(baseHour.AddMinutes(m)).ToUnixTimeMilliseconds())
+            .ToArray();
+
+        var options = new
+        {
+            lanes = 5,                           // nº de filas (para el zebra)
+            minuteOverlay = true,                // 👈 fuerza etiquetas 00..59 superpuestas
+            backgroundColor = "transparent",
+            hAxis = new
+            {
+                minMs = new DateTimeOffset(baseHour).ToUnixTimeMilliseconds(),
+                maxMs = new DateTimeOffset(baseHour.AddMinutes(59)).ToUnixTimeMilliseconds(),
+                format = "mm",
+                ticksMs = ticksMs                // Google puede ocultar algunas; el overlay las repone
+            },
+            timeline = new
+            {
+                groupByRowLabel = true,
+                barLabelStyle = new { color = "transparent" }, // sin texto dentro
+                rowLabelStyle = new { color = "#EDE7E1", fontSize = 12 }
+            }
+        };
+
+        await JS.InvokeVoidAsync("gchartTimeline.draw", _id, rows, options);
+
+    }
+}

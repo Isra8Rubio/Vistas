@@ -1,0 +1,223 @@
+﻿@page "/p6"
+@using MudBlazor
+@using System.Globalization
+@using System.Linq
+
+<MudGrid Class="mt-4">
+    <MudItem xs="12">
+        <MudPaper Class="pa-4" Style="font-family:'Inter',system-ui,-apple-system,Helvetica; background: #1a1a1a;">
+            <MudText Typo="Typo.h6" Class="mb-3" Style="color: white; font-weight: 600;">
+                Conversation Timeline (0–59 min)
+            </MudText>
+
+            <div style="overflow:auto; background: #2d2d2d; border-radius: 8px; padding: 16px;">
+                <svg width="100%" height="@SvgHeight"
+                     viewBox="0 0 @Vw @SvgHeight"
+                     preserveAspectRatio="xMinYMin meet">
+
+                    <!-- fondo principal -->
+                    <rect x="0" y="0" width="@Vw" height="@SvgHeight" fill="#2d2d2d"></rect>
+
+                    <!-- GRID: línea fina por CADA minuto -->
+                    @foreach (var t in AllMinutes)
+                    {
+                        var x = X(t);
+                        <line x1="@Num(x)" y1="@Num(PaddingTop - 6)" x2="@Num(x)" y2="@Num(AxisY)"
+                              stroke="#555" stroke-opacity="0.3" stroke-width="0.5" />
+                    }
+
+                    <!-- GRID fuerte en múltiplos de 5 -->
+                    @foreach (var t in MajorTicks)
+                    {
+                        var x = X(t);
+                        <line x1="@Num(x)" y1="@Num(PaddingTop - 6)" x2="@Num(x)" y2="@Num(AxisY)"
+                              stroke="#777" stroke-opacity="0.6" stroke-width="1" />
+                    }
+
+                    @for (int i = 0; i < Lanes.Count; i++)
+                    {
+                        var y = PaddingTop + i * (LaneH + LaneGap);
+
+                        <!-- fondo carril alternado -->
+                        <rect x="@Num(PlotLeft)" y="@Num(y)" width="@PlotW" height="@LaneH"
+                              fill="#3a3a3a" opacity="@(i % 2 == 0 ? 0.6 : 0.3)"></rect>
+
+                        <!-- etiqueta carril -->
+                        @SvgTxt(8, y + LaneH/2.0 + 1,
+                        Lanes[i],
+                                        "dominant-baseline='middle' style='font-size:12px; fill: #ffffff; font-weight: 500;'")
+
+                    <!-- barras con efectos mejorados -->
+                    @foreach (var s in Segments.Where(s => s.Lane == Lanes[i]))
+                    {
+                        var x = X(s.Start);
+                        var w = Math.Max(3, X(s.End) - x);
+
+                        <!-- Sombra/glow effect -->
+                        <rect x="@Num(x)" y="@Num(y + 1)" rx="4" ry="4"
+                              width="@Num(w)" height="@(LaneH - 2)"
+                              fill="@s.Color" opacity="0.3">
+                        </rect>
+
+                        <!-- Barra principal -->
+                        <rect x="@Num(x)" y="@Num(y)" rx="4" ry="4"
+                              width="@Num(w)" height="@LaneH"
+                              fill="@s.Color" opacity="0.9"
+                              stroke="@GetBorderColor(s.Color)" stroke-width="1">
+                            <title>@($"{s.Label} · {s.Start:mm}–{s.End:mm} min")</title>
+                        </rect>
+
+                        <!-- Highlight superior -->
+                        <rect x="@Num(x)" y="@Num(y)" rx="4" ry="4"
+                              width="@Num(w)" height="6"
+                              fill="url(#highlight)" opacity="0.4">
+                        </rect>
+                    }
+                                        }
+
+                    <!-- Definiciones de gradientes -->
+                    <defs>
+                        <linearGradient id="highlight" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:white;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:white;stop-opacity:0" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- eje de tiempo -->
+                    <line x1="@Num(PlotLeft)" y1="@Num(AxisY)" x2="@Num(PlotLeft + PlotW)" y2="@Num(AxisY)"
+                          stroke="#999" stroke-width="2" />
+
+                    <!-- TICKS + ETIQUETAS: TODOS los minutos (00–59) -->
+                    @foreach (var t in AllMinutes)
+                    {
+                        var x = X(t);
+                        var minute = (int)(t - MinT).TotalMinutes;
+                        var major = minute % 5 == 0;
+
+                        <line x1="@Num(x)" y1="@Num(AxisY)" x2="@Num(x)" y2="@Num(AxisY + (major ? 8 : 5))"
+                              stroke="#ccc" stroke-opacity="@(major ? 1 : 0.7)" stroke-width="@(major ? 2 : 1)" />
+
+                        @SvgTxt(x, AxisY + (major ? 20 : 18),
+                        minute.ToString("00"),
+                                        $"text-anchor='middle' style='font-size:{(major ? 11 : 9)}px; fill: #ffffff; opacity:{(major ? "1" : "0.8")}; font-weight: {(major ? "600" : "400")};'")
+                                        }
+
+                    @Legend(PlotLeft + PlotW - 280, PaddingTop - 15)
+                </svg>
+            </div>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    // ---------- utils ----------
+    private static readonly CultureInfo CI = CultureInfo.InvariantCulture;
+    private static string Num(double v) => v.ToString("0.##", CI);
+
+    private static string GetBorderColor(string fillColor)
+    {
+        return fillColor switch
+        {
+            "#FFD54F" => "#FFC107", // Wait - amarillo más oscuro
+            "#64B5F6" => "#1976D2", // Call - azul más oscuro
+            "#8D6E63" => "#5D4037", // Wrapup - marrón más oscuro
+            "#4DD0E1" => "#0097A7", // IVR - cyan más oscuro
+            _ => "#666"
+        };
+    }
+
+    private static MarkupString SvgTxt(double x, double y, string text, string? extraAttrs = null)
+    {
+        var a = string.IsNullOrWhiteSpace(extraAttrs) ? "" : " " + extraAttrs;
+        return (MarkupString)$"<text x='{x.ToString(CI)}' y='{y.ToString(CI)}'{a}>{text}</text>";
+    }
+
+    private static MarkupString Legend(double x, double y)
+    {
+        string item(double xo, string color, string label, string borderColor) =>
+            $"<rect x='{(x + xo).ToString(CI)}' y='{(y - 8).ToString(CI)}' width='14' height='12' rx='3' fill='{color}' stroke='{borderColor}' stroke-width='1' opacity='0.9'/>" +
+            $"<text x='{(x + xo + 20).ToString(CI)}' y='{y.ToString(CI)}' style='font-size:11px; fill: #ffffff; font-weight: 500;' dominant-baseline='middle'>{label}</text>";
+
+        var html =
+            item(-120, "#FFD54F", "Wait", "#FFC107") +
+            item(-40, "#64B5F6", "Call/Intent", "#1976D2") +
+            item(60, "#8D6E63", "Wrapup", "#5D4037") +
+            item(140, "#4DD0E1", "IVR", "#0097A7");
+
+        return (MarkupString)html;
+    }
+
+    // ---------- modelo ----------
+    private record Seg(string Lane, string Label, DateTime Start, DateTime End, string Color);
+
+    // ---------- layout ----------
+    private const int Vw = 1600;
+    private const int PaddingLeft = 140;
+    private const int PaddingTop = 50;
+    private const int LaneH = 26;
+    private const int LaneGap = 12;
+    private int PlotLeft => PaddingLeft;
+    private int PlotRight => Vw - 30;
+    private int PlotW => PlotRight - PlotLeft;
+    private double AxisY => PaddingTop + Lanes.Count * (LaneH + LaneGap) + 12;
+    private int SvgHeight => (int)(AxisY + 35);
+
+    // Escala 0..59 min
+    private DateTime BaseHour => DateTime.Today;
+    private DateTime MinT => BaseHour;
+    private DateTime MaxT => BaseHour.AddMinutes(59);
+    private double TotalMinutes => (MaxT - MinT).TotalMinutes;
+    private double X(DateTime t) => PlotLeft + (t - MinT).TotalMinutes / TotalMinutes * PlotW;
+
+    // Listas de minutos
+    private List<DateTime> AllMinutes = new();
+    private List<DateTime> MajorTicks = new();
+
+    // helper minuto->DateTime
+    private DateTime M(int minute) => MinT.AddMinutes(minute);
+
+    // ---------- datos ----------
+    private List<string> Lanes = new()
+    { "Customer", "IVR #1", "Agent (Call)", "IVR #2", "Agent (Wrapup)" };
+
+    private List<Seg> Segments = default!;
+
+    protected override void OnInitialized()
+    {
+        // Colores mejorados
+        var blue = "#64B5F6";   // Call/Intent - azul más vibrante
+        var cyan = "#4DD0E1";   // IVR - cyan brillante
+        var yellow = "#FFD54F"; // Wait/Queue - amarillo dorado
+        var brown = "#8D6E63";  // Wrapup - marrón cálido
+
+        var segs = new List<Seg>
+        {
+            // ===== Escenario 1: 3–15 =====
+            new("Customer", "Call",   M(3),  M(13), blue),
+
+            new("IVR #1",   "IVR",    M(3),  M(4),  cyan),
+            new("IVR #2",   "IVR",    M(4),  M(6),  cyan),
+
+            new("Agent (Call)", "Wait", M(6),  M(7),  yellow),
+            new("Agent (Call)", "Call", M(7),  M(13), blue),
+
+            new("Agent (Wrapup)", "Wrapup", M(13), M(15), brown),
+
+            // ===== Escenario 2: 21–35 =====
+            new("Customer", "Call",   M(21), M(35), blue),
+
+            new("IVR #1",   "IVR",    M(21), M(22), cyan),
+            new("IVR #2",   "IVR",    M(22), M(24), cyan),
+
+            new("Agent (Call)", "Wait", M(24), M(25), yellow),
+            new("Agent (Call)", "Call", M(25), M(33), blue),
+
+            new("Agent (Wrapup)", "Wrapup", M(33), M(35), brown),
+        };
+
+        Segments = segs;
+
+        AllMinutes = Enumerable.Range(0, 60).Select(m => MinT.AddMinutes(m)).ToList();
+        MajorTicks = Enumerable.Range(0, 12).Select(i => MinT.AddMinutes(i * 5)).ToList();
+    }
+}

@@ -1,0 +1,195 @@
+﻿@page "/p1"
+@using MudBlazor
+@using System.Globalization
+@using System.Linq
+
+<MudGrid Class="mt-4">
+    <MudItem xs="12">
+        <MudPaper Class="pa-3" Style="font-family:'Inter',system-ui,-apple-system,Helvetica;">
+            <MudText Typo="Typo.h6" Class="mb-2">Conversation Timeline (0–59 min)</MudText>
+
+            <div style="overflow:auto;">
+                <svg width="100%" height="@SvgHeight"
+                     viewBox="0 0 @Vw @SvgHeight"
+                     preserveAspectRatio="xMinYMin meet">
+                    <!-- fondo -->
+                    <rect x="0" y="0" width="@Vw" height="@SvgHeight"
+                          fill="var(--mud-palette-surface)"></rect>
+
+                    <!-- GRID: línea fina por CADA minuto -->
+                    @foreach (var t in AllMinutes)
+                    {
+                        var x = X(t);
+                        <line x1="@Num(x)" y1="@Num(PaddingTop - 6)" x2="@Num(x)" y2="@Num(AxisY)"
+                              stroke="var(--mud-palette-divider)" stroke-opacity="0.25" stroke-width="0.5" />
+                    }
+
+                    <!-- GRID fuerte en múltiplos de 5 -->
+                    @foreach (var t in MajorTicks)
+                    {
+                        var x = X(t);
+                        <line x1="@Num(x)" y1="@Num(PaddingTop - 6)" x2="@Num(x)" y2="@Num(AxisY)"
+                              stroke="var(--mud-palette-divider)" stroke-opacity="0.7" stroke-dasharray="3 4" />
+                    }
+
+                    @for (int i = 0; i < Lanes.Count; i++)
+                    {
+                        var y = PaddingTop + i * (LaneH + LaneGap);
+
+                        <!-- fondo carril -->
+                        <rect x="@Num(PlotLeft)" y="@Num(y)" width="@PlotW" height="@LaneH"
+                              fill="var(--mud-palette-table-striped)" opacity="@(i % 2 == 0 ? 0.45 : 0.25)"></rect>
+
+                        <!-- etiqueta carril -->
+                        @SvgTxt(8, y + LaneH/2.0 + 1,
+                        Lanes[i],
+                                        "dominant-baseline='middle' style='font-size:12px; fill: var(--mud-palette-text-primary);'")
+
+                    <!-- barras (sin texto interior) -->
+                    @foreach (var s in Segments.Where(s => s.Lane == Lanes[i]))
+                    {
+                        var x = X(s.Start);
+                        var w = Math.Max(2, X(s.End) - x);
+
+                        <rect x="@Num(x)" y="@Num(y)" rx="6" ry="6"
+                              width="@Num(w)" height="@LaneH"
+                              fill="@s.Color" opacity="0.95">
+                            <title>@($"{s.Label} · {s.Start:mm}–{s.End:mm} min")</title>
+                        </rect>
+                    }
+                    }
+
+                    <!-- eje de tiempo -->
+                    <line x1="@Num(PlotLeft)" y1="@Num(AxisY)" x2="@Num(PlotLeft + PlotW)" y2="@Num(AxisY)"
+                          stroke="var(--mud-palette-text-secondary)" stroke-width="1" />
+
+                    <!-- TICKS + ETIQUETAS: TODOS los minutos (00–59) -->
+                    @foreach (var t in AllMinutes)
+                    {
+                        var x = X(t);
+                        var minute = (int)(t - MinT).TotalMinutes;
+                        var major = minute % 5 == 0;
+
+                        <line x1="@Num(x)" y1="@Num(AxisY)" x2="@Num(x)" y2="@Num(AxisY + (major ? 7 : 4))"
+                              stroke="var(--mud-palette-text-secondary)" stroke-opacity="@(major ? 0.9 : 0.6)" />
+
+                        @SvgTxt(x, AxisY + (major ? 18 : 16),
+                        minute.ToString("00"),
+                                        $"text-anchor='middle' style='font-size:{(major ? 10 : 9)}px; fill: var(--mud-palette-text-secondary); opacity:{(major ? "1" : "0.7")};'")
+                    }
+
+                    @Legend(PlotLeft + PlotW - 240, PaddingTop - 10)
+                </svg>
+            </div>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    // ---------- utils ----------
+    private static readonly CultureInfo CI = CultureInfo.InvariantCulture;
+    private static string Num(double v) => v.ToString("0.##", CI);
+    private static MarkupString SvgTxt(double x, double y, string text, string? extraAttrs = null)
+    {
+        var a = string.IsNullOrWhiteSpace(extraAttrs) ? "" : " " + extraAttrs;
+        return (MarkupString)$"<text x='{x.ToString(CI)}' y='{y.ToString(CI)}'{a}>{text}</text>";
+    }
+    private static MarkupString Legend(double x, double y)
+    {
+        string item(double xo, string color, string label) =>
+            $"<rect x='{(x + xo).ToString(CI)}' y='{(y - 8).ToString(CI)}' width='12' height='12' rx='2' fill='{color}'/>" +
+            $"<text x='{(x + xo + 18).ToString(CI)}' y='{y.ToString(CI)}' style='font-size:11px; fill: var(--mud-palette-text-secondary);' dominant-baseline='middle'>{label}</text>";
+
+        // Espaciado horizontal cómodo para 4 elementos
+        var html =
+            item(-90, "#FFD54F", "Wait") +
+            item(-20, "#64B5F6", "Call/Intent") +
+            item(80, "#8D6E63", "Wrapup") +
+            item(160, "#4DD0E1", "IVR");
+
+        return (MarkupString)html;
+    }
+
+
+    // ---------- modelo ----------
+    private record Seg(string Lane, string Label, DateTime Start, DateTime End, string Color);
+
+    // ---------- layout ----------
+    private const int Vw = 1600;
+    private const int PaddingLeft = 120;
+    private const int PaddingTop = 36;
+    private const int LaneH = 24;
+    private const int LaneGap = 14;
+    private int PlotLeft => PaddingLeft;
+    private int PlotRight => Vw - 24;
+    private int PlotW => PlotRight - PlotLeft;
+    private double AxisY => PaddingTop + Lanes.Count * (LaneH + LaneGap) + 8;
+    private int SvgHeight => (int)(AxisY + 30);
+
+    // Escala 0..59 min
+    private DateTime BaseHour => DateTime.Today;
+    private DateTime MinT => BaseHour;
+    private DateTime MaxT => BaseHour.AddMinutes(59);
+    private double TotalMinutes => (MaxT - MinT).TotalMinutes;
+    private double X(DateTime t) => PlotLeft + (t - MinT).TotalMinutes / TotalMinutes * PlotW;
+
+    // Listas de minutos
+    private List<DateTime> AllMinutes = new();   // 0..59 (todos)
+    private List<DateTime> MajorTicks = new();   // 0,5,10,...,55
+
+    // helper minuto->DateTime
+    private DateTime M(int minute) => MinT.AddMinutes(minute);
+
+    // ---------- datos ----------
+    private List<string> Lanes = new()
+    { "Customer", "IVR #1", "Agent (Call)", "IVR #2", "Agent (Wrapup)" };
+
+    private List<Seg> Segments = default!;
+
+    protected override void OnInitialized()
+    {
+        // Colores
+        var blue = "#64B5F6"; // Call/Intent
+        var cyan = "#4DD0E1"; // IVR
+        var yellow = "#FFD54F"; // Wait/Queue
+        var brown = "#8D6E63"; // Wrapup
+
+        var segs = new List<Seg>
+    {
+        // ===== Escenario 1 (ajustado): 3–15 =====
+        // Cliente en llamada hasta que termina la conversación (acaba antes del wrap-up)
+        new("Customer", "Call",   M(3),  M(13), blue),
+
+        // IVR menú y luego "conectando"
+        new("IVR #1",   "IVR",    M(3),  M(4),  cyan), // menú (pulse 1/2/3)
+        new("IVR #2",   "IVR",    M(4),  M(6),  cyan), // conectando / locución
+
+        // Espera corta y conversación con agente
+        new("Agent (Call)", "Wait", M(6),  M(7),  yellow),
+        new("Agent (Call)", "Call", M(7),  M(13), blue),
+
+        // Wrap-up del agente tras colgar el cliente
+        new("Agent (Wrapup)", "Wrapup", M(13), M(15), brown),
+    };
+
+        // ===== Escenario 2 (como lo tenías): 21–35 =====
+        segs.AddRange(new Seg[]
+        {
+        new("Customer", "Call",   M(21), M(35), blue),
+
+        new("IVR #1",   "IVR",    M(21), M(22), cyan),  // menú
+        new("IVR #2",   "IVR",    M(22), M(24), cyan),  // conectando/locución
+
+        new("Agent (Call)", "Wait", M(24), M(25), yellow), // cola breve
+        new("Agent (Call)", "Call", M(25), M(33), blue),   // conversación
+
+        new("Agent (Wrapup)", "Wrapup", M(33), M(35), brown),
+        });
+
+        Segments = segs;
+
+        // Eje 0..59 (etiquetas por minuto)
+        AllMinutes = Enumerable.Range(0, 60).Select(m => MinT.AddMinutes(m)).ToList();
+        MajorTicks = Enumerable.Range(0, 12).Select(i => MinT.AddMinutes(i * 5)).ToList();
+    }
+}

@@ -13,6 +13,7 @@ namespace Api.Service.GenesysAPI
             _genesysAuthService = authService;
         }
 
+        ///api/v2/routing/queues
         public async Task<QueueEntityListing?> Routing_GetRoutingQueuesAsync(int pageNumber = 1, int pageSize = 25)
         {
             _logger.LogDebug("Routing_GetRoutingQueuesAsync --> pageNumber={pageNumber}, pageSize={pageSize}",
@@ -37,6 +38,7 @@ namespace Api.Service.GenesysAPI
             }
         }
 
+        ///api/v2/routing/queues/divisionviews
         public async Task<QueueEntityListing?> Routing_GetRoutingQueuesDivisionViewsAsync(int pageNumber = 1, int pageSize = 25, List<string>? divisionId = null)
         {
             _logger.LogDebug("Routing_GetRoutingQueuesDivisionViewsAsync --> pageNumber={pageNumber}, pageSize={pageSize}, divisionsIds={divisionsIds}", 

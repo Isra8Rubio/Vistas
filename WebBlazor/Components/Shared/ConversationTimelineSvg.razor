@@ -1,0 +1,135 @@
+﻿@using WebBlazor.DTO
+@namespace WebBlazor.Shared
+
+<div style="overflow:auto;">
+    <svg width="100%" height="@SvgHeight"
+         viewBox="0 0 @Vw @SvgHeight"
+         preserveAspectRatio="xMinYMin meet">
+
+        <!-- fondo -->
+        <rect x="0" y="0" width="@Vw" height="@SvgHeight"
+              fill="var(--mud-palette-surface)"></rect>
+
+        @* zebra de carriles *@
+        @for (int i = 0; i < Lanes.Count; i++)
+        {
+            var y = PaddingTop + i * (LaneH + LaneGap);
+            <rect x="@PlotLeft" y="@y" width="@PlotW" height="@LaneH"
+                  fill="var(--mud-palette-table-striped)"
+                  opacity="@(i % 2 == 0 ? 0.45 : 0.25)"></rect>
+
+            @SvgText(8, y + LaneH/2d + 1, Lanes[i],
+            "dominant-baseline='middle' style='font-size:12px; fill: var(--mud-palette-text-primary);'")
+                }
+
+        @* GRID menor (cada minuto) *@
+        @foreach (var m in Enumerable.Range(0, DurationMinutes))
+        {
+            var x = X(m);
+            <line x1="@x" y1="@PaddingTop" x2="@x" y2="@AxisY"
+                  stroke="var(--mud-palette-divider)" stroke-opacity="0.22" stroke-width="0.5" />
+        }
+
+        @* GRID mayor (cada MajorStep) *@
+        @foreach (var m in Enumerable.Range(0, DurationMinutes).Where(mm => mm % MajorStep == 0))
+        {
+            var x = X(m);
+            <line x1="@x" y1="@PaddingTop" x2="@x" y2="@AxisY"
+                  stroke="var(--mud-palette-divider)" stroke-opacity="0.45" stroke-dasharray="3 4" />
+        }
+
+        @* Barras *@
+        @foreach (var s in Segments)
+        {
+            var y = PaddingTop + Lanes.IndexOf(s.Lane) * (LaneH + LaneGap);
+            if (y < PaddingTop) { continue; }
+            var x = X(s.StartMin);
+            var w = Math.Max(2, X(s.EndMin) - x);
+
+            <rect x="@x" y="@y" rx="6" ry="6"
+                  width="@w" height="@LaneH"
+                  fill="@ColorOf(s.Kind)" opacity="0.95">
+                <title>@($"{s.Kind} · {s.StartMin:00}-{s.EndMin:00}")</title>
+            </rect>
+        }
+
+        @* eje *@
+        <line x1="@PlotLeft" y1="@AxisY" x2="@PlotLeft + PlotW" y2="@AxisY"
+              stroke="var(--mud-palette-text-secondary)" stroke-width="1" />
+
+        @* etiquetas 00..59 *@
+        @foreach (var m in Enumerable.Range(0, DurationMinutes))
+        {
+            var x = X(m);
+            var major = m % MajorStep == 0;
+            <line x1="@x" y1="@AxisY" x2="@x" y2="@AxisY + (major ? 7 : 4)"
+                  stroke="var(--mud-palette-text-secondary)" stroke-opacity="@(major ? 0.9 : 0.6)" />
+            @SvgText(x, AxisY + (major ? 18 : 16), m.ToString("00"),
+            $"text-anchor='middle' style='font-size:{(major ? 10 : 9)}px; fill: var(--mud-palette-text-secondary); opacity:{(major ? "1" : "0.75")};'")
+                }
+
+        @if (ShowLegend)
+        {
+            @Legend(PlotLeft + PlotW - 320, PaddingTop - 10)
+        }
+    </svg>
+</div>
+
+@code {
+    /* ---------- Parámetros simples ---------- */
+    [Parameter] public IReadOnlyList<TimelineSeg> Segments { get; set; } = Array.Empty<TimelineSeg>();
+    [Parameter] public IReadOnlyList<string>? LaneOrder { get; set; }   // opcional
+    [Parameter] public int DurationMinutes { get; set; } = 60;          // 0..59
+    [Parameter] public int MajorStep { get; set; } = 5;                 // 5 en 5
+    [Parameter] public bool ShowLegend { get; set; } = true;
+
+    /* ---------- Layout ---------- */
+    private const int Vw = 1600;
+    private const int PaddingLeft = 120;
+    private const int PaddingTop = 36;
+    private const int LaneH = 24;
+    private const int LaneGap = 14;
+
+    private int PlotLeft => PaddingLeft;
+    private int PlotRight => Vw - 24;
+    private int PlotW => PlotRight - PlotLeft;
+    private double AxisY => PaddingTop + Lanes.Count * (LaneH + LaneGap) + 8;
+    private int SvgHeight => (int)(AxisY + 32);
+
+    /* ---------- Lanes calculados ---------- */
+    private List<string> Lanes => _lanes ??= (LaneOrder?.ToList()
+                                              ?? Segments.Select(s => s.Lane).Distinct().ToList());
+    private List<string>? _lanes;
+
+    /* ---------- Escala (0..Duration) ---------- */
+    private double X(int minute) => PlotLeft + minute / (double)(DurationMinutes - 1) * PlotW;
+
+    /* ---------- Colores por tipo ---------- */
+    private static string ColorOf(string kind) => kind switch
+    {
+        "IVR" => "#4DD0E1",
+        "Wait" => "#FFD54F",
+        "Wrapup" => "#8D6E63",
+        _ => "#64B5F6" // Call/Intent
+    };
+
+    /* ---------- Helpers de SVG ---------- */
+    private static string Num(double v) => v.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    private static MarkupString SvgText(double x, double y, string text, string? extra = null)
+    {
+        var a = string.IsNullOrWhiteSpace(extra) ? "" : " " + extra;
+        return (MarkupString)$"<text x='{Num(x)}' y='{Num(y)}'{a}>{text}</text>";
+    }
+
+    private static MarkupString Legend(double x, double y)
+    {
+        string item(double dx, string color, string label) =>
+            $"<rect x='{Num(x + dx)}' y='{Num(y - 8)}' width='12' height='12' rx='2' fill='{color}'/>" +
+            $"<text x='{Num(x + dx + 18)}' y='{Num(y)}' style='font-size:11px; fill: var(--mud-palette-text-secondary);' dominant-baseline='middle'>{label}</text>";
+        var html = item(0, "#FFD54F", "Wait") +
+                   item(90, "#64B5F6", "Call/Intent") +
+                   item(200, "#8D6E63", "Wrapup") +
+                   item(290, "#4DD0E1", "IVR");
+        return (MarkupString)html;
+    }
+}
