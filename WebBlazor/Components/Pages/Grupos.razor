@@ -3,7 +3,7 @@
 @using WebBlazor.DTO
 
 <MudDataGrid @ref="dataGrid"
-             T="GrupoDTO"
+             T=""
              ServerData="ServerReload"
              Filterable="true"
              Hover="true"
@@ -214,3 +214,209 @@
 
     private void OnRowClick(DataGridRowClickEventArgs<GrupoDTO> args) => seleccionado = args.Item;
 }
+
+
+@* @page "/grupos"
+@using API.APIService
+@using MudBlazor
+@using API
+@inject HttpClient Http
+
+<MudDataGrid T="GroupListItemDTO"
+             @ref="dataGrid"
+             ServerData="ServerReload"
+             Filterable="true"
+             Hover="true"
+             Dense="true"
+             Bordered="true"
+             Striped="true"
+             RowClick="OnRowClick"
+             Class="mt-4 pa-2">
+
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField T="string"
+                      @bind-Value="Search"
+                      Label="Buscar"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      AdornmentColor="Color.Primary"
+                      Immediate="true"
+                      DebounceInterval="300"
+                      Class="mt-2 mb-1" />
+        <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                       OnClick="ClearFilters"
+                       Class="ml-1 mt-2" />
+    </ToolBarContent>
+
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="Grupo" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left" />
+
+        <TemplateColumn Title="Usuarios" Sortable="true" Filterable="false"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left">
+            <CellTemplate>
+                @{
+                    var count = context.Item.MemberCount;
+                }
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary">
+                    @count
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <TemplateColumn Title="Último cambio" Sortable="true" Filterable="false"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
+                        CellStyle="text-align:left">
+            <CellTemplate>
+                @{
+                    var dt = context.Item.DateModified;
+                    var s = dt.HasValue ? dt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "-";
+                }
+                @s
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="GroupListItemDTO" />
+    </PagerContent>
+</MudDataGrid>
+
+@if (seleccionado is not null)
+{
+    <MudPaper Class="pa-4 mt-4"
+              Style="width:100%; max-width: 520px; margin: 0 auto;
+                         background-color: var(--mud-palette-table-striped);
+                         border:1px solid var(--mud-palette-primary);">
+        <MudText Typo="Typo.h6">@seleccionado.Name</MudText>
+        <MudText Typo="Typo.caption">
+            Último cambio: @(seleccionado.DateModified?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")
+        </MudText>
+
+        <MudDivider Class="my-2" />
+
+        <MudText Class="mb-1"><b>Miembros (@(miembros?.Count ?? 0)):</b></MudText>
+
+        @if (miembros is null)
+        {
+            @for (var i = 0; i < Math.Min(seleccionado.MemberCount, 12); i++)
+            {
+                <MudSkeleton Width="82px" Height="24px" Class="mr-1 mb-1" />
+            }
+        }
+        else if (miembros.Count == 0)
+        {
+            <MudText Typo="Typo.caption">Sin miembros.</MudText>
+        }
+        else
+        {
+            foreach (var m in miembros.Take(20))
+            {
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Class="mr-1 mb-1">
+                    @m.Name
+                </MudChip>
+            }
+            @if (miembros.Count > 20)
+            {
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary">
+                    +@(miembros.Count - 20)
+                </MudChip>
+            }
+        }
+    </MudPaper>
+}
+
+@code {
+    private MudDataGrid<GroupListItemDTO>? dataGrid;
+    private string? _search;
+    private string? Search
+    {
+        get => _search;
+        set { if (_search == value) return; _search = value; _ = dataGrid?.ReloadServerData(); }
+    }
+
+    private GroupListItemDTO? seleccionado;
+    private List<GroupMemberDTO>? miembros;
+
+    // cache local para simplificar: pedimos /api/groups/list y paginamos en cliente
+    private List<GroupListItemDTO> _all = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Traemos TODO y luego el grid pagina/ordena/filtra en cliente (para 6-100 filas va sobrado)
+        _all = await Http.GetFromJsonAsync<List<GroupListItemDTO>>("api/groups/list")
+               ?? new List<GroupListItemDTO>();
+    }
+
+    private Task ClearFilters()
+    {
+        Search = null;
+        seleccionado = null;
+        miembros = null;
+        return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
+    }
+
+    private Task<GridData<GroupListItemDTO>> ServerReload(GridState<GroupListItemDTO> state)
+    {
+        IEnumerable<GroupListItemDTO> data = _all;
+
+        if (!string.IsNullOrWhiteSpace(_search))
+        {
+            var q = _search.Trim();
+            data = data.Where(g =>
+                (g.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false));
+        }
+
+        var sort = state.SortDefinitions.FirstOrDefault();
+        if (sort is not null)
+        {
+            data = sort.SortBy switch
+            {
+                nameof(GroupListItemDTO.Name) => sort.Descending
+                    ? data.OrderByDescending(x => x.Name)
+                    : data.OrderBy(x => x.Name),
+
+                "MemberCount" => sort.Descending
+                    ? data.OrderByDescending(x => x.MemberCount)
+                    : data.OrderBy(x => x.MemberCount),
+
+                "DateModified" => sort.Descending
+                    ? data.OrderByDescending(x => x.DateModified ?? DateTime.MinValue)
+                    : data.OrderBy(x => x.DateModified ?? DateTime.MinValue),
+
+                _ => data
+            };
+        }
+
+        var total = data.Count();
+        var items = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+
+        return Task.FromResult(new GridData<GroupListItemDTO> { TotalItems = total, Items = items });
+    }
+
+    private async void OnRowClick(DataGridRowClickEventArgs<GroupListItemDTO> args)
+    {
+        seleccionado = args.Item;
+        miembros = null;
+        StateHasChanged();
+
+        try
+        {
+            miembros = await Http.GetFromJsonAsync<List<GroupMemberDTO>>(
+                $"api/groups/{seleccionado.Id}/members") ?? new();
+        }
+        catch
+        {
+            miembros = new();
+        }
+
+        StateHasChanged();
+    }
+} *@
+
+
+

@@ -1,23 +1,32 @@
-using ApexCharts;
 using MudBlazor.Services;
 using WebBlazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add MudBlazor services
+// === HttpClient apuntando a tu API ===
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7049/";
+builder.Services.AddScoped<HttpClient>(_ =>
+{
+    var client = new HttpClient
+    {
+        BaseAddress = new Uri(apiBaseUrl)
+    };
+    return client;
+});
+
+// MudBlazor
 builder.Services.AddMudServices();
 
-// Add services to the container.
+// Razor Components (Blazor Server)
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
