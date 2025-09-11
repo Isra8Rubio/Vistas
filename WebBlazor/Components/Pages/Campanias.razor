@@ -29,8 +29,7 @@
                       Class="mt-2 mb-1" />
         <MudIconButton Icon="@Icons.Material.Filled.Clear"
                        OnClick="ClearFilters"
-                       Class="ml-1 mt-2"
-                       Title="Limpiar búsqueda" />
+                       Class="ml-1 mt-2"/>
     </ToolBarContent>
 
     <Columns>
@@ -67,8 +66,7 @@
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
                         CellStyle="max-width:84px;width:84px;text-align:left">
             <CellTemplate>
-                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default"
-                         Title="@($"{context.Item.DivisionNombre} ({context.Item.DivisionCodigo})")">
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default">
                     @context.Item.DivisionCodigo
                 </MudChip>
                 <MudText Class="ml-1" Typo="Typo.body2">@context.Item.DivisionNombre</MudText>

@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Api.Service;
 using Api.Service.GenesysAPI;
+using Microsoft.AspNetCore.Mvc;
 using PureCloudPlatform.Client.V2.Model;
 
 namespace Api.Controllers
@@ -15,16 +11,16 @@ namespace Api.Controllers
     {
         private readonly ILogger<RoutingController> logger;
         private readonly IHttpContextAccessor httpContext;
-        private readonly RoutingApiService routingService;
+        private readonly CallService callService;
 
         public RoutingController(
             ILogger<RoutingController> logger,
             IHttpContextAccessor httpContext,
-            RoutingApiService routingService)
+            CallService callService)
         {
             this.logger = logger;
             this.httpContext = httpContext;
-            this.routingService = routingService;
+            this.callService = callService;
         }
 
         // /api/v2/routing/queues
@@ -42,7 +38,7 @@ namespace Api.Controllers
                 logger.LogInformation("[{TraceId}] Call: GetQueuesAsync(pageNumber={PageNumber}, pageSize={PageSize})",
                     traceId, pageNumber, pageSize);
 
-                var response = await routingService.Routing_GetRoutingQueuesAsync(pageNumber, pageSize);
+                var response = await callService.Routing_GetRoutingQueuesAsync(pageNumber, pageSize);
 
                 logger.LogInformation(response != null
                     ? "[{TraceId}] FinishCall: GetQueuesAsync – returned {Count} items (page {PageNumber})"
@@ -67,26 +63,23 @@ namespace Api.Controllers
             }
         }
 
-        // Proxy de /api/v2/routing/queues/divisionviews (paginado, filtrable por divisionId)
+        // /api/v2/routing/queues/divisionviews
         [HttpGet("queues/divisionviews")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(QueueEntityListing))]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<QueueEntityListing>> GetQueuesDivisionviewsAsync(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 25,
-            // admite múltiples ?divisionId=...&divisionId=...
             [FromQuery(Name = "divisionId")] List<string>? divisionIds = null)
         {
             var traceId = httpContext.HttpContext?.TraceIdentifier.Split(':')[0] ?? "";
-
             try
             {
                 logger.LogInformation("[{TraceId}] Call: GetQueuesDivisionviewsAsync(pageNumber={PageNumber}, pageSize={PageSize}, divisions={DivCount})",
                     traceId, pageNumber, pageSize, divisionIds?.Count ?? 0);
 
-                var response = await routingService.Routing_GetRoutingQueuesDivisionViewsAsync(pageNumber, pageSize, divisionIds);
+                var response = await callService.Routing_GetRoutingQueuesDivisionViewsAsync(pageNumber, pageSize, divisionIds);
 
                 logger.LogInformation(response != null
                     ? "[{TraceId}] FinishCall: GetQueuesDivisionviewsAsync – returned {Count} items (page {PageNumber})"

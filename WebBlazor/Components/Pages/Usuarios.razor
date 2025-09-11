@@ -27,8 +27,7 @@
                       Class="mt-2 mb-1" />
         <MudIconButton Icon="@Icons.Material.Filled.Clear"
                        OnClick="ClearFilters"
-                       Class="ml-1 mt-2"
-                       Title="Limpiar búsqueda" />
+                       Class="ml-1 mt-2" />
     </ToolBarContent>
 
     <Columns>
@@ -48,7 +47,7 @@
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
                         CellStyle="max-width:84px;width:84px;text-align:left" />
 
-        <TemplateColumn Title="Estado" Field="Activo" Sortable="true" Filterable="true"
+        <TemplateColumn Title="Estado" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:center; font-size:.95rem; font-weight:600"
                         CellStyle="max-width:84px;width:84px;text-align:center">
             <CellTemplate>

@@ -1,4 +1,4 @@
-﻿@page "/p8"
+﻿@page "/grafico"
 @using MudBlazor
 @using System.Globalization
 
@@ -24,10 +24,10 @@
 
         <!-- Leyenda con Chips -->
         <MudPaper Elevation="0" Class="pa-2 mb-4">
-            <MudChip T="string" Color="Color.Info" Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.HourglassEmpty">Wait</MudChip>
-            <MudChip T="string" Color="Color.Success" Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.Call">Call/Intent</MudChip>
-            <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.Assignment">Wrapup</MudChip>
-            <MudChip T="string" Color="Color.Secondary" Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.SwitchLeft">IVR</MudChip>
+            <MudChip T="string" Color="Color.Info" Variant="Variant.Filled" Size="Size.Small">Wait</MudChip>
+            <MudChip T="string" Color="Color.Success" Variant="Variant.Filled" Size="Size.Small">Call/Intent</MudChip>
+            <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small">Wrapup</MudChip>
+            <MudChip T="string" Color="Color.Secondary" Variant="Variant.Filled" Size="Size.Small">IVR</MudChip>
         </MudPaper>
 
         <!-- Timeline (con estilo de tabla) -->
@@ -101,13 +101,13 @@
     </MudPaper>
 
         <!-- Controles -->
-    <MudGrid Class="mt-4" GutterSize="GutterSize.Small">
+    <MudGrid Class="mt-4">
         <MudItem xs="3"><MudButton Variant="Variant.Outlined" Style="border:2px solid white;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.PlayArrow" FullWidth>Play</MudButton></MudItem>
         <MudItem xs="3"><MudButton Variant="Variant.Outlined" Style="border:2px solid white;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Pause" FullWidth>Pause</MudButton></MudItem>
         <MudItem xs="3"><MudButton Variant="Variant.Outlined" Style="border:2px solid white;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ZoomIn" FullWidth>Zoom In</MudButton></MudItem>
         <MudItem xs="3"><MudButton Variant="Variant.Outlined" Style="border:2px solid white;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ZoomOut" FullWidth>Zoom Out</MudButton></MudItem>
         </MudGrid>
-</MudContainer>
+    </MudContainer>
 
 @code {
     private record Seg(string Lane, string Kind, int StartMin, int EndMin);

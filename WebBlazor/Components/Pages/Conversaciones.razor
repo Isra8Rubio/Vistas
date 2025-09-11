@@ -17,8 +17,6 @@
     <ToolBarContent>
         <MudDateRangePicker @bind-DateRange="Range"
                             Label="Fechas"
-                            Dense="true"
-                            CloseOnSelection="true"
                             DateFormat="dd/MM/yyyy"
                             Class="mr-0 mb-2" />
         <MudIconButton Icon="@Icons.Material.Filled.Clear"
@@ -56,7 +54,7 @@
                         HeaderStyle="text-align:left; font-size:1.0rem; font-weight:600; white-space:nowrap"
                         CellStyle="max-width:64px;width:64px;text-align:center" />
 
-            <TemplateColumn Title="Pendientes" Sortable="false" Filterable="true" Field="NoLeidos"
+            <TemplateColumn Title="Pendientes" Sortable="false" Filterable="true"
                         HeaderStyle="text-align:left; font-size:1.0rem; font-weight:600; white-space:nowrap"
                         CellStyle="max-width:64px;width:64px;text-align:center">
                 <CellTemplate>

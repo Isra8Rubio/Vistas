@@ -9,10 +9,6 @@
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\js\vis-timeline-interop.js" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="Blazor-ApexCharts" Version="6.0.2" />

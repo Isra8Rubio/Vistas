@@ -1,22 +1,25 @@
-﻿using System;
-
-namespace WebBlazor.DTO
+﻿namespace WebBlazor.DTO
 {
     public class CampaniaListadoDTO
     {
-        public string Titulo { get; set; } = string.Empty;
-        public string Estado { get; set; } = string.Empty;
-        public string Canal { get; set; } = string.Empty;
-
+        public string Titulo { get; set; } = "";
+        public string Estado { get; set; } = "";
+        public string Canal { get; set; } = "";
         public DateTime Inicio { get; set; }
         public DateTime? Fin { get; set; }
+        public string DivisionCodigo { get; set; } = "";
+        public string DivisionNombre { get; set; } = "";
 
-        public string DivisionCodigo { get; set; } = string.Empty;
-        public string DivisionNombre { get; set; } = string.Empty;
+        public CampaniaListadoDTO() { }
 
-        public CampaniaListadoDTO(string titulo, string estado, string canal,
-                                  DateTime inicio, DateTime? fin,
-                                  string divisionCodigo, string divisionNombre)
+        public CampaniaListadoDTO(
+            string titulo,
+            string estado,
+            string canal,
+            DateTime inicio,
+            DateTime? fin,
+            string divisionCodigo,
+            string divisionNombre)
         {
             Titulo = titulo;
             Estado = estado;
