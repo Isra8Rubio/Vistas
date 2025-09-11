@@ -55,14 +55,14 @@ namespace API.APIService
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<GroupEntityListing> Groups_GetGroupsAsync(int? pageNumber, int? pageSize)
+        public virtual System.Threading.Tasks.Task<PagedResultDTOOfGroupDTO> Groups_GetGroupsAsync(int? pageNumber, int? pageSize)
         {
             return Groups_GetGroupsAsync(pageNumber, pageSize, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<GroupEntityListing> Groups_GetGroupsAsync(int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedResultDTOOfGroupDTO> Groups_GetGroupsAsync(int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -113,7 +113,7 @@ namespace API.APIService
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<GroupEntityListing>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedResultDTOOfGroupDTO>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -573,17 +573,137 @@ namespace API.APIService
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PagedResultDTOOfGroupDTO
+    {
+        [Newtonsoft.Json.JsonProperty("entities", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<GroupDTO> Entities { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("pageNumber", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? PageNumber { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("pageSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? PageSize { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("total", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? Total { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("firstUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FirstUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("nextUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string NextUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("previousUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PreviousUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("lastUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string LastUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("selfUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SelfUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("pageCount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? PageCount { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static PagedResultDTOOfGroupDTO FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<PagedResultDTOOfGroupDTO>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class GroupDTO
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Id { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("memberCount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? MemberCount { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("dateModified", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? DateModified { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static GroupDTO FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<GroupDTO>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ProblemDetails
+    {
+        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Type { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Title { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Status { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("detail", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Detail { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("instance", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Instance { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static ProblemDetails FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ProblemDetails>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
     /// <summary>
-    /// GroupEntityListing
+    /// UserEntityListing
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class GroupEntityListing
+    public partial class UserEntityListing
     {
         /// <summary>
         /// Gets or Sets Entities
         /// </summary>
         [Newtonsoft.Json.JsonProperty("entities", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<Group> Entities { get; set; }
+        public System.Collections.Generic.ICollection<User> Entities { get; set; }
 
         /// <summary>
         /// Gets or Sets PageSize
@@ -645,296 +765,12 @@ namespace API.APIService
             return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
 
         }
-        public static GroupEntityListing FromJson(string data)
+        public static UserEntityListing FromJson(string data)
         {
 
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<GroupEntityListing>(data, new Newtonsoft.Json.JsonSerializerSettings());
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<UserEntityListing>(data, new Newtonsoft.Json.JsonSerializerSettings());
 
         }
-
-    }
-
-    /// <summary>
-    /// Group
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Group
-    {
-        /// <summary>
-        /// Active, inactive, or deleted state.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("state", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public StateEnum? State { get; set; }
-
-        /// <summary>
-        /// Type of group.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public TypeEnum? Type { get; set; }
-
-        /// <summary>
-        /// Who can view this group
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("visibility", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public VisibilityEnum? Visibility { get; set; }
-
-        /// <summary>
-        /// The globally unique identifier for the object.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
-
-        /// <summary>
-        /// The group name.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Description
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
-
-        /// <summary>
-        /// Last modified date/time. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("dateModified", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset? DateModified { get; set; }
-
-        /// <summary>
-        /// Number of members.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("memberCount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long? MemberCount { get; set; }
-
-        /// <summary>
-        /// Current version for this resource.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("version", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? Version { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Images
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("images", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<Image> Images { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Addresses
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("addresses", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<GroupContact> Addresses { get; set; }
-
-        /// <summary>
-        /// Are membership rules visible to the person requesting to view the group
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("rulesVisible", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool? RulesVisible { get; set; }
-
-        /// <summary>
-        /// Allow roles to be assigned to this group
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("rolesEnabled", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool? RolesEnabled { get; set; }
-
-        /// <summary>
-        /// Allow owners to be included as members of the group
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("includeOwners", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool? IncludeOwners { get; set; }
-
-        /// <summary>
-        /// Allow calls to be placed to this group.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("callsEnabled", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool? CallsEnabled { get; set; }
-
-        /// <summary>
-        /// Owners of the group
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("owners", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<User> Owners { get; set; }
-
-        /// <summary>
-        /// The URI for this object
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("selfUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string SelfUri { get; set; }
-
-        public string ToJson()
-        {
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-        public static Group FromJson(string data)
-        {
-
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Group>(data, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-
-    }
-
-    /// <summary>
-    /// Active, inactive, or deleted state.
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum StateEnum
-    {
-
-        OutdatedSdkVersion = 0,
-
-        Active = 1,
-
-        Inactive = 2,
-
-        Deleted = 3,
-
-    }
-
-    /// <summary>
-    /// Type of group.
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum TypeEnum
-    {
-
-        OutdatedSdkVersion = 0,
-
-        Official = 1,
-
-        Social = 2,
-
-    }
-
-    /// <summary>
-    /// Who can view this group
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum VisibilityEnum
-    {
-
-        OutdatedSdkVersion = 0,
-
-        Public = 1,
-
-        Owners = 2,
-
-        Members = 3,
-
-    }
-
-    /// <summary>
-    /// Image
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Image
-    {
-        /// <summary>
-        /// Height and/or width of image. ex: 640x480 or x128
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("resolution", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Resolution { get; set; }
-
-        /// <summary>
-        /// Gets or Sets ImageUri
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("imageUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ImageUri { get; set; }
-
-        public string ToJson()
-        {
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-        public static Image FromJson(string data)
-        {
-
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Image>(data, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-
-    }
-
-    /// <summary>
-    /// GroupContact
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class GroupContact
-    {
-        /// <summary>
-        /// Contact type of the address
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public TypeEnum2? Type { get; set; }
-
-        /// <summary>
-        /// Media type of the address
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("mediaType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public MediaTypeEnum? MediaType { get; set; }
-
-        /// <summary>
-        /// Phone number for this contact type
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("address", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Address { get; set; }
-
-        /// <summary>
-        /// Extension is set if the number is e164 valid
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("extension", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Extension { get; set; }
-
-        /// <summary>
-        /// Formatted version of the address property
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("display", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Display { get; set; }
-
-        public string ToJson()
-        {
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-        public static GroupContact FromJson(string data)
-        {
-
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<GroupContact>(data, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-
-    }
-
-    /// <summary>
-    /// Contact type of the address
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum TypeEnum2
-    {
-
-        OutdatedSdkVersion = 0,
-
-        Groupring = 1,
-
-        Groupphone = 2,
-
-    }
-
-    /// <summary>
-    /// Media type of the address
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum MediaTypeEnum
-    {
-
-        OutdatedSdkVersion = 0,
-
-        Phone = 1,
 
     }
 
@@ -948,7 +784,7 @@ namespace API.APIService
         /// The current state for this user.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("state", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public StateEnum2? State { get; set; }
+        public StateEnum? State { get; set; }
 
         /// <summary>
         /// The globally unique identifier for the object.
@@ -1197,7 +1033,7 @@ namespace API.APIService
     /// The current state for this user.
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum StateEnum2
+    public enum StateEnum
     {
 
         OutdatedSdkVersion = 0,
@@ -1286,13 +1122,13 @@ namespace API.APIService
         /// Gets or Sets MediaType
         /// </summary>
         [Newtonsoft.Json.JsonProperty("mediaType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public MediaTypeEnum2? MediaType { get; set; }
+        public MediaTypeEnum? MediaType { get; set; }
 
         /// <summary>
         /// Gets or Sets Type
         /// </summary>
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public TypeEnum3? Type { get; set; }
+        public TypeEnum? Type { get; set; }
 
         /// <summary>
         /// Email address or phone number for this contact type
@@ -1343,7 +1179,7 @@ namespace API.APIService
     /// Gets or Sets MediaType
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum MediaTypeEnum2
+    public enum MediaTypeEnum
     {
 
         OutdatedSdkVersion = 0,
@@ -1360,7 +1196,7 @@ namespace API.APIService
     /// Gets or Sets Type
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum TypeEnum3
+    public enum TypeEnum
     {
 
         OutdatedSdkVersion = 0,
@@ -1382,6 +1218,39 @@ namespace API.APIService
         Main = 8,
 
         Other = 9,
+
+    }
+
+    /// <summary>
+    /// Image
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Image
+    {
+        /// <summary>
+        /// Height and/or width of image. ex: 640x480 or x128
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("resolution", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Resolution { get; set; }
+
+        /// <summary>
+        /// Gets or Sets ImageUri
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("imageUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ImageUri { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static Image FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Image>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
 
     }
 
@@ -2007,7 +1876,7 @@ namespace API.APIService
         /// Current state of the location entity
         /// </summary>
         [Newtonsoft.Json.JsonProperty("state", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public StateEnum3? State { get; set; }
+        public StateEnum2? State { get; set; }
 
         /// <summary>
         /// The globally unique identifier for the object.
@@ -2118,7 +1987,7 @@ namespace API.APIService
     /// Current state of the location entity
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum StateEnum3
+    public enum StateEnum2
     {
 
         OutdatedSdkVersion = 0,
@@ -2172,7 +2041,7 @@ namespace API.APIService
         /// The type of emergency number.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public TypeEnum4? Type { get; set; }
+        public TypeEnum2? Type { get; set; }
 
         /// <summary>
         /// Gets or Sets E164
@@ -2205,7 +2074,7 @@ namespace API.APIService
     /// The type of emergency number.
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum TypeEnum4
+    public enum TypeEnum2
     {
 
         OutdatedSdkVersion = 0,
@@ -2756,7 +2625,7 @@ namespace API.APIService
         /// Gets or Sets Type
         /// </summary>
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public TypeEnum5? Type { get; set; }
+        public TypeEnum3? Type { get; set; }
 
         /// <summary>
         /// Gets or Sets Value
@@ -2783,7 +2652,7 @@ namespace API.APIService
     /// Gets or Sets Type
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum TypeEnum5
+    public enum TypeEnum3
     {
 
         OutdatedSdkVersion = 0,
@@ -2848,6 +2717,257 @@ namespace API.APIService
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Location>(data, new Newtonsoft.Json.JsonSerializerSettings());
 
         }
+
+    }
+
+    /// <summary>
+    /// Group
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Group
+    {
+        /// <summary>
+        /// Active, inactive, or deleted state.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("state", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public StateEnum3? State { get; set; }
+
+        /// <summary>
+        /// Type of group.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public TypeEnum4? Type { get; set; }
+
+        /// <summary>
+        /// Who can view this group
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("visibility", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public VisibilityEnum? Visibility { get; set; }
+
+        /// <summary>
+        /// The globally unique identifier for the object.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Id { get; set; }
+
+        /// <summary>
+        /// The group name.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Description
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Last modified date/time. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("dateModified", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? DateModified { get; set; }
+
+        /// <summary>
+        /// Number of members.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("memberCount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? MemberCount { get; set; }
+
+        /// <summary>
+        /// Current version for this resource.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("version", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Version { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Images
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("images", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<Image> Images { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Addresses
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("addresses", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<GroupContact> Addresses { get; set; }
+
+        /// <summary>
+        /// Are membership rules visible to the person requesting to view the group
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("rulesVisible", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? RulesVisible { get; set; }
+
+        /// <summary>
+        /// Allow roles to be assigned to this group
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("rolesEnabled", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? RolesEnabled { get; set; }
+
+        /// <summary>
+        /// Allow owners to be included as members of the group
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("includeOwners", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? IncludeOwners { get; set; }
+
+        /// <summary>
+        /// Allow calls to be placed to this group.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("callsEnabled", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? CallsEnabled { get; set; }
+
+        /// <summary>
+        /// Owners of the group
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("owners", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<User> Owners { get; set; }
+
+        /// <summary>
+        /// The URI for this object
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("selfUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SelfUri { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static Group FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Group>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// Active, inactive, or deleted state.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum StateEnum3
+    {
+
+        OutdatedSdkVersion = 0,
+
+        Active = 1,
+
+        Inactive = 2,
+
+        Deleted = 3,
+
+    }
+
+    /// <summary>
+    /// Type of group.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum TypeEnum4
+    {
+
+        OutdatedSdkVersion = 0,
+
+        Official = 1,
+
+        Social = 2,
+
+    }
+
+    /// <summary>
+    /// Who can view this group
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum VisibilityEnum
+    {
+
+        OutdatedSdkVersion = 0,
+
+        Public = 1,
+
+        Owners = 2,
+
+        Members = 3,
+
+    }
+
+    /// <summary>
+    /// GroupContact
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class GroupContact
+    {
+        /// <summary>
+        /// Contact type of the address
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public TypeEnum5? Type { get; set; }
+
+        /// <summary>
+        /// Media type of the address
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("mediaType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public MediaTypeEnum2? MediaType { get; set; }
+
+        /// <summary>
+        /// Phone number for this contact type
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("address", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Address { get; set; }
+
+        /// <summary>
+        /// Extension is set if the number is e164 valid
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("extension", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Extension { get; set; }
+
+        /// <summary>
+        /// Formatted version of the address property
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("display", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Display { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static GroupContact FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<GroupContact>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// Contact type of the address
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum TypeEnum5
+    {
+
+        OutdatedSdkVersion = 0,
+
+        Groupring = 1,
+
+        Groupphone = 2,
+
+    }
+
+    /// <summary>
+    /// Media type of the address
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum MediaTypeEnum2
+    {
+
+        OutdatedSdkVersion = 0,
+
+        Phone = 1,
 
     }
 
@@ -3174,129 +3294,6 @@ namespace API.APIService
         {
 
             return Newtonsoft.Json.JsonConvert.DeserializeObject<OAuthLastTokenIssued>(data, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ProblemDetails
-    {
-        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Type { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Title { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? Status { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("detail", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Detail { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("instance", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Instance { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [Newtonsoft.Json.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-        public string ToJson()
-        {
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-        public static ProblemDetails FromJson(string data)
-        {
-
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<ProblemDetails>(data, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-
-    }
-
-    /// <summary>
-    /// UserEntityListing
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UserEntityListing
-    {
-        /// <summary>
-        /// Gets or Sets Entities
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("entities", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<User> Entities { get; set; }
-
-        /// <summary>
-        /// Gets or Sets PageSize
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("pageSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? PageSize { get; set; }
-
-        /// <summary>
-        /// Gets or Sets PageNumber
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("pageNumber", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? PageNumber { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Total
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("total", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public long? Total { get; set; }
-
-        /// <summary>
-        /// Gets or Sets FirstUri
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("firstUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FirstUri { get; set; }
-
-        /// <summary>
-        /// Gets or Sets NextUri
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("nextUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string NextUri { get; set; }
-
-        /// <summary>
-        /// Gets or Sets PreviousUri
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("previousUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PreviousUri { get; set; }
-
-        /// <summary>
-        /// Gets or Sets LastUri
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("lastUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string LastUri { get; set; }
-
-        /// <summary>
-        /// Gets or Sets SelfUri
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("selfUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string SelfUri { get; set; }
-
-        /// <summary>
-        /// Gets or Sets PageCount
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("pageCount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? PageCount { get; set; }
-
-        public string ToJson()
-        {
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-        public static UserEntityListing FromJson(string data)
-        {
-
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<UserEntityListing>(data, new Newtonsoft.Json.JsonSerializerSettings());
 
         }
 

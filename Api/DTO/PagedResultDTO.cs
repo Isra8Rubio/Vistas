@@ -2,9 +2,15 @@
 {
     public class PagedResultDTO<T>
     {
-        public IReadOnlyList<T> Items { get; set; } = Array.Empty<T>();
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        public int Total { get; set; }
+        public List<T> Entities { get; set; } = new();
+        public int? PageNumber { get; set; }
+        public int? PageSize { get; set; }
+        public long? Total { get; set; }
+        public string? FirstUri { get; set; }
+        public string? NextUri { get; set; }
+        public string? PreviousUri { get; set; }
+        public string? LastUri { get; set; }
+        public string? SelfUri { get; set; }
+        public int? PageCount { get; set; }
     }
 }

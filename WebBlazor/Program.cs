@@ -1,3 +1,4 @@
+using API.APIService;
 using MudBlazor.Services;
 using WebBlazor.Components;
 
@@ -16,6 +17,14 @@ builder.Services.AddScoped<HttpClient>(_ =>
 
 // MudBlazor
 builder.Services.AddMudServices();
+
+// Services
+//builder.Services.AddScoped<ApiService>();
+
+builder.Services.AddHttpClient<APIClient>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+});
 
 // Razor Components (Blazor Server)
 builder.Services.AddRazorComponents()

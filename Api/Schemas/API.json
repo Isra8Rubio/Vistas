@@ -40,7 +40,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GroupEntityListing"
+                  "$ref": "#/components/schemas/PagedResultDTOOfGroupDTO"
                 }
               }
             }
@@ -233,9 +233,114 @@
   },
   "components": {
     "schemas": {
-      "GroupEntityListing": {
+      "PagedResultDTOOfGroupDTO": {
         "type": "object",
-        "description": "GroupEntityListing",
+        "additionalProperties": false,
+        "properties": {
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupDTO"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "firstUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "nextUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "previousUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "selfUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "GroupDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "memberCount": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "dateModified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UserEntityListing": {
+        "type": "object",
+        "description": "UserEntityListing",
         "additionalProperties": false,
         "properties": {
           "entities": {
@@ -243,7 +348,7 @@
             "description": "Gets or Sets Entities",
             "nullable": true,
             "items": {
-              "$ref": "#/components/schemas/Group"
+              "$ref": "#/components/schemas/User"
             }
           },
           "pageSize": {
@@ -297,355 +402,6 @@
           }
         }
       },
-      "Group": {
-        "type": "object",
-        "description": "Group",
-        "additionalProperties": false,
-        "properties": {
-          "state": {
-            "description": "Active, inactive, or deleted state.",
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/StateEnum"
-              }
-            ]
-          },
-          "type": {
-            "description": "Type of group.",
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TypeEnum"
-              }
-            ]
-          },
-          "visibility": {
-            "description": "Who can view this group",
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/VisibilityEnum"
-              }
-            ]
-          },
-          "id": {
-            "type": "string",
-            "description": "The globally unique identifier for the object.",
-            "nullable": true
-          },
-          "name": {
-            "type": "string",
-            "description": "The group name.",
-            "nullable": true
-          },
-          "description": {
-            "type": "string",
-            "description": "Gets or Sets Description",
-            "nullable": true
-          },
-          "dateModified": {
-            "type": "string",
-            "description": "Last modified date/time. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
-            "format": "date-time",
-            "nullable": true
-          },
-          "memberCount": {
-            "type": "integer",
-            "description": "Number of members.",
-            "format": "int64",
-            "nullable": true
-          },
-          "version": {
-            "type": "integer",
-            "description": "Current version for this resource.",
-            "format": "int32",
-            "nullable": true
-          },
-          "images": {
-            "type": "array",
-            "description": "Gets or Sets Images",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/Image"
-            }
-          },
-          "addresses": {
-            "type": "array",
-            "description": "Gets or Sets Addresses",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/GroupContact"
-            }
-          },
-          "rulesVisible": {
-            "type": "boolean",
-            "description": "Are membership rules visible to the person requesting to view the group",
-            "nullable": true
-          },
-          "rolesEnabled": {
-            "type": "boolean",
-            "description": "Allow roles to be assigned to this group",
-            "nullable": true
-          },
-          "includeOwners": {
-            "type": "boolean",
-            "description": "Allow owners to be included as members of the group",
-            "nullable": true
-          },
-          "callsEnabled": {
-            "type": "boolean",
-            "description": "Allow calls to be placed to this group.",
-            "nullable": true
-          },
-          "owners": {
-            "type": "array",
-            "description": "Owners of the group",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/User"
-            }
-          },
-          "selfUri": {
-            "type": "string",
-            "description": "The URI for this object",
-            "nullable": true
-          }
-        }
-      },
-      "StateEnum": {
-        "type": "integer",
-        "description": "Active, inactive, or deleted state.",
-        "x-enumNames": [
-          "OutdatedSdkVersion",
-          "Active",
-          "Inactive",
-          "Deleted"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "x-enum-names": [
-          "OutdatedSdkVersion",
-          "Active",
-          "Inactive",
-          "Deleted"
-        ],
-        "x-enum-varnames": [
-          "OutdatedSdkVersion",
-          "Active",
-          "Inactive",
-          "Deleted"
-        ],
-        "x-enum-descriptions": [
-          null,
-          null,
-          null,
-          null
-        ],
-        "x-enumDescriptions": [
-          null,
-          null,
-          null,
-          null
-        ]
-      },
-      "TypeEnum": {
-        "type": "integer",
-        "description": "Type of group.",
-        "x-enumNames": [
-          "OutdatedSdkVersion",
-          "Official",
-          "Social"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ],
-        "x-enum-names": [
-          "OutdatedSdkVersion",
-          "Official",
-          "Social"
-        ],
-        "x-enum-varnames": [
-          "OutdatedSdkVersion",
-          "Official",
-          "Social"
-        ],
-        "x-enum-descriptions": [
-          null,
-          null,
-          null
-        ],
-        "x-enumDescriptions": [
-          null,
-          null,
-          null
-        ]
-      },
-      "VisibilityEnum": {
-        "type": "integer",
-        "description": "Who can view this group",
-        "x-enumNames": [
-          "OutdatedSdkVersion",
-          "Public",
-          "Owners",
-          "Members"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "x-enum-names": [
-          "OutdatedSdkVersion",
-          "Public",
-          "Owners",
-          "Members"
-        ],
-        "x-enum-varnames": [
-          "OutdatedSdkVersion",
-          "Public",
-          "Owners",
-          "Members"
-        ],
-        "x-enum-descriptions": [
-          null,
-          null,
-          null,
-          null
-        ],
-        "x-enumDescriptions": [
-          null,
-          null,
-          null,
-          null
-        ]
-      },
-      "Image": {
-        "type": "object",
-        "description": "Image",
-        "additionalProperties": false,
-        "properties": {
-          "resolution": {
-            "type": "string",
-            "description": "Height and/or width of image. ex: 640x480 or x128",
-            "nullable": true
-          },
-          "imageUri": {
-            "type": "string",
-            "description": "Gets or Sets ImageUri",
-            "nullable": true
-          }
-        }
-      },
-      "GroupContact": {
-        "type": "object",
-        "description": "GroupContact",
-        "additionalProperties": false,
-        "properties": {
-          "type": {
-            "description": "Contact type of the address",
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TypeEnum2"
-              }
-            ]
-          },
-          "mediaType": {
-            "description": "Media type of the address",
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/MediaTypeEnum"
-              }
-            ]
-          },
-          "address": {
-            "type": "string",
-            "description": "Phone number for this contact type",
-            "nullable": true
-          },
-          "extension": {
-            "type": "string",
-            "description": "Extension is set if the number is e164 valid",
-            "nullable": true
-          },
-          "display": {
-            "type": "string",
-            "description": "Formatted version of the address property",
-            "nullable": true
-          }
-        }
-      },
-      "TypeEnum2": {
-        "type": "integer",
-        "description": "Contact type of the address",
-        "x-enumNames": [
-          "OutdatedSdkVersion",
-          "Groupring",
-          "Groupphone"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ],
-        "x-enum-names": [
-          "OutdatedSdkVersion",
-          "Groupring",
-          "Groupphone"
-        ],
-        "x-enum-varnames": [
-          "OutdatedSdkVersion",
-          "Groupring",
-          "Groupphone"
-        ],
-        "x-enum-descriptions": [
-          null,
-          null,
-          null
-        ],
-        "x-enumDescriptions": [
-          null,
-          null,
-          null
-        ]
-      },
-      "MediaTypeEnum": {
-        "type": "integer",
-        "description": "Media type of the address",
-        "x-enumNames": [
-          "OutdatedSdkVersion",
-          "Phone"
-        ],
-        "enum": [
-          0,
-          1
-        ],
-        "x-enum-names": [
-          "OutdatedSdkVersion",
-          "Phone"
-        ],
-        "x-enum-varnames": [
-          "OutdatedSdkVersion",
-          "Phone"
-        ],
-        "x-enum-descriptions": [
-          null,
-          null
-        ],
-        "x-enumDescriptions": [
-          null,
-          null
-        ]
-      },
       "User": {
         "type": "object",
         "description": "User",
@@ -656,7 +412,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/StateEnum2"
+                "$ref": "#/components/schemas/StateEnum"
               }
             ]
           },
@@ -946,7 +702,7 @@
           }
         }
       },
-      "StateEnum2": {
+      "StateEnum": {
         "type": "integer",
         "description": "The current state for this user.",
         "x-enumNames": [
@@ -1030,7 +786,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/MediaTypeEnum2"
+                "$ref": "#/components/schemas/MediaTypeEnum"
               }
             ]
           },
@@ -1039,7 +795,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/TypeEnum3"
+                "$ref": "#/components/schemas/TypeEnum"
               }
             ]
           },
@@ -1070,7 +826,7 @@
           }
         }
       },
-      "MediaTypeEnum2": {
+      "MediaTypeEnum": {
         "type": "integer",
         "description": "Gets or Sets MediaType",
         "x-enumNames": [
@@ -1110,7 +866,7 @@
           null
         ]
       },
-      "TypeEnum3": {
+      "TypeEnum": {
         "type": "integer",
         "description": "Gets or Sets Type",
         "x-enumNames": [
@@ -1185,6 +941,23 @@
           null,
           null
         ]
+      },
+      "Image": {
+        "type": "object",
+        "description": "Image",
+        "additionalProperties": false,
+        "properties": {
+          "resolution": {
+            "type": "string",
+            "description": "Height and/or width of image. ex: 640x480 or x128",
+            "nullable": true
+          },
+          "imageUri": {
+            "type": "string",
+            "description": "Gets or Sets ImageUri",
+            "nullable": true
+          }
+        }
       },
       "Biography": {
         "type": "object",
@@ -1693,7 +1466,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/StateEnum3"
+                "$ref": "#/components/schemas/StateEnum2"
               }
             ]
           },
@@ -1800,7 +1573,7 @@
           }
         }
       },
-      "StateEnum3": {
+      "StateEnum2": {
         "type": "integer",
         "description": "Current state of the location entity",
         "x-enumNames": [
@@ -1861,7 +1634,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/TypeEnum4"
+                "$ref": "#/components/schemas/TypeEnum2"
               }
             ]
           },
@@ -1877,7 +1650,7 @@
           }
         }
       },
-      "TypeEnum4": {
+      "TypeEnum2": {
         "type": "integer",
         "description": "The type of emergency number.",
         "x-enumNames": [
@@ -2434,7 +2207,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/TypeEnum5"
+                "$ref": "#/components/schemas/TypeEnum3"
               }
             ]
           },
@@ -2445,7 +2218,7 @@
           }
         }
       },
-      "TypeEnum5": {
+      "TypeEnum3": {
         "type": "integer",
         "description": "Gets or Sets Type",
         "x-enumNames": [
@@ -2537,6 +2310,338 @@
             ]
           }
         }
+      },
+      "Group": {
+        "type": "object",
+        "description": "Group",
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "description": "Active, inactive, or deleted state.",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/StateEnum3"
+              }
+            ]
+          },
+          "type": {
+            "description": "Type of group.",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TypeEnum4"
+              }
+            ]
+          },
+          "visibility": {
+            "description": "Who can view this group",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/VisibilityEnum"
+              }
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "The globally unique identifier for the object.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "The group name.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Gets or Sets Description",
+            "nullable": true
+          },
+          "dateModified": {
+            "type": "string",
+            "description": "Last modified date/time. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "memberCount": {
+            "type": "integer",
+            "description": "Number of members.",
+            "format": "int64",
+            "nullable": true
+          },
+          "version": {
+            "type": "integer",
+            "description": "Current version for this resource.",
+            "format": "int32",
+            "nullable": true
+          },
+          "images": {
+            "type": "array",
+            "description": "Gets or Sets Images",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/Image"
+            }
+          },
+          "addresses": {
+            "type": "array",
+            "description": "Gets or Sets Addresses",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/GroupContact"
+            }
+          },
+          "rulesVisible": {
+            "type": "boolean",
+            "description": "Are membership rules visible to the person requesting to view the group",
+            "nullable": true
+          },
+          "rolesEnabled": {
+            "type": "boolean",
+            "description": "Allow roles to be assigned to this group",
+            "nullable": true
+          },
+          "includeOwners": {
+            "type": "boolean",
+            "description": "Allow owners to be included as members of the group",
+            "nullable": true
+          },
+          "callsEnabled": {
+            "type": "boolean",
+            "description": "Allow calls to be placed to this group.",
+            "nullable": true
+          },
+          "owners": {
+            "type": "array",
+            "description": "Owners of the group",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "selfUri": {
+            "type": "string",
+            "description": "The URI for this object",
+            "nullable": true
+          }
+        }
+      },
+      "StateEnum3": {
+        "type": "integer",
+        "description": "Active, inactive, or deleted state.",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Active",
+          "Inactive",
+          "Deleted"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Active",
+          "Inactive",
+          "Deleted"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Active",
+          "Inactive",
+          "Deleted"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "TypeEnum4": {
+        "type": "integer",
+        "description": "Type of group.",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Official",
+          "Social"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Official",
+          "Social"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Official",
+          "Social"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null
+        ]
+      },
+      "VisibilityEnum": {
+        "type": "integer",
+        "description": "Who can view this group",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Public",
+          "Owners",
+          "Members"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Public",
+          "Owners",
+          "Members"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Public",
+          "Owners",
+          "Members"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "GroupContact": {
+        "type": "object",
+        "description": "GroupContact",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "description": "Contact type of the address",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TypeEnum5"
+              }
+            ]
+          },
+          "mediaType": {
+            "description": "Media type of the address",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MediaTypeEnum2"
+              }
+            ]
+          },
+          "address": {
+            "type": "string",
+            "description": "Phone number for this contact type",
+            "nullable": true
+          },
+          "extension": {
+            "type": "string",
+            "description": "Extension is set if the number is e164 valid",
+            "nullable": true
+          },
+          "display": {
+            "type": "string",
+            "description": "Formatted version of the address property",
+            "nullable": true
+          }
+        }
+      },
+      "TypeEnum5": {
+        "type": "integer",
+        "description": "Contact type of the address",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Groupring",
+          "Groupphone"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Groupring",
+          "Groupphone"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Groupring",
+          "Groupphone"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null
+        ]
+      },
+      "MediaTypeEnum2": {
+        "type": "integer",
+        "description": "Media type of the address",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Phone"
+        ],
+        "enum": [
+          0,
+          1
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Phone"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Phone"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null
+        ]
       },
       "Team": {
         "type": "object",
@@ -2815,99 +2920,6 @@
             "type": "string",
             "description": "Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
             "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "UserEntityListing": {
-        "type": "object",
-        "description": "UserEntityListing",
-        "additionalProperties": false,
-        "properties": {
-          "entities": {
-            "type": "array",
-            "description": "Gets or Sets Entities",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/User"
-            }
-          },
-          "pageSize": {
-            "type": "integer",
-            "description": "Gets or Sets PageSize",
-            "format": "int32",
-            "nullable": true
-          },
-          "pageNumber": {
-            "type": "integer",
-            "description": "Gets or Sets PageNumber",
-            "format": "int32",
-            "nullable": true
-          },
-          "total": {
-            "type": "integer",
-            "description": "Gets or Sets Total",
-            "format": "int64",
-            "nullable": true
-          },
-          "firstUri": {
-            "type": "string",
-            "description": "Gets or Sets FirstUri",
-            "nullable": true
-          },
-          "nextUri": {
-            "type": "string",
-            "description": "Gets or Sets NextUri",
-            "nullable": true
-          },
-          "previousUri": {
-            "type": "string",
-            "description": "Gets or Sets PreviousUri",
-            "nullable": true
-          },
-          "lastUri": {
-            "type": "string",
-            "description": "Gets or Sets LastUri",
-            "nullable": true
-          },
-          "selfUri": {
-            "type": "string",
-            "description": "Gets or Sets SelfUri",
-            "nullable": true
-          },
-          "pageCount": {
-            "type": "integer",
-            "description": "Gets or Sets PageCount",
-            "format": "int32",
             "nullable": true
           }
         }

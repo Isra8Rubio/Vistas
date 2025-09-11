@@ -1,7 +1,9 @@
 ﻿using Api.DTO;
+using Api.Helpers;
 using Api.Service;
 using Microsoft.AspNetCore.Mvc;
 using PureCloudPlatform.Client.V2.Model;
+using System.Collections.Generic;
 
 namespace Api.Controllers
 {
@@ -25,10 +27,10 @@ namespace Api.Controllers
 
         // GET /api/groups
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GroupEntityListing))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResultDTO<GroupDTO>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<GroupEntityListing>> GetGroupsAsync(
+        public async Task<ActionResult<PagedResultDTO<GroupDTO>>> GetGroupsAsync(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 25)
         {
@@ -50,7 +52,7 @@ namespace Api.Controllers
                 if (response?.Entities is null || !response.Entities.Any())
                     return NotFound();
 
-                return Ok(response);
+                return Ok(Mappers.FromRaw(response));
             }
             catch (Exception ex)
             {
