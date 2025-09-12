@@ -6,7 +6,7 @@
     "version": "v1"
   },
   "paths": {
-    "/api/groups": {
+    "/api/Groups": {
       "get": {
         "tags": [
           "Groups"
@@ -61,7 +61,7 @@
         }
       }
     },
-    "/api/groups/{groupId}/individuals": {
+    "/api/Groups/{groupId}/individuals": {
       "get": {
         "tags": [
           "Groups"
@@ -210,6 +210,61 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/QueueEntityListing"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_GetUsers",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 25
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultDTOOfUserDTO"
                 }
               }
             }
@@ -5202,6 +5257,82 @@
           null,
           null
         ]
+      },
+      "PagedResultDTOOfUserDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDTO"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "firstUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "nextUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "previousUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "selfUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "UserDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "listaGrupos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupDTO"
+            }
+          }
+        }
       }
     }
   }

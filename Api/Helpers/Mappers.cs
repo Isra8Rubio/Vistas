@@ -5,6 +5,7 @@ namespace Api.Helpers
 {
     public static class Mappers
     {
+        // -- Groups --
         public static GroupDTO FromRaw(Group group)
         {
             return new GroupDTO
@@ -35,5 +36,35 @@ namespace Api.Helpers
             };
         }
 
+        // -- Users --
+        public static UserDTO FromRaw(User user)
+        {
+            return new UserDTO
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                ListaGrupos = (user.Groups ?? new List<Group>()).Select(g => new GroupDTO { Id = g.Id, Name = g.Name }).ToList(),
+            };
+        }
+
+        public static List<UserDTO> ToUserList(List<User> users) => users.Select(u => FromRaw(u)).ToList();
+
+        public static PagedResultDTO<UserDTO> FromRaw(UserEntityListing userEntityListing)
+        {
+            return new PagedResultDTO<UserDTO>
+            {
+                Entities = ToUserList(userEntityListing.Entities),
+                Total = userEntityListing.Total,
+                PageCount = userEntityListing.PageCount,
+                PageNumber = userEntityListing.PageNumber,
+                PageSize = userEntityListing.PageSize,
+                FirstUri = userEntityListing.FirstUri,
+                LastUri = userEntityListing.LastUri,
+                SelfUri = userEntityListing.SelfUri,
+                NextUri = userEntityListing.NextUri,
+                PreviousUri = userEntityListing.PreviousUri,
+            };
+        }
     }
 }

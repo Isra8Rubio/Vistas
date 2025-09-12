@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("api/groups")]
+    [Route("api/[controller]")]
     public class GroupsController : ControllerBase
     {
         private readonly ILogger<GroupsController> logger;

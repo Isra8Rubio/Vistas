@@ -7,15 +7,22 @@ namespace Api.Service
     {
         private readonly RoutingApiService _routingService;
         private readonly GroupApiService _groupService;
+        private readonly UserApiService _userService;
 
         public CallService(
             RoutingApiService routingService,
             GroupApiService groupService,
+            UserApiService userService,
             ILogger<GenesysAPIService> logger) : base(logger)
         {
             _routingService = routingService;
             _groupService = groupService;
+            _userService = userService;
         }
+
+        // ===== Users =====
+        public async Task<UserEntityListing?> Users_GetUsersAsync(int pageSize = 25, int pageNumber = 1)
+            => await _userService.Users_GetUsersAsync(pageSize, pageNumber);
 
         // ===== Routing =====
         public async Task<QueueEntityListing?> Routing_GetRoutingQueuesAsync(int pageNumber = 1, int pageSize = 25)

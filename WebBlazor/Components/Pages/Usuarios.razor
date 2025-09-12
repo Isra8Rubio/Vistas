@@ -1,8 +1,10 @@
 ﻿@page "/usuarios"
 @using MudBlazor
+@using API.APIService
+@inject APIClient Api
 
 <MudDataGrid @ref="dataGrid"
-             T="UsuarioDTO"
+             T="UserDTO"
              ServerData="ServerReload"
              Filterable="true"
              Hover="true"
@@ -31,83 +33,75 @@
     </ToolBarContent>
 
     <Columns>
-        <PropertyColumn Property="x => x.Nombre" Title="Usuario" Sortable="true" Filterable="true"
+        <PropertyColumn Property="x => x.Name" Title="Usuario" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="max-width:84px;width:84px;text-align:left; cursor:pointer" />
+                        CellStyle="max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; cursor:pointer" />
 
         <PropertyColumn Property="x => x.Email" Title="Email" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="max-width:84px;width:84px;text-align:left" />
+                        CellStyle="max-width:280px;text-align:left" />
 
-        <PropertyColumn Property="x => x.Grupo" Title="Grupo" Sortable="true" Filterable="true"
-                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="max-width:84px;width:84px;text-align:left" />
-
-        <PropertyColumn Property="x => x.Rol" Title="Rol" Sortable="true" Filterable="true"
-                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="max-width:84px;width:84px;text-align:left" />
-
-        <TemplateColumn Title="Estado" Sortable="true" Filterable="true"
-                        HeaderStyle="text-align:center; font-size:.95rem; font-weight:600"
-                        CellStyle="max-width:84px;width:84px;text-align:center">
+        <!-- Grupos (chips) -->
+        <TemplateColumn Title="Grupos" Sortable="false" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
+                        CellStyle="text-align:left">
             <CellTemplate>
-                <MudChip Size="Size.Small" Variant="Variant.Outlined"
-                         Color="@(context.Item.Activo ? Color.Success : Color.Error)">
-                    @(context.Item.Activo ? "Disponible" : "Baja")
-                </MudChip>
+                @if (context.Item.ListaGrupos is not null && context.Item.ListaGrupos.Count > 0)
+                {
+                    foreach (var g in context.Item.ListaGrupos)
+                    {
+                        <MudChip Class="mr-1 mb-1" Size="Size.Small" Variant="Variant.Outlined">
+                            @g.Name
+                        </MudChip>
+                    }
+                }
+                else
+                {
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">—</MudText>
+                }
             </CellTemplate>
         </TemplateColumn>
-
-        <PropertyColumn Property="x => x.UltimoAcceso" Title="Último acceso" Sortable="false" Filterable="true"
-                        Format="dd/MM/yyyy HH:mm"
-                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
-                        CellStyle="max-width:64px;width:64px;text-align:center" />
     </Columns>
 
     <PagerContent>
-        <MudDataGridPager T="UsuarioDTO" />
+        <MudDataGridPager T="UserDTO" />
     </PagerContent>
-
 </MudDataGrid>
 
-@if (seleccionado is not null)
+@* @if (seleccionado is not null)
 {
-    var miembrosCount = MiembrosDelGrupo(seleccionado.Grupo).Count();
+    var grupos = seleccionado.ListaGrupos ?? new();
 
     <MudPaper Class="pa-4 mt-4"
-              Style="width:100%; max-width: 360px; margin: 0 auto;
-                         background-color: var(--mud-palette-table-striped);
-                         border:1px solid var(--mud-palette-primary);">
+              Style="width:100%; max-width: 420px; margin: 0 auto;
+                     background-color: var(--mud-palette-table-striped);
+                     border:1px solid var(--mud-palette-primary);">
 
-        <MudText Typo="Typo.h6">@seleccionado.Nombre</MudText>
-        <MudText Class="mb-1">@seleccionado.Email</MudText>
-
-        <div class="mb-2">
-            <MudChip T="string"
-                     Size="Size.Small"
-                     Variant="Variant.Outlined"
-                     Color="@(seleccionado.Activo ? Color.Success : Color.Error)">
-                @(seleccionado.Activo ? "Disponible" : "Baja")
-            </MudChip>
-        </div>
-
-        <MudText Class="mb-1"><b>Rol:</b> @seleccionado.Rol</MudText>
-        <MudText Class="mb-2"><b>Grupo:</b> @($"{seleccionado.Grupo} ({miembrosCount} miembros)")</MudText>
+        <MudText Typo="Typo.h6">@seleccionado.Name</MudText>
+        <MudText Class="mb-2">@seleccionado.Email</MudText>
 
         <MudDivider Class="my-2" />
 
-        <MudText Typo="Typo.caption">
-            Último acceso: @seleccionado.UltimoAcceso.ToString("dd/MM/yyyy HH:mm")
-        </MudText>
+        <MudText Typo="Typo.subtitle2" Class="mb-1">Grupos (@grupos.Count)</MudText>
+        @if (grupos.Count > 0)
+        {
+            <div class="d-flex flex-wrap">
+                @foreach (var g in grupos)
+                {
+                    <MudChip Class="mr-1 mb-1" Size="Size.Small" Variant="Variant.Outlined">@g.Name</MudChip>
+                }
+            </div>
+        }
+        else
+        {
+            <MudText Typo="Typo.caption" Class="mud-text-secondary">Sin grupos</MudText>
+        }
     </MudPaper>
-}
-
-
+} *@
 
 @code {
-    private MudDataGrid<UsuarioDTO>? dataGrid;
-    private UsuarioDTO? seleccionado;
-    private string RowStyle(GrupoDTO _, int __) => "cursor:pointer;";
+    private MudDataGrid<UserDTO>? dataGrid;
+    private UserDTO? seleccionado;
 
     private Task ClearFilters()
     {
@@ -124,58 +118,40 @@
         set { if (_search == value) return; _search = value; _ = dataGrid?.ReloadServerData(); }
     }
 
-
-    // Datos
-    private readonly List<UsuarioDTO> usuarios = new()
+    private async Task<GridData<UserDTO>> ServerReload(GridState<UserDTO> state)
     {
-        new("Ana Pérez", "ana.perez@contoso.com", "Marketing", "Editor", true,  DateTime.Now.AddMinutes(-5)),
-        new("Carlos Freire", "carlos.freire@contoso.com", "Ventas", "Colaborador", true, DateTime.Now.AddHours(-3)),
-        new("Jesús Domínguez", "jesus.dominguez@contoso.com", "IT", "Admin", true, DateTime.Now.AddHours(-20)),
-        new("Paco Gil", "logistica@contoso.com", "Logística", "Servicio", false, DateTime.Today.AddDays(-2)),
-        new("María López", "maria.lopez@contoso.com", "Marketing", "Colaborador", true, DateTime.Today.AddDays(-1)),
-        new("Antonio Romeri", "soporte.n1@contoso.com", "IT", "Colaborador", true, DateTime.Today.AddDays(-4)),
-        new("Josefina Rodríguez", "ventas@contoso.com", "Ventas", "Editor", true, DateTime.Today.AddDays(-2)),
-        new("Ricardo García", "rrhh@contoso.com", "RRHH", "Editor", false, DateTime.Today.AddDays(-7)),
-    };
-
-    private IEnumerable<UsuarioDTO> MiembrosDelGrupo(string grupo)
-        => usuarios.Where(u => u.Grupo.Equals(grupo, StringComparison.OrdinalIgnoreCase));
-
-    // Carga server-side con filtro de texto, orden y paginación
-    private Task<GridData<UsuarioDTO>> ServerReload(GridState<UsuarioDTO> state)
-    {
-        IEnumerable<UsuarioDTO> data = usuarios;
-
-        if (!string.IsNullOrWhiteSpace(_search))
+        try
         {
-            var q = _search.Trim();
-            data = data.Where(x =>
-                x.Nombre.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                x.Email.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                x.Grupo.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                x.Rol.Contains(q, StringComparison.OrdinalIgnoreCase));
-        }
+            var pageNumber = state.Page + 1;
+            var pageSize = state.PageSize;
+            var data = await Api.Users_GetUsersAsync(pageNumber, pageSize);
+            var total = data.Total > 0 ? data.Total
+                                       : (data.PageCount > 0 && data.PageSize > 0 ? data.PageCount * data.PageSize
+                                                                                   : data.Entities.Count);
 
-        var sort = state.SortDefinitions.FirstOrDefault();
-        if (sort is not null)
-        {
-            data = sort.SortBy switch
+            IEnumerable<UserDTO> items = data.Entities;
+            if (!string.IsNullOrWhiteSpace(_search))
             {
-                nameof(UsuarioDTO.Nombre)        => sort.Descending ? data.OrderByDescending(x => x.Nombre)        : data.OrderBy(x => x.Nombre),
-                nameof(UsuarioDTO.Email)         => sort.Descending ? data.OrderByDescending(x => x.Email)         : data.OrderBy(x => x.Email),
-                nameof(UsuarioDTO.Grupo)         => sort.Descending ? data.OrderByDescending(x => x.Grupo)         : data.OrderBy(x => x.Grupo),
-                nameof(UsuarioDTO.Rol)           => sort.Descending ? data.OrderByDescending(x => x.Rol)           : data.OrderBy(x => x.Rol),
-                nameof(UsuarioDTO.Activo)        => sort.Descending ? data.OrderByDescending(x => x.Activo)        : data.OrderBy(x => x.Activo),
-                nameof(UsuarioDTO.UltimoAcceso)  => sort.Descending ? data.OrderByDescending(x => x.UltimoAcceso)  : data.OrderBy(x => x.UltimoAcceso),
-                _ => data
+                var q = _search.Trim();
+                items = items.Where(x =>
+                    (x.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.Email?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.ListaGrupos?.Any(g => g.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ?? false));
+            }
+
+            return new GridData<UserDTO>
+            {
+                TotalItems = (int)total,
+                Items = items.ToList()
             };
         }
-
-        var total = data.Count();
-        var items = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
-
-        return Task.FromResult(new GridData<UsuarioDTO> { TotalItems = total, Items = items });
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+            return new GridData<UserDTO> { TotalItems = 0, Items = [] };
+        }
     }
 
-    private void OnRowClick(DataGridRowClickEventArgs<UsuarioDTO> args) => seleccionado = args.Item;
+
+    private void OnRowClick(DataGridRowClickEventArgs<UserDTO> args) => seleccionado = args.Item;
 }
