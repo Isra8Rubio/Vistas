@@ -23,6 +23,7 @@ namespace Api.Controllers
             this.callService = callService;
         }
 
+
         // GET /api/users
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResultDTO<UserDTO>))]
@@ -103,5 +104,37 @@ namespace Api.Controllers
                 return StatusCode(500, new { Message = "Error llamando a Genesys Cloud (Users)", Detail = ex.Message });
             }
         }
+
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDTO))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<UserDTO>> GetUserByIdAsync([FromRoute] string id)
+        {
+            try
+            {
+                var raw = await callService.Users_GetUserByIdAsync(id);
+                if (raw is null) return NotFound();
+
+                var dto = Mappers.FromRaw(raw);
+
+                // Completar nombres de grupos si vienen vacíos
+                var missing = (dto.ListaGrupos ?? []).Where(g => string.IsNullOrWhiteSpace(g.Name) && !string.IsNullOrWhiteSpace(g.Id)).ToList();
+                foreach (var g in missing)
+                {
+                    var full = await callService.Groups_GetGroupByIdAsync(g.Id!);
+                    if (!string.IsNullOrWhiteSpace(full?.Name))
+                        g.Name = full!.Name!;
+                }
+
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "GetUserByIdAsync error");
+                return StatusCode(500, new { Message = "Error llamando a Genesys Cloud (User by Id)", Detail = ex.Message });
+            }
+        }
+
     }
 }

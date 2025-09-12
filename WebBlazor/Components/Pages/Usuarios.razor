@@ -2,6 +2,7 @@
 @using MudBlazor
 @using API.APIService
 @inject APIClient Api
+@inject NavigationManager Nav
 
 <MudDataGrid @ref="dataGrid"
              T="UserDTO"
@@ -11,7 +12,7 @@
              Dense="true"
              Bordered="true"
              Striped="true"
-             RowClick="OnRowClick"
+             RowClick="GotoUser"
              Class="mt-4 pa-2"
              Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
 
@@ -165,7 +166,8 @@
             return new GridData<UserDTO> { TotalItems = 0, Items = [] };
         }
     }
-
-
     private void OnRowClick(DataGridRowClickEventArgs<UserDTO> args) => seleccionado = args.Item;
+
+    private void GotoUser(DataGridRowClickEventArgs<UserDTO> args)
+    => Nav.NavigateTo($"/usuarios/{args.Item.Id}");
 }

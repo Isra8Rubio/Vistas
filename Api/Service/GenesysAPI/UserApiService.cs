@@ -33,16 +33,16 @@ namespace Api.Service.GenesysAPI
         }
 
 
-
-        //Prueba -> No vale
-        public async Task<User?> Users_GetUserByIdAsync(string userId, string? state = null)
+        public async Task<User?> Users_GetUserByIdAsync(string userId)
         {
-            _logger.LogDebug("Users_GetUserByIdAsync --> userId={userId}, state={state}", userId, state);
+            _logger.LogDebug("Users_GetUserByIdAsync --> userId={userId}", userId);
             _genesysAuthService.CheckToken();
 
             try
             {
-                return await ExecuteWithRetry(async() => await _usersApi.GetUserAsync(userId, state: state),
+                var expand = new List<string> { "groups" };
+                return await ExecuteWithRetry(
+                    async () => await _usersApi.GetUserAsync(userId, expand: expand),
                     "Users_GetUserByIdAsync");
             }
             catch (Exception ex)
