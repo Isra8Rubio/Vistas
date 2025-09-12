@@ -38,5 +38,8 @@ namespace Api.Service
 
         public async Task<UserEntityListing?> Groups_GetGroupsIndividualsAsync(string groupId)
             => await _groupService.Groups_GetGroupsIndividualsAsync(groupId);
+
+        public async Task<Group?> Groups_GetGroupByIdAsync(string groupId)
+            => await _groupService.Groups_GetGroupByIdAsync(groupId);
     }
 }

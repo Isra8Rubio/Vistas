@@ -35,7 +35,8 @@ namespace Api.Controllers
             var traceId = httpContext.HttpContext?.TraceIdentifier.Split(':')[0] ?? "";
             try
             {
-                logger.LogInformation("[{TraceId}] Call: GetUsersAsync(pageNumber={PageNumber}, pageSize={PageSize})", traceId, pageNumber, pageSize);
+                logger.LogInformation("[{TraceId}] Call: GetUsersAsync(pageNumber={PageNumber}, pageSize={PageSize})",
+                    traceId, pageNumber, pageSize);
 
                 var response = await callService.Users_GetUsersAsync(pageSize, pageNumber);
 
@@ -49,7 +50,52 @@ namespace Api.Controllers
                 if (response?.Entities is null || !response.Entities.Any())
                     return NotFound();
 
-                return Ok(Mappers.FromRaw(response));
+                // 1) Map a DTOs 
+                var dto = Mappers.FromRaw(response);
+
+                // 2) Detecta IDs de grupo sin nombre
+                var missingIds = dto.Entities
+                    .SelectMany(u => u.ListaGrupos ?? new List<GroupDTO>())
+                    .Where(g => string.IsNullOrWhiteSpace(g.Name) && !string.IsNullOrWhiteSpace(g.Id))
+                    .Select(g => g.Id!)
+                    .Distinct()
+                    .ToList();
+
+                // 3) Si hay grupos sin nombre, creamos un diccionario id->name
+                if (missingIds.Count > 0)
+                {
+                    // Para no saturar la API
+                    var throttler = new SemaphoreSlim(5);
+                    var tasks = missingIds.Select(async id =>
+                    {
+                        await throttler.WaitAsync();
+                        try { return await callService.Groups_GetGroupByIdAsync(id); }
+                        finally { throttler.Release(); }
+                    });
+
+                    var fetched = await Task.WhenAll(tasks);
+
+                    var namesById = fetched
+                        .Where(g => g != null && !string.IsNullOrWhiteSpace(g.Id))
+                        .GroupBy(g => g!.Id)
+                        .Select(g => g.First()!)
+                        .ToDictionary(g => g.Id!, g => g.Name ?? g.Id);
+
+                    // 4) Nombre a los grupos
+                    foreach (var u in dto.Entities)
+                    {
+                        foreach (var g in u.ListaGrupos)
+                        {
+                            if (string.IsNullOrWhiteSpace(g.Name) && !string.IsNullOrWhiteSpace(g.Id)
+                                && namesById.TryGetValue(g.Id, out var name))
+                            {
+                                g.Name = name;
+                            }
+                        }
+                    }
+                }
+                // 5) DTO completado
+                return Ok(dto);
             }
             catch (Exception ex)
             {

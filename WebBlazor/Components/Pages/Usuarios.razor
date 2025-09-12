@@ -44,16 +44,21 @@
         <!-- Grupos (chips) -->
         <TemplateColumn Title="Grupos" Sortable="false" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
-                        CellStyle="text-align:left">
+                        CellStyle="text-align:left; white-space:normal;">
             <CellTemplate>
-                @if (context.Item.ListaGrupos is not null && context.Item.ListaGrupos.Count > 0)
+                @if (context.Item.ListaGrupos is { Count: > 0 })
                 {
-                    foreach (var g in context.Item.ListaGrupos)
-                    {
-                        <MudChip Class="mr-1 mb-1" Size="Size.Small" Variant="Variant.Outlined">
-                            @g.Name
-                        </MudChip>
-                    }
+                    <div style="display:flex; flex-wrap:wrap; gap:.25rem; align-items:center;">
+                        @foreach (var g in context.Item.ListaGrupos)
+                        {
+                            var label = !string.IsNullOrWhiteSpace(g.Name) ? g.Name : g.Id;
+                            <MudTooltip Text="@($"Id: {g.Id}")">
+                                <MudChip Class="mr-1 mb-1" Size="Size.Small" Variant="Variant.Outlined">
+                                    @label
+                                </MudChip>
+                            </MudTooltip>
+                        }
+                    </div>
                 }
                 else
                 {
@@ -61,6 +66,7 @@
                 }
             </CellTemplate>
         </TemplateColumn>
+
     </Columns>
 
     <PagerContent>
@@ -68,9 +74,9 @@
     </PagerContent>
 </MudDataGrid>
 
-@* @if (seleccionado is not null)
+@if (seleccionado is not null)
 {
-    var grupos = seleccionado.ListaGrupos ?? new();
+    var grupos = seleccionado.ListaGrupos ?? new List<GroupDTO>();
 
     <MudPaper Class="pa-4 mt-4"
               Style="width:100%; max-width: 420px; margin: 0 auto;
@@ -83,12 +89,19 @@
         <MudDivider Class="my-2" />
 
         <MudText Typo="Typo.subtitle2" Class="mb-1">Grupos (@grupos.Count)</MudText>
+
         @if (grupos.Count > 0)
         {
-            <div class="d-flex flex-wrap">
+            <div style="display:flex; flex-wrap:wrap; gap:.25rem;">
                 @foreach (var g in grupos)
                 {
-                    <MudChip Class="mr-1 mb-1" Size="Size.Small" Variant="Variant.Outlined">@g.Name</MudChip>
+                    var label = !string.IsNullOrWhiteSpace(g?.Name) ? g!.Name : g?.Id;
+
+                    <MudTooltip Text="@($"Id: {g?.Id}")">
+                        <MudChip T="string" Class="mr-1 mb-1" Size="Size.Small" Variant="Variant.Outlined">
+                            @label
+                        </MudChip>
+                    </MudTooltip>
                 }
             </div>
         }
@@ -97,7 +110,8 @@
             <MudText Typo="Typo.caption" Class="mud-text-secondary">Sin grupos</MudText>
         }
     </MudPaper>
-} *@
+}
+
 
 @code {
     private MudDataGrid<UserDTO>? dataGrid;

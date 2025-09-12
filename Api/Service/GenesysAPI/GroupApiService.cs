@@ -30,6 +30,23 @@ namespace Api.Service.GenesysAPI
             }
         }
 
+        public async Task<Group?> Groups_GetGroupByIdAsync(string groupId)
+        {
+            _logger.LogDebug("Groups_GetGroupByIdAsync --> groupId={groupId}", groupId);
+            _genesysAuthService.CheckToken();
+            try
+            {
+                return await ExecuteWithRetry(
+                    async () => await _groupsApi.GetGroupAsync(groupId),
+                    "Groups_GetGroupByIdAsync");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Groups_GetGroupByIdAsync error");
+                return null;
+            }
+        }
+
         public async Task<UserEntityListing?> Groups_GetGroupsIndividualsAsync(string groupId)
         {
             _logger.LogDebug("Groups_GetGroupsIndividualsAsync --> groupId={groupId}", groupId);

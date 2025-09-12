@@ -21,7 +21,8 @@ namespace Api.Service.GenesysAPI
 
             try
             {
-                return await ExecuteWithRetry(async() => await _usersApi.GetUsersAsync(pageSize, pageNumber, state: state), 
+                var expand = new List<string> { "groups" };
+                return await ExecuteWithRetry(async() => await _usersApi.GetUsersAsync(pageSize, pageNumber, expand: expand), 
                     "Users_GetUsersAsync");
             }
             catch (Exception ex)
