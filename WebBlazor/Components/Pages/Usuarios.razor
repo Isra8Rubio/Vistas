@@ -1,8 +1,12 @@
 ﻿@page "/usuarios"
+@using CsvHelper
 @using MudBlazor
 @using API.APIService
+@using System.Text
+@using System.Globalization
 @inject APIClient Api
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <MudDataGrid @ref="dataGrid"
              T="UserDTO"
@@ -31,6 +35,12 @@
         <MudIconButton Icon="@Icons.Material.Filled.Clear"
                        OnClick="ClearFilters"
                        Class="ml-1 mt-2" />
+
+        <!-- Botón Exportar CSV -->
+        <MudButton Class="ml-2 mt-2" Variant="Variant.Outlined" Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Download" OnClick="ExportCsv">
+            Exportar CSV
+        </MudButton>
     </ToolBarContent>
 
     <Columns>
@@ -115,6 +125,7 @@
 
 
 @code {
+    private List<UserDTO> _lastItems = new();
     private MudDataGrid<UserDTO>? dataGrid;
     private UserDTO? seleccionado;
 
@@ -140,11 +151,14 @@
             var pageNumber = state.Page + 1;
             var pageSize = state.PageSize;
             var data = await Api.Users_GetUsersAsync(pageNumber, pageSize);
+
             var total = data.Total > 0 ? data.Total
-                                       : (data.PageCount > 0 && data.PageSize > 0 ? data.PageCount * data.PageSize
-                                                                                   : data.Entities.Count);
+                                       : (data.PageCount > 0 && data.PageSize > 0
+                                          ? data.PageCount * data.PageSize
+                                          : data.Entities.Count);
 
             IEnumerable<UserDTO> items = data.Entities;
+
             if (!string.IsNullOrWhiteSpace(_search))
             {
                 var q = _search.Trim();
@@ -154,18 +168,59 @@
                     (x.ListaGrupos?.Any(g => g.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ?? false));
             }
 
+            var list = items.ToList();
+            _lastItems = list; // guardamos lo que ve el grid ahora
+
             return new GridData<UserDTO>
             {
                 TotalItems = (int)total,
-                Items = items.ToList()
+                Items = list
             };
         }
-        catch (Exception ex)
+        catch
         {
-            Console.Error.WriteLine(ex);
+            _lastItems = new();
             return new GridData<UserDTO> { TotalItems = 0, Items = [] };
         }
     }
+
+    private async Task ExportCsv()
+    {
+        // Proyectamos a un “row” plano para el CSV
+        var rows = _lastItems.Select(u => new ExportUserRow
+        {
+            Usuario = u.Name ?? "",
+            Email = u.Email ?? "",
+            Grupos = u.ListaGrupos is { Count: > 0 }
+                     ? string.Join(" | ", u.ListaGrupos.Where(g => g is not null).Select(g => string.IsNullOrWhiteSpace(g!.Name) ? g.Id : g.Name))
+                     : ""
+        });
+
+        using var sw = new StringWriter(new StringBuilder());
+        using (var csv = new CsvWriter(sw, CultureInfo.GetCultureInfo("es-ES")))
+        {
+            csv.WriteHeader<ExportUserRow>();
+            await csv.NextRecordAsync();
+            foreach (var r in rows)
+            {
+                csv.WriteRecord(r);
+                await csv.NextRecordAsync();
+            }
+        }
+
+        var csvContent = sw.ToString();
+
+        var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/DownloadCSV.js");
+        await module.InvokeVoidAsync("saveFile", $"usuarios_{DateTime.Now:yyyyMMdd_HHmm}.csv", csvContent);
+    }
+
+    public class ExportUserRow
+    {
+        public string Usuario { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Grupos { get; set; } = "";
+    }
+
     private void OnRowClick(DataGridRowClickEventArgs<UserDTO> args) => seleccionado = args.Item;
 
     private void GotoUser(DataGridRowClickEventArgs<UserDTO> args)
