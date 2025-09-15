@@ -135,6 +135,5 @@ namespace Api.Controllers
                 return StatusCode(500, new { Message = "Error llamando a Genesys Cloud (User by Id)", Detail = ex.Message });
             }
         }
-
     }
 }

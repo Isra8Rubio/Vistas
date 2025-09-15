@@ -1,8 +1,8 @@
 ﻿@page "/grupos"
 @using MudBlazor
-@inject HttpClient Http
 @using API.APIService
 @inject APIClient Api
+@inject NavigationManager Nav
 
 <MudDataGrid @ref="dataGrid"
              T="GroupDTO"
@@ -12,6 +12,7 @@
              Dense="true"
              Bordered="true"
              Striped="true"
+             RowClick="GotoGroup"
              Class="mt-4 pa-2"
              Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
 
@@ -35,16 +36,16 @@
     <Columns>
         <PropertyColumn Property="x => x.Name" Title="Grupo" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="max-width:64px;width:64px;text-align:left" />
+                        CellStyle="max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; cursor:pointer" />
 
         <PropertyColumn Property="x => x.MemberCount" Title="Nº miembros" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="max-width:64px;width:64px;text-align:left" />
+                        CellStyle="text-align:left" />
 
         <PropertyColumn Property="x => x.DateModified" Title="Último cambio" Sortable="true" Filterable="true"
                         Format="dd/MM/yyyy HH:mm"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
-                        CellStyle="max-width:64px;width:64px;text-align:center" />
+                        CellStyle="text-align:center" />
     </Columns>
 
     <PagerContent>
@@ -54,16 +55,14 @@
 
 @code {
     private MudDataGrid<GroupDTO>? dataGrid;
-    private GroupDTO? seleccionado;
 
     private Task ClearFilters()
     {
         Search = null;
-        seleccionado = null;
         return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
     }
 
-    // Búsqueda
+    // TODO: Búsqueda no local
     private string? _search;
     private string? Search
     {
@@ -75,9 +74,34 @@
     {
         try
         {
-            PagedResultDTOOfGroupDTO data = await Api.Groups_GetGroupsAsync(1, 25);
+            var pageNumber = state.Page + 1;
+            var pageSize = state.PageSize;
 
-            return new GridData<GroupDTO> { TotalItems = data.Entities.Count(), Items = data.Entities };
+            var data = await Api.Groups_GetGroupsAsync(pageNumber, pageSize);
+
+            var total = data.Total > 0 ? data.Total
+                                       : (data.PageCount > 0 && data.PageSize > 0 ? data.PageCount * data.PageSize
+                                                                                   : data.Entities.Count);
+
+            IEnumerable<GroupDTO> items = data.Entities;
+
+            if (!string.IsNullOrWhiteSpace(_search))
+            {
+                var q = _search.Trim();
+                items = items.Where(x =>
+                    (x.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.ListaUsuarios?.Any(u =>
+                        (u.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                        (u.Email?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false)
+                    ) ?? false)
+                );
+            }
+
+            return new GridData<GroupDTO>
+            {
+                TotalItems = (int)total,
+                Items = items.ToList()
+            };
         }
         catch (Exception ex)
         {
@@ -86,8 +110,13 @@
         }
     }
 
-    private void OnRowClick(DataGridRowClickEventArgs<GroupDTO> args) => seleccionado = args.Item;
+    private void GotoGroup(DataGridRowClickEventArgs<GroupDTO> args)
+    {
+        if (!string.IsNullOrWhiteSpace(args.Item.Id))
+            Nav.NavigateTo($"/grupos/{args.Item.Id}");
+    }
 }
+
 
 
 @* @page "/grupos"

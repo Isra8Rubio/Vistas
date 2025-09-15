@@ -13,7 +13,8 @@ namespace Api.Helpers
                 Id = group.Id,
                 Name = group.Name,
                 MemberCount = group.MemberCount,
-                DateModified = group.DateModified
+                DateModified = group.DateModified,
+                ListaUsuarios = (group.Owners ?? new List<User>()).Select(u => new UserDTO { Id = u.Id, Name = u.Name, Email = u.Email }).ToList()
             };
         }
 

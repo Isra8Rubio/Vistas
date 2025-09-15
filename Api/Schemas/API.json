@@ -61,6 +61,47 @@
         }
       }
     },
+    "/api/Groups/{id}": {
+      "get": {
+        "tags": [
+          "Groups"
+        ],
+        "operationId": "Groups_GetGroupById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/routing/queues": {
       "get": {
         "tags": [
@@ -358,6 +399,36 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "listaUsuarios": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDTO"
+            }
+          }
+        }
+      },
+      "UserDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "listaGrupos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupDTO"
+            }
           }
         }
       },
@@ -2762,30 +2833,6 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
-          }
-        }
-      },
-      "UserDTO": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "nullable": true
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "listaGrupos": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GroupDTO"
-            }
           }
         }
       }

@@ -20,6 +20,7 @@ namespace Api.Service.GenesysAPI
 
             try
             {
+                var expand = new List<string> { "owners" };
                 return await ExecuteWithRetry(async() => await _groupsApi.GetGroupsAsync(pageSize,pageNumber),
                     "Groups_GetGroupsAsync");
             }
@@ -36,6 +37,7 @@ namespace Api.Service.GenesysAPI
             _genesysAuthService.CheckToken();
             try
             {
+                var expand = new List<string> { "owners" };
                 return await ExecuteWithRetry(
                     async () => await _groupsApi.GetGroupAsync(groupId),
                     "Groups_GetGroupByIdAsync");
