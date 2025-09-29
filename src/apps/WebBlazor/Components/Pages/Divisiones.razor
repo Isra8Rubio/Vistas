@@ -1,0 +1,151 @@
+﻿@page "/divisiones"
+@using MudBlazor
+@using API.APIService
+@using DivisionApiDTO = API.APIService.DivisionDTO
+@inject APIClient Api
+
+<MudDataGrid @ref="dataGrid"
+             T="DivisionApiDTO"
+             ServerData="ServerReload"
+             Filterable="true"
+             Hover="true"
+             Dense="true"
+             Bordered="true"
+             Striped="true"
+             RowClick="OnRowClick"
+             Class="mt-4 pa-2"
+             Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
+
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField T="string"
+                      @bind-Value="Search"
+                      Label="Buscar"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      AdornmentColor="Color.Primary"
+                      Immediate="true"
+                      DebounceInterval="300"
+                      Class="mt-2 mb-1" />
+        <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                       OnClick="ClearFilters"
+                       Class="ml-1 mt-2"/>
+    </ToolBarContent>
+
+    <Columns>
+        <!-- Nombre -->
+        <PropertyColumn Property="x => x.Name" Title="División" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; cursor:pointer" />
+
+        <!-- Id abreviado como “Código” -->
+        <TemplateColumn Title="Código">
+            <CellTemplate>
+                @{
+                    var id = context.Item.Id ?? "-";
+                }
+                @(id == "-" ? "-" : id[..Math.Min(8, id.Length)])
+            </CellTemplate>
+        </TemplateColumn>
+
+        <!-- HomeDivision (existe en el DTO de la API) -->
+        <TemplateColumn Title="Tipo" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:center; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:center">
+            <CellTemplate>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                         Color="@(context.Item.HomeDivision == true ? Color.Info : Color.Default)">
+                    @(context.Item.HomeDivision == true ? "Home" : "Normal")
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <!-- Ejemplo: total de objetos si viene ObjectCounts -->
+        <TemplateColumn Title="Objetos" Sortable="false" Filterable="false"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left">
+            <CellTemplate>
+                @((context.Item.ObjectCounts?.Values?.Sum(v => (long)v) ?? 0).ToString("N0"))
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="DivisionApiDTO" />
+    </PagerContent>
+</MudDataGrid>
+
+@if (seleccionado is not null)
+{
+    <MudPaper Class="pa-4 mt-4"
+              Style="width:100%; max-width: 480px; margin: 0 auto;
+                     background-color: var(--mud-palette-table-striped);
+                     border:1px solid var(--mud-palette-primary);">
+        <MudText Typo="Typo.h6">@seleccionado.Name</MudText>
+        <MudText Class="mb-1"><b>Id:</b> @seleccionado.Id</MudText>
+        <MudText Class="mb-1"><b>Descripción:</b> @(seleccionado.Description ?? "—")</MudText>
+        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                 Color="@(seleccionado.HomeDivision == true ? Color.Info : Color.Default)">
+            @(seleccionado.HomeDivision == true ? "Home" : "Normal")
+        </MudChip>
+    </MudPaper>
+}
+
+@code {
+    private MudDataGrid<DivisionApiDTO>? dataGrid;
+    private DivisionApiDTO? seleccionado;
+
+    private string? _search;
+    private string? Search
+    {
+        get => _search;
+        set { if (_search == value) return; _search = value; _ = dataGrid?.ReloadServerData(); }
+    }
+
+    private Task ClearFilters()
+    {
+        _search = null;
+        seleccionado = null;
+        return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
+    }
+
+    private async Task<GridData<DivisionApiDTO>> ServerReload(GridState<DivisionApiDTO> state)
+    {
+        try
+        {
+            var pageNumber = state.Page + 1;
+            var pageSize   = state.PageSize;
+
+            // Ajusta el nombre del método si NSwag generó otro
+            var data = await Api.Divisions_GetDivisionsAsync(pageNumber, pageSize);
+
+            var total = data.Total > 0
+                        ? data.Total
+                        : (data.PageCount > 0 && data.PageSize > 0
+                           ? data.PageCount * data.PageSize
+                           : data.Entities.Count);
+
+            IEnumerable<DivisionApiDTO> items = data.Entities ?? new List<DivisionApiDTO>();
+
+            if (!string.IsNullOrWhiteSpace(_search))
+            {
+                var q = _search.Trim();
+                items = items.Where(d => (d.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false)
+                                         || (d.Id?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false));
+            }
+
+            return new GridData<DivisionApiDTO>
+            {
+                TotalItems = (int)total,
+                Items = items.ToList()
+            };
+        }
+        catch
+        {
+            return new GridData<DivisionApiDTO> { TotalItems = 0, Items = Array.Empty<DivisionApiDTO>() };
+        }
+    }
+
+    private void OnRowClick(DataGridRowClickEventArgs<DivisionApiDTO> args) => seleccionado = args.Item;
+}

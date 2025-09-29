@@ -1,0 +1,427 @@
+﻿@page "/notfound"
+@using MudBlazor
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<div class="notfound-container">
+    <!-- Particles de fondo -->
+    <div class="particles">
+        @for (int i = 0; i < 50; i++)
+        {
+            <div class="particle" style="left: @(Random.Shared.Next(0, 100))%; top: @(Random.Shared.Next(0, 100))%; animation-delay: @(Random.Shared.Next(0, 3000))ms; animation-duration: @(Random.Shared.Next(2000, 5000))ms;"></div>
+        }
+    </div>
+
+    <!-- Gradiente dinámico -->
+    <div class="mouse-gradient" id="mouseGradient"></div>
+
+    <!-- Grid de fondo -->
+    <div class="background-grid"></div>
+
+    <!-- Contenido principal -->
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="content-container">
+        <div class="content-wrapper">
+            
+            <!-- Número 404 con efecto glitch -->
+            <div class="title-container">
+                <h1 class="main-title @(glitchActive ? "glitch-active" : "")">404</h1>
+                @if (glitchActive)
+                {
+                    <h1 class="glitch-red">404</h1>
+                    <h1 class="glitch-cyan">404</h1>
+                }
+            </div>
+
+            <!-- Texto principal -->
+            <div class="text-section">
+                <MudText Typo="Typo.h2" Class="subtitle">
+                    Página no encontrada
+                </MudText>
+                <MudText Typo="Typo.h6" Class="description">
+                    La página que buscas se perdió en el ciberespacio.<br />
+                    Pero no te preocupes, podemos llevarte de vuelta a casa.
+                </MudText>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="buttons-section">
+                <MudButton Variant="Variant.Filled" 
+                          StartIcon="@Icons.Material.Filled.Home"
+                          Class="home-button"
+                          OnClick="GoToHome">
+                    Volver al inicio
+                </MudButton>
+
+                <MudButton Variant="Variant.Outlined" 
+                          StartIcon="@Icons.Material.Filled.Search"
+                          Class="search-button"
+                          OnClick="OpenSearch">
+                    Buscar
+                </MudButton>
+
+                <MudButton Variant="Variant.Text" 
+                          StartIcon="@Icons.Material.Filled.ArrowBack"
+                          Class="back-button"
+                          OnClick="GoBack">
+                    Atrás
+                </MudButton>
+            </div>
+
+            <!-- Elementos decorativos -->
+            <div class="decoration decoration-1"></div>
+            <div class="decoration decoration-2"></div>
+            <div class="line line-1"></div>
+            <div class="line line-2"></div>
+        </div>
+    </MudContainer>
+
+    <!-- Efectos de brillo en las esquinas -->
+    <div class="corner-glow corner-glow-1"></div>
+    <div class="corner-glow corner-glow-2"></div>
+</div>
+
+<style>
+    .notfound-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0f172a, #581c87, #0f172a);
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .particles {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #a855f7;
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: pulse-particle infinite;
+    }
+
+    .mouse-gradient {
+        position: absolute;
+        inset: 0;
+        opacity: 0.2;
+        transition: all 1s ease-out;
+        pointer-events: none;
+    }
+
+    .background-grid {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, transparent, rgba(147, 51, 234, 0.05), transparent);
+        background-image: 
+            linear-gradient(rgba(147, 51, 234, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(147, 51, 234, 0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+    }
+
+    .content-container {
+        position: relative;
+        z-index: 10;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+    }
+
+    .content-wrapper {
+        text-align: center;
+        width: 100%;
+        position: relative;
+    }
+
+    .title-container {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+    .main-title {
+        font-size: clamp(6rem, 15vw, 12rem);
+        font-weight: 900;
+        background: linear-gradient(45deg, #a855f7, #ec4899, #ef4444);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: pulse-title 2s infinite;
+        user-select: none;
+        margin: 0;
+        line-height: 1;
+    }
+
+    .main-title.glitch-active {
+        animation: bounce 0.2s;
+    }
+
+    .glitch-red, .glitch-cyan {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: clamp(6rem, 15vw, 12rem);
+        font-weight: 900;
+        opacity: 0.7;
+        animation: ping 0.2s;
+        margin: 0;
+        line-height: 1;
+    }
+
+    .glitch-red {
+        color: #ef4444;
+        transform: translate(-2px, 0);
+    }
+
+    .glitch-cyan {
+        color: #06b6d4;
+        transform: translate(2px, 0);
+    }
+
+    .text-section {
+        margin-bottom: 3rem;
+        animation: fade-in 1s ease-out 0.5s both;
+    }
+
+    .subtitle {
+        color: white;
+        opacity: 0.9;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    .description {
+        color: #c4b5fd;
+        opacity: 0.8;
+        line-height: 1.6;
+        font-size: clamp(1rem, 2.5vw, 1.25rem);
+    }
+
+    .buttons-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+        padding-top: 2rem;
+    }
+
+    @media (min-width: 640px) {
+        .buttons-section {
+            flex-direction: row;
+            justify-content: center;
+        }
+    }
+
+    .home-button {
+        background: linear-gradient(45deg, #7c3aed, #ec4899) !important;
+        color: white !important;
+        box-shadow: 0 25px 50px -12px rgba(168, 85, 247, 0.25) !important;
+        transition: all 0.3s ease !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .home-button:hover {
+        transform: scale(1.05) rotate(1deg) !important;
+        box-shadow: 0 25px 50px -12px rgba(168, 85, 247, 0.4) !important;
+    }
+
+    .search-button {
+        border-color: #a855f7 !important;
+        color: #c4b5fd !important;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease !important;
+    }
+
+    .search-button:hover {
+        background-color: #a855f7 !important;
+        color: white !important;
+        transform: scale(1.05) rotate(-1deg) !important;
+    }
+
+    .back-button {
+        color: #c4b5fd !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .back-button:hover {
+        color: white !important;
+        transform: scale(1.05) !important;
+    }
+
+    .decoration {
+        position: absolute;
+        border-radius: 50%;
+        blur: 60px;
+        animation: pulse-decoration infinite;
+    }
+
+    .decoration-1 {
+        top: -5rem;
+        left: -5rem;
+        width: 10rem;
+        height: 10rem;
+        background: rgba(168, 85, 247, 0.2);
+    }
+
+    .decoration-2 {
+        bottom: -5rem;
+        right: -5rem;
+        width: 15rem;
+        height: 15rem;
+        background: rgba(236, 72, 153, 0.2);
+        animation-delay: 1s;
+    }
+
+    .line {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        top: 50%;
+        background: linear-gradient(to right, transparent, rgba(168, 85, 247, 0.5), transparent);
+        animation: pulse-line infinite;
+    }
+
+    .line-2 {
+        background: linear-gradient(to right, transparent, rgba(236, 72, 153, 0.3), transparent);
+        animation-delay: 1.5s;
+    }
+
+    .corner-glow {
+        position: absolute;
+        border-radius: 50%;
+        blur: 120px;
+        animation: pulse-corner infinite;
+    }
+
+    .corner-glow-1 {
+        top: 0;
+        left: 0;
+        width: 18rem;
+        height: 18rem;
+        background: rgba(124, 58, 237, 0.1);
+    }
+
+    .corner-glow-2 {
+        bottom: 0;
+        right: 0;
+        width: 24rem;
+        height: 24rem;
+        background: rgba(236, 72, 153, 0.1);
+        animation-delay: 2s;
+    }
+
+    @keyframes pulse-particle {
+        0%, 100% { opacity: 0.1; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(1.5); }
+    }
+
+    @keyframes pulse-title {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+
+    @keyframes ping {
+        75%, 100% { transform: scale(1.1); opacity: 0; }
+    }
+
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse-decoration {
+        0%, 100% { opacity: 0.1; transform: scale(1); }
+        50% { opacity: 0.3; transform: scale(1.1); }
+    }
+
+    @keyframes pulse-line {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 0.6; }
+    }
+
+    @keyframes pulse-corner {
+        0%, 100% { opacity: 0.05; transform: scale(1); }
+        50% { opacity: 0.15; transform: scale(1.05); }
+    }
+</style>
+
+@code {
+    private bool glitchActive = false;
+    private Timer? glitchTimer;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Configurar seguimiento del mouse
+            await JSRuntime.InvokeVoidAsync("setupMouseTracking");
+            
+            // Configurar efecto glitch
+            StartGlitchEffect();
+        }
+    }
+
+    private void StartGlitchEffect()
+    {
+        glitchTimer = new Timer(async _ =>
+        {
+            glitchActive = true;
+            StateHasChanged();
+            
+            await Task.Delay(200);
+            
+            glitchActive = false;
+            StateHasChanged();
+        }, null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(Random.Shared.Next(3, 8)));
+    }
+
+    private void GoToHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private void OpenSearch()
+    {
+        // Implementar lógica de búsqueda
+        Navigation.NavigateTo("/search");
+    }
+
+    private void GoBack()
+    {
+        JSRuntime.InvokeVoidAsync("history.back");
+    }
+
+    public void Dispose()
+    {
+        glitchTimer?.Dispose();
+    }
+}
+
+<script>
+    window.setupMouseTracking = () => {
+        const gradient = document.getElementById('mouseGradient');
+        if (!gradient) return;
+
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            
+            gradient.style.background = `radial-gradient(600px circle at ${x}% ${y}%, rgba(147, 51, 234, 0.3), transparent 50%)`;
+        });
+    };
+</script>

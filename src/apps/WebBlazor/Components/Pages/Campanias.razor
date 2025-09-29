@@ -1,0 +1,175 @@
+﻿@page "/campanias"
+@using MudBlazor
+@using API.APIService
+@inject APIClient Api
+@inject NavigationManager Nav
+
+<MudDataGrid @ref="dataGrid"
+             T="QueueDTO"
+             ServerData="ServerReload"
+             Filterable="true"
+             Hover="true"
+             Dense="true"
+             Bordered="true"
+             Striped="true"
+             RowClick="OnRowClick"
+             Class="mt-4 pa-2"
+             Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
+
+    <ToolBarContent>
+        <MudSpacer />
+        <MudTextField T="string"
+                      @bind-Value="Search"
+                      Label="Buscar"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      AdornmentColor="Color.Primary"
+                      Immediate="true"
+                      DebounceInterval="300"
+                      Class="mt-2 mb-1" />
+        <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                       OnClick="ClearFilters"
+                       Class="ml-1 mt-2" />
+    </ToolBarContent>
+
+    <Columns>
+        <!-- Campaña / Cola -->
+        <PropertyColumn Property="x => x.Name" Title="Campaña" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="max-width:320px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; cursor:pointer" />
+
+        <!-- Nº miembros -->
+        <TemplateColumn Title="Nº miembros" Sortable="true" Filterable="false"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left">
+            <CellTemplate>
+                @((context.Item.MemberCount.HasValue ? context.Item.MemberCount.Value.ToString("N0") : "—"))
+            </CellTemplate>
+        </TemplateColumn>
+
+        <!-- División (si la añades en el DTO; si no, puedes ocultar esta columna) -->
+        @* Descomenta si tu QueueDTO incluye Division con Name *@
+        @* 
+        <TemplateColumn Title="División" Sortable="true" Filterable="true"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                        CellStyle="text-align:left">
+            <CellTemplate>
+                @(context.Item?.Division?.Name ?? "—")
+            </CellTemplate>
+        </TemplateColumn>
+        *@
+
+        <!-- Último cambio -->
+        <TemplateColumn Title="Último cambio" Sortable="true" Filterable="false"
+                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
+                        CellStyle="text-align:center">
+            <CellTemplate>
+                @(context.Item.DateModified.HasValue
+                                ? context.Item.DateModified.Value.ToString("dd/MM/yyyy HH:mm")
+                                : "—")
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="QueueDTO" />
+    </PagerContent>
+</MudDataGrid>
+
+@if (seleccionada is not null)
+{
+    <MudPaper Class="pa-4 mt-4"
+              Style="width:100%; max-width: 520px; margin: 0 auto;
+                         background-color: var(--mud-palette-table-striped);
+                         border:1px solid var(--mud-palette-primary);">
+        <MudText Typo="Typo.h6">@seleccionada.Name</MudText>
+
+        <div class="mb-2">
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Class="mr-1">
+                @($"Miembros: {seleccionada.MemberCount?.ToString("N0") ?? "—"}")
+            </MudChip>
+
+            @* Descomenta si tienes Division en el DTO *@
+            @* <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default" Class="mr-1">
+                @($"División: {seleccionada.Division?.Name ?? "—"}")
+               </MudChip> *@
+
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default">
+                @($"Último cambio: {(seleccionada.DateModified?.ToString("dd/MM/yyyy HH:mm") ?? "—")}")
+            </MudChip>
+        </div>
+
+        <MudStack Row Spacing="2" Class="mt-2">
+            <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.OpenInNew"
+                       OnClick="@(() => Nav.NavigateTo($"/campanias/{seleccionada.Id}"))">
+                Abrir detalle
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+}
+
+@code {
+    private MudDataGrid<QueueDTO>? dataGrid;
+    private QueueDTO? seleccionada;
+
+    // búsqueda
+    private string? _search;
+    private string? Search
+    {
+        get => _search;
+        set { if (_search == value) return; _search = value; _ = dataGrid?.ReloadServerData(); }
+    }
+
+    private Task ClearFilters()
+    {
+        _search = null;
+        seleccionada = null;
+        return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
+    }
+
+    private async Task<GridData<QueueDTO>> ServerReload(GridState<QueueDTO> state)
+    {
+        try
+        {
+            var pageNumber = state.Page + 1;
+            var pageSize = state.PageSize;
+
+            // ⬇️ Ajusta el nombre del método según te lo haya generado NSwag
+            var data = await Api.Routing_GetQueuesAsync(pageNumber, pageSize, null);
+
+            var total = data.Total > 0
+                        ? data.Total
+                        : (data.PageCount > 0 && data.PageSize > 0
+                            ? data.PageCount * data.PageSize
+                            : data.Entities.Count);
+
+            IEnumerable<QueueDTO> items = data.Entities;
+
+            // Filtro texto
+            if (!string.IsNullOrWhiteSpace(_search))
+            {
+                var q = _search.Trim();
+                items = items.Where(x =>
+                    (x.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false)
+                // || (x.Division?.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) // si tienes Division
+                );
+            }
+
+            // Ordenación simple por estado.SortDefinitions si quieres, pero con Name basta por ahora.
+            var list = items.ToList();
+
+            return new GridData<QueueDTO>
+            {
+                TotalItems = (int)total,
+                Items = list
+            };
+        }
+        catch
+        {
+            return new GridData<QueueDTO> { TotalItems = 0, Items = Array.Empty<QueueDTO>() };
+        }
+    }
+
+    private void OnRowClick(DataGridRowClickEventArgs<QueueDTO> args) => seleccionada = args.Item;
+}

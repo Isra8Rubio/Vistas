@@ -1,0 +1,378 @@
+﻿@page "/grupos/{id}"
+@using MudBlazor
+@using API.APIService
+@inject APIClient Api
+@inject NavigationManager Nav
+
+<!-- Volver -->
+<MudStack Row="true"
+          AlignItems="AlignItems.Center"
+          Justify="Justify.SpaceBetween"
+          Class="pa-2 mt-4"
+          Style="width:100%;">
+    <MudButton Variant="Variant.Outlined"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.ArrowBack"
+               OnClick="@Back"
+               Class="pa-2">
+        Volver a Grupos
+    </MudButton>
+</MudStack>
+
+@if (loading)
+{
+    <MudCard Class="mt-3 mx-auto" Style="max-width: 1200px; border-radius: 12px;">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudSkeleton Width="300px" Height="32px" Animation="Animation.Wave" />
+                <MudSkeleton Width="200px" Height="20px" Class="mt-2" Animation="Animation.Wave" />
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudSkeleton Width="120px" Height="32px" Animation="Animation.Wave" />
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudDivider />
+        <MudCardContent>
+            <MudSkeleton Width="250px" Height="40px" Animation="Animation.Wave" />
+            <MudSkeleton Width="100%" Height="56px" Class="mt-3" Animation="Animation.Wave" />
+            @for (var i = 0; i < 5; i++)
+            {
+                <MudSkeleton Width="100%" Height="48px" Class="mt-2" Animation="Animation.Wave" />
+            }
+        </MudCardContent>
+    </MudCard>
+}
+else if (error is not null)
+{
+    <MudAlert Severity="Severity.Error"
+              Variant="Variant.Outlined"
+              Elevation="0"
+              Class="mt-3 mx-auto"
+              Style="max-width: 1200px; border-radius: 12px;">
+        <div>
+            <MudText Typo="Typo.h6" Class="mb-2">Error al cargar el grupo</MudText>
+            <MudText>@error</MudText>
+        </div>
+        <MudStack Row="true" Class="mt-3" Spacing="2">
+            <MudButton OnClick="Reload"
+                       Color="Color.Error"
+                       Variant="Variant.Filled"
+                       StartIcon="@Icons.Material.Filled.Refresh">
+                Reintentar
+            </MudButton>
+            <MudButton OnClick="Back"
+                       Variant="Variant.Outlined">
+                Volver
+            </MudButton>
+        </MudStack>
+    </MudAlert>
+}
+else if (group is not null)
+{
+    <!-- Hero -->
+    <MudPaper Class="pa-6 mt-3 mx-auto"
+              Style="max-width: 1200px;
+                                 background: linear-gradient(135deg, var(--mud-palette-primary) 0%,
+    var(--mud-palette-primary-darken) 100%);
+                                 border-radius: 16px;
+                                 color: white;">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                <MudAvatar Size="Size.Large"
+                           Style="width: 80px; height: 80px; background-color: rgba(255,255,255,0.2);">
+                    <MudIcon Icon="@Icons.Material.Filled.Groups"
+                             Style="font-size: 2.5rem; color: white;" />
+                </MudAvatar>
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h4" Style="color: white; font-weight: 600;">
+                        @group.Name
+                    </MudText>
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Outlined.Schedule"
+                                     Size="Size.Small"
+                                     Style="color: rgba(255,255,255,0.8);" />
+                            <MudText Typo="Typo.body2" Style="color: rgba(255,255,255,0.9);">
+                                Modificado: @group.DateModified?.ToString("dd/MM/yyyy HH:mm")
+                            </MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudStack>
+            </MudStack>
+
+            <!-- Nº Miembros -->
+            <MudStack Spacing="2">
+                <MudPaper Class="pa-4"
+                          Style="background-color: rgba(255,255,255,0.15); border-radius: 12px; min-width: 140px; min-height: 90px;">
+                    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="0">
+                        <MudText Typo="Typo.h4" Style="color: white; font-weight: 700;">
+                            @(group.MemberCount ?? 0)
+                        </MudText>
+                        <MudText Typo="Typo.caption" Style="color: rgba(255,255,255,0.85);">
+                            Miembros
+                        </MudText>
+                    </MudStack>
+                </MudPaper>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+
+    <!-- Content Section -->
+    <MudCard Class="pa-0 mt-4 mx-auto"
+             Style="max-width: 1200px; border-radius: 16px; overflow: hidden;">
+        <MudCardContent Class="pa-6">
+            <MudStack Spacing="4">
+
+                <!-- Search and Filters -->
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="3">
+                    <MudTextField T="string"
+                                  @bind-Value="Search"
+                                  Label="Buscar usuario"
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.End"
+                                  AdornmentIcon="@Icons.Material.Filled.Search"
+                                  AdornmentColor="Color.Primary"
+                                  Immediate="true"
+                                  DebounceInterval="250"
+                                  Style="max-width: 400px;" />
+
+                    <!-- View Toggle -->
+                    <MudToggleGroup T="string"
+                                    @bind-Value="viewMode"
+                                    Color="Color.Primary"
+                                    CheckMark="false">
+                        @*                         <MudToggleItem Value="grid" Icon="@Icons.Material.Filled.GridView" />
+                        <MudToggleItem Value="list" Icon="@Icons.Material.Filled.List" /> *@
+                    </MudToggleGroup>
+                </MudStack>
+
+                <!-- Results Header -->
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <MudText Typo="Typo.h6">
+                        Miembros del Grupo (@FilteredUsers.Count())
+                    </MudText>
+
+                    @if (!string.IsNullOrWhiteSpace(Search))
+                    {
+                        <MudButton Size="Size.Small"
+                                   Variant="Variant.Text"
+                                   OnClick="ClearSearch"
+                                   StartIcon="@Icons.Material.Filled.Clear">
+                            Limpiar filtro
+                        </MudButton>
+                    }
+                </MudStack>
+
+                <!-- Content based on view mode -->
+                @if (FilteredUsers.Any())
+                {
+                    @if (viewMode == "grid")
+                    {
+                        <!-- Grid View -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
+                            @foreach (var usuario in FilteredUsers)
+                            {
+                                <MudPaper Class="pa-4 cursor-pointer hover-card"
+                                          Style="border-radius: 12px; border: 1px solid var(--mud-palette-divider); transition: all 0.3s ease;"
+                                          @onclick="() => GotoUser(usuario)">
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                                        <MudAvatar Size="Size.Medium"
+                                                   Color="Color.Primary"
+                                                   Variant="Variant.Filled">
+                                            @Initials(usuario.Name)
+                                        </MudAvatar>
+                                        <MudStack Spacing="1" Style="flex: 1; min-width: 0;">
+                                            <MudText Typo="Typo.subtitle1" Style="font-weight: 500;">
+                                                @(!string.IsNullOrWhiteSpace(usuario.Name) ? usuario.Name : usuario.Id)
+                                            </MudText>
+                                            @if (!string.IsNullOrWhiteSpace(usuario.Email))
+                                            {
+                                                <MudText Typo="Typo.body2"
+                                                         Class="mud-text-secondary"
+                                                         Style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    @usuario.Email
+                                                </MudText>
+                                            }
+                                        </MudStack>
+                                        <MudIconButton Icon="@Icons.Material.Filled.ArrowForward"
+                                                       Size="Size.Small"
+                                                       Color="Color.Primary" />
+                                    </MudStack>
+                                </MudPaper>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- List View with DataGrid -->
+                        <MudDataGrid T="UserDTO"
+                                     Items="@FilteredUsers.ToList()"
+                                     Hover="true"
+                                     Dense="false"
+                                     Bordered="true"
+                                     Striped="true"
+                                     RowClick="GotoUser"
+                                     Style="border-radius: 12px; overflow: hidden;">
+
+                            <Columns>
+                                <TemplateColumn Title="Usuario" Sortable="true">
+                                    <CellTemplate>
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                                            <MudAvatar Size="Size.Medium" Color="Color.Primary" Variant="Variant.Filled">
+                                                @Initials(context.Item?.Name)
+                                            </MudAvatar>
+                                            <MudStack Spacing="1">
+                                                <MudText Typo="Typo.subtitle1" Style="font-weight: 500;">
+                                                    @(!string.IsNullOrWhiteSpace(context.Item?.Name) ? context.Item!.Name : context.Item?.Id)
+                                                </MudText>
+                                                @if (!string.IsNullOrWhiteSpace(context.Item?.Email))
+                                                {
+                                                    <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                                                        @context.Item!.Email
+                                                    </MudText>
+                                                }
+                                            </MudStack>
+                                        </MudStack>
+                                    </CellTemplate>
+                                </TemplateColumn>
+
+                                <TemplateColumn Title="Acciones" Sortable="false">
+                                    <CellTemplate>
+                                        <MudStack Row="true" Justify="Justify.Center" Spacing="1">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                                           Color="Color.Primary"
+                                                           Size="Size.Small"
+                                                           OnClick="() => GotoUser(context.Item!)"
+                                                           Title="Ver perfil" />
+                                            <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"
+                                                           Color="Color.Error"
+                                                           Size="Size.Small"
+                                                           Title="Quitar del grupo" />
+                                        </MudStack>
+                                    </CellTemplate>
+                                </TemplateColumn>
+                            </Columns>
+
+                            <PagerContent>
+                                <MudDataGridPager T="UserDTO" />
+                            </PagerContent>
+                        </MudDataGrid>
+                    }
+                }
+                else if ((group.ListaUsuarios?.Count ?? 0) > 0)
+                {
+                    <!-- No results but has users -->
+                    <MudPaper Class="pa-8 text-center" Style="border-radius: 12px; background-color: var(--mud-palette-background-grey);">
+                        <MudIcon Icon="@Icons.Material.Outlined.SearchOff"
+                                 Style="font-size: 4rem; color: var(--mud-palette-text-secondary);" />
+                        <MudText Typo="Typo.h6" Class="mt-2">No se encontraron usuarios</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary mb-3">
+                            Intenta con un término de búsqueda diferente
+                        </MudText>
+                        <MudButton Variant="Variant.Outlined"
+                                   OnClick="ClearSearch"
+                                   StartIcon="@Icons.Material.Filled.Clear">
+                            Limpiar filtro
+                        </MudButton>
+                    </MudPaper>
+                }
+                else
+                {
+                    <!-- Empty state -->
+                    <MudPaper Class="pa-8 text-center" Style="border-radius: 12px; background-color: var(--mud-palette-background-grey);">
+                        <MudIcon Icon="@Icons.Material.Outlined.PersonOff"
+                                 Style="font-size: 4rem; color: var(--mud-palette-text-secondary);" />
+                        <MudText Typo="Typo.h6" Class="mt-2">Este grupo está vacío</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary mb-4">
+                            Agrega algunos miembros para comenzar
+                        </MudText>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd">
+                            Agregar Miembros
+                        </MudButton>
+                    </MudPaper>
+                }
+            </MudStack>
+        </MudCardContent>
+    </MudCard>
+}
+
+<style>
+    .hover-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-color: var(--mud-palette-primary) !important;
+    }
+</style>
+
+@code {
+    [Parameter] public string? id { get; set; }
+
+    private GroupDTO? group;
+    private bool loading = true;
+    private string? error;
+    private string viewMode = "grid";
+    private string? Search { get; set; }
+
+    private IEnumerable<UserDTO> FilteredUsers =>
+        (group?.ListaUsuarios ?? Enumerable.Empty<UserDTO>()).Where(u =>
+            string.IsNullOrWhiteSpace(Search) ||
+            (u.Name?.Contains(Search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (u.Email?.Contains(Search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (u.Id?.Contains(Search, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loading = true;
+        error = null;
+        group = null;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                error = "Id de grupo no válido.";
+                return;
+            }
+
+            group = await Api.Groups_GetGroupByIdAsync(id);
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void Back() => Nav.NavigateTo("/grupos");
+
+    private void Reload()
+    {
+        _ = OnParametersSetAsync();
+        StateHasChanged();
+    }
+
+    private void GotoUser(DataGridRowClickEventArgs<UserDTO> args)
+    {
+        if (!string.IsNullOrWhiteSpace(args.Item?.Id))
+            Nav.NavigateTo($"/usuarios/{args.Item!.Id}");
+    }
+
+    private void GotoUser(UserDTO user)
+    {
+        if (!string.IsNullOrWhiteSpace(user?.Id))
+            Nav.NavigateTo($"/usuarios/{user!.Id}");
+    }
+
+    private void ClearSearch() => Search = string.Empty;
+
+    private static string Initials(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0].Substring(0, 1).ToUpperInvariant();
+        return (parts[0][0].ToString() + parts[^1][0]).ToUpperInvariant();
+    }
+}
