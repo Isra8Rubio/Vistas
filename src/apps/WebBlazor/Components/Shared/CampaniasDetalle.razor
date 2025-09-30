@@ -1,0 +1,112 @@
+﻿@page "/campanias/{id}"
+@using MudBlazor
+@using API.APIService
+@inject APIClient Api
+@inject NavigationManager Nav
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="pa-2 mt-4">
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.ArrowBack"
+               OnClick="@Back">
+        Volver a Campañas
+    </MudButton>
+</MudStack>
+
+@if (loading)
+{
+    <MudPaper Class="pa-4 mt-3 mx-auto" style="max-width: 1000px;">
+        <MudSkeleton Width="300px" Height="28px" />
+        <MudSkeleton Width="220px" Height="18px" Class="mt-2" />
+        <MudDivider Class="my-3" />
+        @for (var i = 0; i < 6; i++)
+        {
+            <MudSkeleton Width="100%" Height="44px" Class="mt-2" />
+        }
+    </MudPaper>
+}
+else if (error is not null)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Elevation="0"
+              Class="mt-3 mx-auto" style="max-width: 1000px;">
+        @error
+        <MudButton OnClick="Reload" Color="Color.Error" Variant="Variant.Text"
+                   StartIcon="@Icons.Material.Filled.Refresh" Class="ml-2">
+            Reintentar
+        </MudButton>
+    </MudAlert>
+}
+else if (_queue is not null)
+{
+    <MudCard Class="pa-0 mt-3 mx-auto" style="max-width: 1000px; border-radius: 12px; overflow: hidden;">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">@(_queue.Name ?? "Campaña")</MudText>
+                @if (_queue.DateModified is not null)
+                {
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                        Modificada: @_queue.DateModified?.ToString("dd/MM/yyyy HH:mm")
+                    </MudText>
+                }
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudChip T="string" Variant="Variant.Outlined">
+                    Miembros: @(_queue.MemberCount ?? 0)
+                </MudChip>
+            </CardHeaderActions>
+        </MudCardHeader>
+
+        <MudDivider />
+
+        <MudCardContent Class="pa-4">
+            <MudText Typo="Typo.subtitle2" Class="mb-1">Miembros</MudText>
+            <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                Listado de miembros no disponible por ahora.
+            </MudText>
+        </MudCardContent>
+    </MudCard>
+}
+
+@code {
+    [Parameter] public string? id { get; set; }
+
+    private QueueDTO? _queue;
+    private bool loading = true;
+    private string? error;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loading = true; error = null; _queue = null;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                error = "Id de campaña no válido.";
+                return;
+            }
+
+            // Detalle de la campaña (cola)
+            _queue = await Api.Routing_GetQueueByIdAsync(id);
+        }
+        catch (ApiException ex) when (ex.StatusCode == 404)
+        {
+            error = "Campaña no encontrada.";
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void Back() => Nav.NavigateTo("/campanias");
+
+    private void Reload()
+    {
+        _ = OnParametersSetAsync();
+        StateHasChanged();
+    }
+}

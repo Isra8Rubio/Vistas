@@ -163,10 +163,17 @@ else if (division is not null)
             var pageSize = state.PageSize;
 
             // Nota: el cliente NSwag puede exponer 'divisionId' como IEnumerable<string> o string[].
-            var result = await Api.Routing_GetRoutingQueuesDivisionViewsAsync(pageNumber, pageSize, new[] { id! });
+            var result = await Api.Routing_GetQueuesDivisionviewsAsync(pageNumber, pageSize, new[] { id! });
 
             var total = (int)(result?.Total ?? 0);
-            var items = (result?.Entities ?? new List<QueueDTO>()).ToList();
+            var items = (result?.Entities ?? Array.Empty<Queue>())
+                .Select(q => new QueueDTO
+                {
+                    Id = q.Id,
+                    Name = q.Name,
+                    DateModified = q.DateModified
+                })
+                .ToList();
 
             return new GridData<QueueDTO> { Items = items, TotalItems = total };
         }
