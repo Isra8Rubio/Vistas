@@ -9,7 +9,7 @@
 @inject ISnackbar Snackbar
 
 <MudGrid Class="mt-2">
-    <!-- Columna izquierda: grid -->
+    <!-- Grid -->
     <MudItem xs="12" md="10">
         <MudDataGrid @ref="dataGrid"
                      T="UserDTO"
@@ -19,17 +19,9 @@
                      Bordered="true"
                      Striped="true"
                      RowClick="GotoUser"
-                     Class="pa-2"
-                     Style="font-variant-numeric: tabular-nums;">
+                     Class="pa-2">
             <ToolBarContent>
-                <MudStack Row AlignItems="AlignItems.Center" Style="width:100%">
-                    <!-- Export -->
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.Download"
-                               OnClick="ExportCsv">
-                        Exportar CSV
-                    </MudButton>
+                <MudStack Row AlignItems="AlignItems.Center" Style="width:100%" Class="pa-1 mb-4">
 
                     <MudSpacer />
 
@@ -53,28 +45,27 @@
                                 Title="Usuario"
                                 Sortable="true" Filterable="true"
                                 HeaderStyle="text-align:left; font-weight:600"
-                                CellStyle="max-width:260px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer" />
+                                CellStyle="width:20%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer" />
                 <PropertyColumn Property="x => x.Email"
                                 Title="Email"
                                 Sortable="true" Filterable="true"
                                 HeaderStyle="text-align:left; font-weight:600"
-                                CellStyle="max-width:280px;" />
+                                CellStyle="width:25%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer" />
 
+            <!-- Configuración de la vista de grupos -->
                 <TemplateColumn Title="Grupos" Sortable="false" Filterable="true"
-                                HeaderStyle="text-align:left; font-weight:600; white-space:nowrap"
-                                CellStyle="text-align:left; white-space:normal;">
+                                HeaderStyle="text-align:left; font-weight:600"
+                                CellStyle="width:55%; cursor:pointer">
                     <CellTemplate>
                         @if (context.Item.ListaGrupos is { Count: > 0 })
                         {
                             <div style="display:flex; flex-wrap:wrap; gap:.25rem; align-items:center;">
-                                @foreach (var g in context.Item.ListaGrupos)
+                                @foreach (var grupos in context.Item.ListaGrupos)
                                 {
-                                    var label = !string.IsNullOrWhiteSpace(g?.Name) ? g!.Name : g?.Id;
-                                    <MudTooltip Text="@($"Id: {g?.Id}")">
+                                    var label = !string.IsNullOrWhiteSpace(grupos?.Name) ? grupos!.Name : "Grupo sin nombre";
                                         <MudChip Size="Size.Small" Variant="Variant.Outlined" Class="mr-1 mb-1">
                                             @label
                                         </MudChip>
-                                    </MudTooltip>
                                 }
                             </div>
                         }
@@ -86,18 +77,26 @@
                 </TemplateColumn>
             </Columns>
 
+            <!-- Paginación -->
             <PagerContent>
                 <MudDataGridPager T="UserDTO" RowsPerPageString="Filas por página:" />
             </PagerContent>
+
         </MudDataGrid>
     </MudItem>
 </MudGrid>
 
+@*     private IReadOnlyList<UserDTO> _pageItemsUsers = Array.Empty<UserDTO>();
+    // Llamada a la API
+    var response = await Api.Users_GetUsersAsync(pageNumber, pageSize);
+    var items = response?.Entities?.ToList() ?? new List<UserDTO>();
+    var total = (int)(response?.Total ?? 0);
+
+    _pageItemsUsers = items; *@
+
 @code {
     private MudDataGrid<UserDTO>? dataGrid;
-    private List<UserDTO> _lastItems = new();
     private UserDTO? seleccionado;
-    private int _totalItems;
 
     // búsqueda
     private string? _search;
@@ -114,23 +113,26 @@
         return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
     }
 
-    // carga server-side
+    // Carga
     private async Task<GridData<UserDTO>> ServerReload(GridState<UserDTO> state)
     {
         try
         {
+            // Parámetros de paginación
             var pageNumber = state.Page + 1;
             var pageSize = state.PageSize;
 
+            // Llamada a la API
             var data = await Api.Users_GetUsersAsync(pageNumber, pageSize);
 
-            // Total robusto (si algún backend no manda Total)
+            // Cálculo robusto del total de elementos
             var total = data.Total > 0
               ? data.Total
               : (data.PageCount > 0 && data.PageSize > 0 ? data.PageCount * data.PageSize : data.Entities.Count);
 
             IEnumerable<UserDTO> items = data.Entities;
 
+            // Filtro de búsqueda
             if (!string.IsNullOrWhiteSpace(_search))
             {
                 var q = _search.Trim();
@@ -141,8 +143,7 @@
             }
 
             var list = items.ToList();
-            _lastItems = list;
-            _totalItems = (int)total;
+
             // si no hay selección o ya no existe en esta página, limpia el panel
             if (seleccionado is not null && !list.Any(u => u.Id == seleccionado.Id))
                 seleccionado = null;
@@ -152,54 +153,15 @@
         catch (ApiException ex)
         {
             Snackbar.Add($"No se pudo cargar usuarios: {ex.StatusCode}", Severity.Error);
-            _lastItems = new();
             return new GridData<UserDTO> { TotalItems = 0, Items = [] };
         }
         catch (Exception ex)
         {
             Snackbar.Add($"No se pudo cargar usuarios: {ex.Message}", Severity.Error);
-            _lastItems = new();
             return new GridData<UserDTO> { TotalItems = 0, Items = [] };
         }
     }
 
     private void GotoUser(DataGridRowClickEventArgs<UserDTO> args)
     => Nav.NavigateTo($"/usuarios/{args.Item.Id}");
-
-    // private void OnRowClick(DataGridRowClickEventArgs<UserDTO> args) => seleccionado = args.Item;
-
-    private async Task ExportCsv()
-    {
-        // fila plana para CSV
-        var rows = _lastItems.Select(u => new
-        {
-            Usuario = u.Name ?? "",
-            Email = u.Email ?? "",
-            Grupos = u.ListaGrupos is { Count: > 0 }
-                    ? string.Join(" | ", u.ListaGrupos.Where(g => g is not null)
-                                                      .Select(g => string.IsNullOrWhiteSpace(g!.Name) ? g.Id : g.Name))
-                    : ""
-        });
-
-        var sb = new StringBuilder();
-        using var sw = new StringWriter(sb);
-        using (var csv = new CsvHelper.CsvWriter(sw, CultureInfo.GetCultureInfo("es-ES")))
-        {
-            // cabeceras
-            csv.WriteField("Usuario"); csv.WriteField("Email"); csv.WriteField("Grupos");
-            await csv.NextRecordAsync();
-
-            foreach (var r in rows)
-            {
-                csv.WriteField(r.Usuario);
-                csv.WriteField(r.Email);
-                csv.WriteField(r.Grupos);
-                await csv.NextRecordAsync();
-            }
-        }
-
-        var csvContent = sb.ToString();
-        var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/DownloadCSV.js");
-        await module.InvokeVoidAsync("saveFile", $"usuarios_{DateTime.Now:yyyyMMdd_HHmm}.csv", csvContent);
-    }
 }

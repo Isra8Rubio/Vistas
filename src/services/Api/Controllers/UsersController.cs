@@ -29,9 +29,7 @@ namespace Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResultDTO<UserDTO>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<PagedResultDTO<UserDTO>>> GetUsersAsync(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 25)
+        public async Task<ActionResult<PagedResultDTO<UserDTO>>> GetUsersAsync(int pageNumber = 1,int pageSize = 25)
         {
             var traceId = httpContext.HttpContext?.TraceIdentifier.Split(':')[0] ?? "";
             try

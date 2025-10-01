@@ -15,7 +15,8 @@ namespace Api.Helpers
                 MemberCount = group.MemberCount,
                 DateModified = group.DateModified,
                 ListaUsuarios = (group.Owners ?? new List<User>())
-                .Select(u => new UserDTO { Id = u.Id, Name = u.Name, Email = u.Email }).ToList()
+                    .Select(u => new UserDTO { Id = u.Id, Name = u.Name, Email = u.Email })
+                    .ToList()
             };
         }
 
@@ -46,7 +47,9 @@ namespace Api.Helpers
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
-                ListaGrupos = (user.Groups ?? new List<Group>()).Select(g => new GroupDTO { Id = g.Id, Name = g.Name }).ToList(),
+                ListaGrupos = (user.Groups ?? new List<Group>())
+                    .Select(g => new GroupDTO { Id = g.Id, Name = g.Name })
+                    .ToList(),
             };
         }
 
@@ -77,7 +80,12 @@ namespace Api.Helpers
                 Id = q.Id,
                 Name = q.Name,
                 MemberCount = q.MemberCount,
-                DateModified = q.DateModified
+                DateModified = q.DateModified,
+                Division = q.Division == null ? null : new DivisionSummaryDTO
+                {
+                    Id = q.Division.Id,
+                    Name = q.Division.Name
+                }
             };
         }
 

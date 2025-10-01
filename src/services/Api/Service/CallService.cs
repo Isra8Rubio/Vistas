@@ -1,4 +1,5 @@
-﻿using Api.Service.GenesysAPI;
+﻿using Api.DTO;
+using Api.Service.GenesysAPI;
 using Microsoft.AspNetCore.Authorization;
 using PureCloudPlatform.Client.V2.Api;
 using PureCloudPlatform.Client.V2.Model;
@@ -59,5 +60,8 @@ namespace Api.Service
 
         public async Task<AuthzDivision?> Divisions_GetDivisionByIdAsync(string divisionId)
             => await _divisionService.Divisions_GetDivisionByIdAsync(divisionId);
+
+        public static DivisionSummaryDTO? DivisionSummaryFromRaw(AuthzDivision? div)
+            => div is null ? null : new DivisionSummaryDTO { Id = div.Id, Name = div.Name };
     }
 }

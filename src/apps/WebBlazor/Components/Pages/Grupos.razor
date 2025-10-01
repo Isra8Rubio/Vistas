@@ -19,14 +19,15 @@
                      Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
 
             <ToolBarContent>
-                <!-- Filtro por rango de fechas -->
+            <!-- Filtro por rango de fechas -->
                 <MudDateRangePicker @bind-DateRange="Range"
                                     Label="Fechas"
                                     DateFormat="dd/MM/yyyy"
-                                    Class="mr-2 mb-2"
-                                    DisableToolbar="false" />
+                                    Class="mr-2 mb-2"/>
 
-                <!-- Buscar -->
+                <MudSpacer />
+
+            <!-- Buscar -->
                 <MudTextField T="string"
                               @bind-Value="Search"
                               Label="Buscar"
@@ -38,12 +39,11 @@
                               DebounceInterval="300"
                               Class="mr-2 mb-2" />
 
-                <!-- Limpiar -->
+            <!-- Limpiar -->
                 <MudIconButton Icon="@Icons.Material.Filled.Clear"
                                OnClick="ClearFilters"
                                Class="mr-2 mb-2" />
 
-                <MudSpacer />
             </ToolBarContent>
 
             <Columns>
@@ -53,17 +53,19 @@
 
                 <PropertyColumn Property="x => x.MemberCount" Title="Nº miembros" Sortable="true" Filterable="true"
                                 HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                                CellStyle="text-align:left" />
+                                CellStyle="text-align:left; cursor:pointer" />
 
                 <PropertyColumn Property="x => x.DateModified" Title="Último cambio" Sortable="true" Filterable="true"
                                 Format="dd/MM/yyyy HH:mm"
                                 HeaderStyle="text-align:left; font-size:.95rem; font-weight:600; white-space:nowrap"
-                                CellStyle="text-align:center" />
+                                CellStyle="text-align:center; cursor:pointer" />
             </Columns>
 
+            <!-- Paginación -->
             <PagerContent>
                 <MudDataGridPager T="GroupDTO" />
             </PagerContent>
+
         </MudDataGrid>
     </MudItem>
 </MudGrid>
