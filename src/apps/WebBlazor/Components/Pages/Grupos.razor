@@ -4,7 +4,7 @@
 @inject APIClient Api
 @inject NavigationManager Nav
 
-<MudGrid Class="mt-0">
+<MudGrid Class="mt-1">
     <MudItem xs="12" md="10">
         <MudDataGrid @ref="dataGrid"
                      T="GroupDTO"
@@ -15,7 +15,7 @@
                      Bordered="true"
                      Striped="true"
                      RowClick="GotoGroup"
-                     Class="mt-4 pa-2"
+                     Class="mt-1 pa-2"
                      Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
 
             <ToolBarContent>
@@ -50,10 +50,6 @@
                 <PropertyColumn Property="x => x.Name" Title="Grupo" Sortable="true" Filterable="true"
                                 HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
                                 CellStyle="max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; cursor:pointer" />
-
-                <PropertyColumn Property="x => x.MemberCount" Title="Nº miembros" Sortable="true" Filterable="true"
-                                HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                                CellStyle="text-align:left; cursor:pointer" />
 
                 <PropertyColumn Property="x => x.DateModified" Title="Último cambio" Sortable="true" Filterable="true"
                                 Format="dd/MM/yyyy HH:mm"

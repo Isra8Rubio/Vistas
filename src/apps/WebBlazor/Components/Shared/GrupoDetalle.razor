@@ -106,7 +106,7 @@ else if (group is not null)
                           Style="background-color: rgba(255,255,255,0.15); border-radius: 12px; min-width: 140px; min-height: 90px;">
                     <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="0">
                         <MudText Typo="Typo.h4" Style="color: white; font-weight: 700;">
-                            @(group.MemberCount ?? 0)
+                            @FilteredUsers.Count()
                         </MudText>
                         <MudText Typo="Typo.caption" Style="color: rgba(255,255,255,0.85);">
                             Miembros
@@ -121,8 +121,8 @@ else if (group is not null)
     <MudCard Class="pa-0 mt-4 mx-auto"
              Style="max-width: 1200px; border-radius: 16px; overflow: hidden;">
         <MudCardContent Class="pa-6">
+            <MudSpacer />
             <MudStack Spacing="4">
-
                 <!-- Search and Filters -->
                 <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="3">
                     <MudTextField T="string"
@@ -148,9 +148,6 @@ else if (group is not null)
 
                 <!-- Results Header -->
                 <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-                    <MudText Typo="Typo.h6">
-                        Miembros del Grupo (@FilteredUsers.Count())
-                    </MudText>
 
                     @if (!string.IsNullOrWhiteSpace(Search))
                     {
@@ -261,7 +258,6 @@ else if (group is not null)
                 }
                 else if ((group.ListaUsuarios?.Count ?? 0) > 0)
                 {
-                    <!-- No results but has users -->
                     <MudPaper Class="pa-8 text-center" Style="border-radius: 12px; background-color: var(--mud-palette-background-grey);">
                         <MudIcon Icon="@Icons.Material.Outlined.SearchOff"
                                  Style="font-size: 4rem; color: var(--mud-palette-text-secondary);" />
@@ -370,3 +366,239 @@ else if (group is not null)
         return (parts[0][0].ToString() + parts[^1][0]).ToUpperInvariant();
     }
 }
+
+
+
+
+
+
+
+
+
+
+@* @page "/divisiones/{id}"
+@using MudBlazor
+@using API.APIService
+@inject APIClient Api
+@inject NavigationManager Nav
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="pa-2 mt-4">
+    <MudButton Variant="Variant.Outlined"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.ArrowBack"
+               OnClick="@Back">
+        Volver a Divisiones
+    </MudButton>
+</MudStack>
+
+@if (loading)
+{
+    <MudCard Class="mt-3 mx-auto" Style="max-width: 1100px; border-radius: 12px;">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudSkeleton Width="280px" Height="28px" Animation="Animation.Wave" />
+                <MudSkeleton Width="320px" Height="18px" Class="mt-2" Animation="Animation.Wave" />
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudDivider />
+        <MudCardContent>
+            <MudSkeleton Width="220px" Height="40px" />
+            @for (var i = 0; i < 6; i++)
+            {
+                <MudSkeleton Width="100%" Height="44px" Class="mt-2" />
+            }
+        </MudCardContent>
+    </MudCard>
+}
+else if (error is not null)
+{
+    <MudAlert Severity="Severity.Error"
+              Variant="Variant.Outlined"
+              Elevation="0"
+              Class="mt-3 mx-auto"
+              Style="max-width: 1100px; border-radius: 12px;">
+        <MudText Typo="Typo.h6" Class="mb-2">Error al cargar la división</MudText>
+        <MudText>@error</MudText>
+        <MudStack Row="true" Spacing="2" Class="mt-3">
+            <MudButton OnClick="Reload"
+                       Color="Color.Error"
+                       StartIcon="@Icons.Material.Filled.Refresh">
+                Reintentar
+            </MudButton>
+            <MudButton OnClick="Back" Variant="Variant.Outlined">Volver</MudButton>
+        </MudStack>
+    </MudAlert>
+}
+else if (division is not null)
+{
+    <!-- Cabecera -->
+    <MudPaper Class="pa-5 mt-3 mx-auto"
+              Style="max-width: 1100px; border-radius: 12px; border:1px solid var(--mud-palette-primary);">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h5">@division.Name</MudText>
+                @if (!string.IsNullOrWhiteSpace(division.Description))
+                {
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">@division.Description</MudText>
+                }
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+
+    <!-- Campañas de la división -->
+    <MudCard Class="pa-0 mt-3 mx-auto" Style="max-width: 1100px; border-radius: 12px; overflow: hidden;">
+        <MudCardContent Class="pa-4">
+            <!-- Search + contador (como en grupos) -->
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-3">
+                <MudTextField T="string"
+                              @bind-Value="Search"
+                              Label="Buscar campaña"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              AdornmentColor="Color.Primary"
+                              Immediate="true"
+                              DebounceInterval="250"
+                              Style="max-width: 420px;" />
+                @if (!string.IsNullOrWhiteSpace(Search))
+                {
+                    <MudButton Size="Size.Small"
+                               Variant="Variant.Text"
+                               OnClick="ClearSearch"
+                               StartIcon="@Icons.Material.Filled.Clear">
+                        Limpiar filtro
+                    </MudButton>
+                }
+            </MudStack>
+
+            <MudDataGrid @ref="grid"
+                         T="QueueDTO"
+                         ServerData="LoadQueues"
+                         Hover="true"
+                         Bordered="true"
+                         Striped="true"
+                         RowClick="OnQueueClick">
+
+                <ToolBarContent>
+                    <MudText Typo="Typo.subtitle2" Class="ml-2">
+                        Resultados: @(_lastTotal >= 0 ? _lastTotal : 0)
+                    </MudText>
+                </ToolBarContent>
+
+                <Columns>
+                    <PropertyColumn Property="x => x.Name" Title="Campaña"
+                                    HeaderStyle="text-align:left; font-weight:600"
+                                    CellStyle="Width: 40%; text-align:left; cursor:pointer" />
+                    <TemplateColumn Title="Modificado" Sortable="true">
+                        <CellTemplate>
+                            @context.Item.DateModified?.ToString("dd/MM/yyyy HH:mm")
+                        </CellTemplate>
+                        <HeaderTemplate>
+                            <MudText>Modificado</MudText>
+                        </HeaderTemplate>
+                    </TemplateColumn>
+                </Columns>
+
+                <PagerContent>
+                    <MudDataGridPager T="QueueDTO" />
+                </PagerContent>
+            </MudDataGrid>
+        </MudCardContent>
+    </MudCard>
+}
+
+@code {
+    [Parameter] public string? id { get; set; }
+
+    private DivisionDTO? division;
+    private MudDataGrid<QueueDTO>? grid;
+    private bool loading = true;
+    private string? error;
+
+    // búsqueda (como en grupos)
+    private string? Search { get; set; }
+    private int _lastTotal = -1;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loading = true; error = null; division = null;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                error = "Id de división no válido.";
+                return;
+            }
+
+            division = await Api.Divisions_GetDivisionByIdAsync(id);
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task<GridData<QueueDTO>> LoadQueues(GridState<QueueDTO> state)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return new GridData<QueueDTO> { Items = Array.Empty<QueueDTO>(), TotalItems = 0 };
+
+        try
+        {
+            var pageNumber = state.Page + 1;
+            var pageSize = state.PageSize;
+
+            // 👇 PASO CLAVE: pasamos q al backend para buscar en TODAS las campañas de la división
+            var q = string.IsNullOrWhiteSpace(Search) ? null : Search!.Trim();
+
+            // Ajusta esta firma en tu APIClient para incluir q como query opcional.
+            // Ej: GET /routing/queues/divisionviews?pageNumber=..&pageSize=..&divisionIds=..&q=...
+            var result = await Api.Routing_GetQueuesDivisionviewsAsync(pageNumber, pageSize, new[] { id! }, q);
+
+            var total = (int)(result?.Total ?? 0);
+            _lastTotal = total;
+
+            var items = (result?.Entities ?? Array.Empty<Queue>())
+                .Select(qr => new QueueDTO
+                {
+                    Id = qr.Id,
+                    Name = qr.Name,
+                    DateModified = qr.DateModified
+                })
+                .ToList();
+
+            return new GridData<QueueDTO> { Items = items, TotalItems = total };
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            _lastTotal = 0;
+            return new GridData<QueueDTO> { Items = Array.Empty<QueueDTO>(), TotalItems = 0 };
+        }
+    }
+
+    private void OnQueueClick(DataGridRowClickEventArgs<QueueDTO> args)
+    {
+        if (!string.IsNullOrWhiteSpace(args.Item?.Id))
+            Nav.NavigateTo($"/campanias/{args.Item!.Id}");
+    }
+
+    private void Back() => Nav.NavigateTo("/divisiones");
+
+    private void Reload()
+    {
+        _ = OnParametersSetAsync();
+        StateHasChanged();
+    }
+
+    private void ClearSearch()
+    {
+        Search = string.Empty;
+        _ = grid?.ReloadServerData();
+    }
+}
+ *@

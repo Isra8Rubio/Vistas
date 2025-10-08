@@ -49,7 +49,7 @@ namespace Api.Controllers
                 _logger.LogInformation("[{TraceId}] FinishCall: GetDivisionsAsync – returned {Count} items (page {Page})",
                     traceId, dto.Entities.Count, pageNumber);
 
-                return Ok(dto); // <- siempre 200 con Entities (posible lista vacía)
+                return Ok(dto); // <- siempre 200 con Entities
             }
             catch (Exception ex)
             {

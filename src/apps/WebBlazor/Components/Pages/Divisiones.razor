@@ -5,6 +5,8 @@
 @inject APIClient Api
 @inject NavigationManager Nav
 
+<MudGrid Class="mt-2">
+<MudItem xs="12" md="10">
 <MudDataGrid @ref="dataGrid"
              T="DivisionApiDTO"
              ServerData="ServerReload"
@@ -35,54 +37,22 @@
     </ToolBarContent>
 
     <Columns>
-        <!-- Nombre -->
         <PropertyColumn Property="x => x.Name" Title="División" Sortable="true" Filterable="true"
                         HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
                         CellStyle="max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; cursor:pointer" />
 
-        <!-- Código (id abreviado) -->
-        <TemplateColumn Title="Código">
-            <CellTemplate>
-                @{
-                    var id = context.Item.Id ?? "-";
-                }
-                @(id == "-" ? "-" : id[..Math.Min(8, id.Length)])
-            </CellTemplate>
-        </TemplateColumn>
-
-        <!-- HomeDivision -->
-        <TemplateColumn Title="Tipo" Sortable="true" Filterable="true"
-                        HeaderStyle="text-align:center; font-size:.95rem; font-weight:600"
-                        CellStyle="text-align:center">
-            <CellTemplate>
-                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
-                         Color="@(context.Item.HomeDivision == true ? Color.Info : Color.Default)">
-                    @(context.Item.HomeDivision == true ? "Home" : "Normal")
-                </MudChip>
-            </CellTemplate>
-        </TemplateColumn>
-
-        <!-- Total objetos (si viene ObjectCounts) -->
-        <TemplateColumn Title="Objetos" Sortable="false" Filterable="false"
-                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="text-align:left">
-            <CellTemplate>
-                @{
-                    long totalObjs = 0;
-                    if (context.Item.ObjectCounts?.Values is not null)
-                        totalObjs = context.Item.ObjectCounts.Values
-                        .Where(v => v != null)
-                        .Sum(v => Convert.ToInt64(v));
-                }
-                @totalObjs.ToString("N0")
-            </CellTemplate>
-        </TemplateColumn>
+        <PropertyColumn Property="x => x.Description" Title="Descripción" Sortable="true" Filterable="false"
+            HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+            CellStyle="text-align:left; cursor:pointer" />
     </Columns>
 
     <PagerContent>
         <MudDataGridPager T="DivisionApiDTO" />
     </PagerContent>
-</MudDataGrid>
+
+        </MudDataGrid>
+    </MudItem>
+</MudGrid>
 
 @code {
     private MudDataGrid<DivisionApiDTO>? dataGrid;

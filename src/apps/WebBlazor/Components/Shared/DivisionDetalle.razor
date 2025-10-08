@@ -17,7 +17,7 @@
 
 @if (loading)
 {
-    <MudCard Class="mt-3 mx-auto" Style="max-width: 1100px; border-radius: 12px;">
+    <MudCard Class="mt-3 mx-auto" Style="max-width: 1000px; border-radius: 12px;">
         <MudCardHeader>
             <CardHeaderContent>
                 <MudSkeleton Width="280px" Height="28px" Animation="Animation.Wave" />
@@ -66,28 +66,11 @@ else if (division is not null)
                     <MudText Typo="Typo.body2" Class="mud-text-secondary">@division.Description</MudText>
                 }
             </MudStack>
-
-            <MudStack Row="true" Spacing="1">
-                <MudChip T="string" Variant="Variant.Outlined" Color="@(division.HomeDivision == true ? Color.Success : Color.Default)">
-                    @(division.HomeDivision == true ? "Home" : "Normal")
-                </MudChip>
-                @if (division.ObjectCounts?.Count > 0)
-                {
-                    <MudChip T="string" Variant="Variant.Outlined">
-                        Objetos: @division.ObjectCounts.Values.Sum()
-                    </MudChip>
-                }
-            </MudStack>
         </MudStack>
     </MudPaper>
 
     <!-- Campañas de la división -->
     <MudCard Class="pa-0 mt-3 mx-auto" Style="max-width: 1100px; border-radius: 12px; overflow: hidden;">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Campañas de esta división</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
         <MudDivider />
         <MudCardContent Class="pa-4">
             <MudDataGrid @ref="grid"
@@ -101,16 +84,7 @@ else if (division is not null)
                 <Columns>
                     <PropertyColumn Property="x => x.Name" Title="Campaña"
                                     HeaderStyle="text-align:left; font-weight:600"
-                                    CellStyle="text-align:left; cursor:pointer" />
-
-                    <PropertyColumn Property="x => x.MemberCount" Title="Miembros"
-                                    HeaderStyle="text-align:center; font-weight:600"
-                                    CellStyle="text-align:center; width:100px" />
-
-                    <PropertyColumn Property="x => x.DateModified" Title="Últ. modificación"
-                                    Format="dd/MM/yyyy HH:mm"
-                                    HeaderStyle="text-align:center; font-weight:600; white-space:nowrap"
-                                    CellStyle="text-align:center; width:180px" />
+                                    CellStyle="Width: 20%; text-align:left; cursor:pointer" />
                 </Columns>
 
                 <PagerContent>
@@ -162,7 +136,6 @@ else if (division is not null)
             var pageNumber = state.Page + 1;
             var pageSize = state.PageSize;
 
-            // Nota: el cliente NSwag puede exponer 'divisionId' como IEnumerable<string> o string[].
             var result = await Api.Routing_GetQueuesDivisionviewsAsync(pageNumber, pageSize, new[] { id! });
 
             var total = (int)(result?.Total ?? 0);

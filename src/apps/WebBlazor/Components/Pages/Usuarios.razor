@@ -8,7 +8,7 @@
 @inject IJSRuntime JS
 @inject ISnackbar Snackbar
 
-<MudGrid Class="mt-2">
+<MudGrid Class="mt-1">
     <!-- Grid -->
     <MudItem xs="12" md="10">
         <MudDataGrid @ref="dataGrid"
@@ -19,7 +19,8 @@
                      Bordered="true"
                      Striped="true"
                      RowClick="GotoUser"
-                     Class="pa-2">
+                     Class="mt-1 pa-2"
+                     Elevation="2">
             <ToolBarContent>
                 <MudStack Row AlignItems="AlignItems.Center" Style="width:100%" Class="pa-1 mb-4">
 

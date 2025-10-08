@@ -110,15 +110,14 @@ namespace Api.Helpers
         }
 
         // ===== Divisions =====
-        public static DivisionDTO FromRaw(AuthzDivision d)
+        public static DivisionDTO FromRaw(AuthzDivision authzDivision)
         {
             return new DivisionDTO
             {
-                Id = d.Id,
-                Name = d.Name,
-                Description = d.Description,
-                HomeDivision = d.HomeDivision,
-                ObjectCounts = d.ObjectCounts?.ToDictionary(kv => kv.Key, kv => (long)(kv.Value ?? 0))
+                Id = authzDivision.Id,
+                Name = authzDivision.Name,
+                Description = authzDivision.Description,
+                HomeDivision = authzDivision.HomeDivision,
             };
         }
 
