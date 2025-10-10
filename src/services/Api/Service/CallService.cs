@@ -12,18 +12,21 @@ namespace Api.Service
         private readonly GroupApiService _groupService;
         private readonly UserApiService _userService;
         private readonly DivisionApiService _divisionService;
+        private readonly ConversationApiService _conversationService;
 
         public CallService(
             RoutingApiService routingService,
             GroupApiService groupService,
             UserApiService userService,
             DivisionApiService divisionService,
+            ConversationApiService conversationService,
         ILogger<GenesysAPIService> logger) : base(logger)
         {
             _routingService = routingService;
             _groupService = groupService;
             _userService = userService;
             _divisionService = divisionService;
+            _conversationService = conversationService;
         }
 
         // ===== Users =====
@@ -63,5 +66,19 @@ namespace Api.Service
 
         public static DivisionSummaryDTO? DivisionSummaryFromRaw(AuthzDivision? div)
             => div is null ? null : new DivisionSummaryDTO { Id = div.Id, Name = div.Name };
+
+        // ===== Conversations =====
+        public void Conversations_SetIntervalExtract(DateTimeOffset from)
+            => _conversationService.SetIntervalExtract(from);
+
+        public Task<string?> Conversations_RequestJobAsync()
+            => _conversationService.Analytics_ConversationsDetails_RequestJobAsync();
+
+        public Task<AsyncQueryStatus?> Conversations_GetJobStatusAsync(string jobId)
+            => _conversationService.Analytics_ConversationsDetails_GetJobStatusAsync(jobId);
+
+        public Task<List<AnalyticsConversation>> Conversations_GetJobResultsAsync(string jobId)
+            => _conversationService.Analytics_ConversationsDetails_GetJobResultsAsync(jobId);
+
     }
 }

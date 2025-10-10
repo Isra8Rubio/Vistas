@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Components\Pages\Usuarios.razor.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Remove="Components\Pages\NotFound.razor" />
   </ItemGroup>
 

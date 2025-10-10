@@ -1,14 +1,8 @@
 ﻿@page "/usuarios"
 @using MudBlazor
 @using API.APIService
-@using System.Globalization
-@using System.Text
-@inject APIClient Api
-@inject NavigationManager Nav
-@inject IJSRuntime JS
-@inject ISnackbar Snackbar
 
-<MudGrid Class="mt-1">
+<MudGrid Class="mt-0">
     <!-- Grid -->
     <MudItem xs="12" md="10">
         <MudDataGrid @ref="dataGrid"
@@ -53,7 +47,7 @@
                                 HeaderStyle="text-align:left; font-weight:600"
                                 CellStyle="width:25%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer" />
 
-            <!-- Configuración de la vista de grupos -->
+                <!-- Configuración de la vista de grupos -->
                 <TemplateColumn Title="Grupos" Sortable="false" Filterable="true"
                                 HeaderStyle="text-align:left; font-weight:600"
                                 CellStyle="width:55%; cursor:pointer">
@@ -64,9 +58,9 @@
                                 @foreach (var grupos in context.Item.ListaGrupos)
                                 {
                                     var label = !string.IsNullOrWhiteSpace(grupos?.Name) ? grupos!.Name : "Grupo sin nombre";
-                                        <MudChip Size="Size.Small" Variant="Variant.Outlined" Class="mr-1 mb-1">
-                                            @label
-                                        </MudChip>
+                                    <MudChip Size="Size.Small" Variant="Variant.Outlined" Class="mr-1 mb-1">
+                                        @label
+                                    </MudChip>
                                 }
                             </div>
                         }
@@ -86,83 +80,3 @@
         </MudDataGrid>
     </MudItem>
 </MudGrid>
-
-@*     private IReadOnlyList<UserDTO> _pageItemsUsers = Array.Empty<UserDTO>();
-    // Llamada a la API
-    var response = await Api.Users_GetUsersAsync(pageNumber, pageSize);
-    var items = response?.Entities?.ToList() ?? new List<UserDTO>();
-    var total = (int)(response?.Total ?? 0);
-
-    _pageItemsUsers = items; *@
-
-@code {
-    private MudDataGrid<UserDTO>? dataGrid;
-    private UserDTO? seleccionado;
-
-    // búsqueda
-    private string? _search;
-    private string? Search
-    {
-        get => _search;
-        set { if (_search == value) return; _search = value; _ = dataGrid?.ReloadServerData(); }
-    }
-
-    private Task ClearFilters()
-    {
-        Search = null;
-        seleccionado = null;
-        return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
-    }
-
-    // Carga
-    private async Task<GridData<UserDTO>> ServerReload(GridState<UserDTO> state)
-    {
-        try
-        {
-            // Parámetros de paginación
-            var pageNumber = state.Page + 1;
-            var pageSize = state.PageSize;
-
-            // Llamada a la API
-            var data = await Api.Users_GetUsersAsync(pageNumber, pageSize);
-
-            // Cálculo robusto del total de elementos
-            var total = data.Total > 0
-              ? data.Total
-              : (data.PageCount > 0 && data.PageSize > 0 ? data.PageCount * data.PageSize : data.Entities.Count);
-
-            IEnumerable<UserDTO> items = data.Entities;
-
-            // Filtro de búsqueda
-            if (!string.IsNullOrWhiteSpace(_search))
-            {
-                var q = _search.Trim();
-                items = items.Where(x =>
-                  (x.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                  (x.Email?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                  (x.ListaGrupos?.Any(g => g?.Name?.Contains(q, StringComparison.OrdinalIgnoreCase) ?? false) ?? false));
-            }
-
-            var list = items.ToList();
-
-            // si no hay selección o ya no existe en esta página, limpia el panel
-            if (seleccionado is not null && !list.Any(u => u.Id == seleccionado.Id))
-                seleccionado = null;
-
-            return new GridData<UserDTO> { TotalItems = (int)total, Items = list };
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add($"No se pudo cargar usuarios: {ex.StatusCode}", Severity.Error);
-            return new GridData<UserDTO> { TotalItems = 0, Items = [] };
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"No se pudo cargar usuarios: {ex.Message}", Severity.Error);
-            return new GridData<UserDTO> { TotalItems = 0, Items = [] };
-        }
-    }
-
-    private void GotoUser(DataGridRowClickEventArgs<UserDTO> args)
-    => Nav.NavigateTo($"/usuarios/{args.Item.Id}");
-}

@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using API.APIService;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using API.APIService;
 
-namespace Web.Components.Pages
+namespace WebBlazor.Components.Pages 
 {
     public partial class Usuarios : ComponentBase
     {
-        // Inyecciones (movidas desde el .razor)
         [Inject] private APIClient Api { get; set; } = default!;
         [Inject] private NavigationManager Nav { get; set; } = default!;
         [Inject] private IJSRuntime JS { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
 
-        // Estado Grid
+        // Referencia al grid
         private MudDataGrid<UserDTO>? dataGrid;
-        private List<UserDTO> _lastItems = new();
+
+        // Selección actual
         private UserDTO? seleccionado;
-        private int _totalItems;
 
         // Búsqueda
         private string? _search;
@@ -43,24 +38,22 @@ namespace Web.Components.Pages
             return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
         }
 
-        // Carga server-side
+        // Carga de datos para el DataGrid
         private async Task<GridData<UserDTO>> ServerReload(GridState<UserDTO> state)
         {
             try
             {
-                // Parámetros de paginación solicitados por el grid
+                // Parámetros de paginación
                 var pageNumber = state.Page + 1;
                 var pageSize = state.PageSize;
 
                 // Llamada a la API
                 var data = await Api.Users_GetUsersAsync(pageNumber, pageSize);
 
-                // Cálculo robusto del total de elementos
+                // Total robusto
                 var total = data.Total > 0
                     ? data.Total
-                    : (data.PageCount > 0 && data.PageSize > 0
-                        ? data.PageCount * data.PageSize
-                        : data.Entities.Count);
+                    : data.PageCount > 0 && data.PageSize > 0 ? data.PageCount * data.PageSize : data.Entities.Count;
 
                 IEnumerable<UserDTO> items = data.Entities;
 
@@ -75,10 +68,8 @@ namespace Web.Components.Pages
                 }
 
                 var list = items.ToList();
-                _lastItems = list;
-                _totalItems = (int)total;
 
-                // si no hay selección o ya no existe en esta página, limpia selección
+                // Si ya no está el seleccionado en la página, limpiar
                 if (seleccionado is not null && !list.Any(u => u.Id == seleccionado.Id))
                     seleccionado = null;
 
@@ -87,13 +78,11 @@ namespace Web.Components.Pages
             catch (ApiException ex)
             {
                 Snackbar.Add($"No se pudo cargar usuarios: {ex.StatusCode}", Severity.Error);
-                _lastItems = new();
                 return new GridData<UserDTO> { TotalItems = 0, Items = [] };
             }
             catch (Exception ex)
             {
                 Snackbar.Add($"No se pudo cargar usuarios: {ex.Message}", Severity.Error);
-                _lastItems = new();
                 return new GridData<UserDTO> { TotalItems = 0, Items = [] };
             }
         }

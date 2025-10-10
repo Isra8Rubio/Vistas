@@ -5,50 +5,50 @@
 @inject APIClient Api
 @inject NavigationManager Nav
 
-<MudGrid Class="mt-2">
-<MudItem xs="12" md="10">
-<MudDataGrid @ref="dataGrid"
-             T="DivisionApiDTO"
-             ServerData="ServerReload"
-             Filterable="true"
-             Hover="true"
-             Dense="true"
-             Bordered="true"
-             Striped="true"
-             RowClick="GotoDivision"
-             Class="mt-4 pa-2"
-             Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
+<MudGrid Class="mt-0">
+    <MudItem xs="12" md="10">
+        <MudDataGrid @ref="dataGrid"
+                     T="DivisionApiDTO"
+                     ServerData="ServerReload"
+                     Filterable="true"
+                     Hover="true"
+                     Dense="true"
+                     Bordered="true"
+                     Striped="true"
+                     RowClick="GotoDivision"
+                     Class="mt-1 pa-2"
+                     Style="font-family: 'Inter', system-ui, -apple-system, Helvetica; font-variant-numeric: tabular-nums;">
 
-    <ToolBarContent>
-        <MudSpacer />
-        <MudTextField T="string"
-                      @bind-Value="Search"
-                      Label="Buscar"
-                      Variant="Variant.Outlined"
-                      Adornment="Adornment.End"
-                      AdornmentIcon="@Icons.Material.Filled.Search"
-                      AdornmentColor="Color.Primary"
-                      Immediate="true"
-                      DebounceInterval="300"
-                      Class="mt-2 mb-1" />
-        <MudIconButton Icon="@Icons.Material.Filled.Clear"
-                       OnClick="ClearFilters"
-                       Class="ml-1 mt-2" />
-    </ToolBarContent>
+            <ToolBarContent>
+                <MudSpacer />
+                <MudTextField T="string"
+                              @bind-Value="Search"
+                              Label="Buscar"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              AdornmentColor="Color.Primary"
+                              Immediate="true"
+                              DebounceInterval="300"
+                              Class="mt-2 mb-1" />
+                <MudIconButton Icon="@Icons.Material.Filled.Clear"
+                               OnClick="ClearFilters"
+                               Class="ml-1 mt-2" />
+            </ToolBarContent>
 
-    <Columns>
-        <PropertyColumn Property="x => x.Name" Title="División" Sortable="true" Filterable="true"
-                        HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-                        CellStyle="max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; cursor:pointer" />
+            <Columns>
+                <PropertyColumn Property="x => x.Name" Title="División" Sortable="true" Filterable="true"
+                                HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                                CellStyle="max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; cursor:pointer" />
 
-        <PropertyColumn Property="x => x.Description" Title="Descripción" Sortable="true" Filterable="false"
-            HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
-            CellStyle="text-align:left; cursor:pointer" />
-    </Columns>
+                <PropertyColumn Property="x => x.Description" Title="Descripción" Sortable="true" Filterable="false"
+                                HeaderStyle="text-align:left; font-size:.95rem; font-weight:600"
+                                CellStyle="text-align:left; cursor:pointer" />
+            </Columns>
 
-    <PagerContent>
-        <MudDataGridPager T="DivisionApiDTO" />
-    </PagerContent>
+            <PagerContent>
+                <MudDataGridPager T="DivisionApiDTO" />
+            </PagerContent>
 
         </MudDataGrid>
     </MudItem>

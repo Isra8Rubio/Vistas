@@ -27,9 +27,7 @@ builder.Services.AddSingleton<GenesysConfig>(sp =>
     {
         GenesysClient = genesysSection["GenesysClient"] ?? string.Empty,
         GenesysSecret = genesysSection["GenesysSecret"] ?? string.Empty,
-        GenesysRegionString = genesysSection["GenesysRegion"] ?? "eu_west_1"
     };
-
     return config;
 });
 
