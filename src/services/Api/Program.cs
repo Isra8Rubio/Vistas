@@ -1,12 +1,20 @@
 using Api.Service;
 using Api.Service.GenesysAPI;
 using Microsoft.OpenApi.Models;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using GenesysConfig = Api.Service.GenesysAPI.Models.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Swagger
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+    });
 builder.Services.AddOpenApiDocument(o => { o.Title = "Genesys API"; o.Version = "v1"; });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

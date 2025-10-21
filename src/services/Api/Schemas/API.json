@@ -6,6 +6,207 @@
     "version": "v1"
   },
   "paths": {
+    "/api/Conversations/jobs": {
+      "post": {
+        "tags": [
+          "Conversations"
+        ],
+        "operationId": "Conversations_CreateJob",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobIdResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": ""
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Conversations/jobs/{jobId}": {
+      "get": {
+        "tags": [
+          "Conversations"
+        ],
+        "operationId": "Conversations_GetJobStatus",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncQueryStatus"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Conversations/jobs/{jobId}/results": {
+      "get": {
+        "tags": [
+          "Conversations"
+        ],
+        "operationId": "Conversations_GetJobResults",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnalyticsConversation"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Conversations/jobs/{jobId}/summary": {
+      "get": {
+        "tags": [
+          "Conversations"
+        ],
+        "operationId": "Conversations_GetJobResultsSummary",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 2
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 25
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultDTOOfConversationListItemDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/Divisions": {
       "get": {
         "tags": [
@@ -474,6 +675,3016 @@
   },
   "components": {
     "schemas": {
+      "JobIdResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AsyncQueryStatus": {
+        "type": "object",
+        "description": "AsyncQueryStatus",
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "description": "The current state of the asynchronous query",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/StateEnum"
+              }
+            ]
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "The error associated with the current query, if the state is FAILED",
+            "nullable": true
+          },
+          "expirationDate": {
+            "type": "string",
+            "description": "The time at which results for this query will expire. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "submissionDate": {
+            "type": "string",
+            "description": "The time at which the query was submitted. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "completionDate": {
+            "type": "string",
+            "description": "The time at which the query completed. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "StateEnum": {
+        "type": "string",
+        "description": "The current state of the asynchronous query",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Queued",
+          "Pending",
+          "Failed",
+          "Cancelled",
+          "Fulfilled",
+          "Expired"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "QUEUED",
+          "PENDING",
+          "FAILED",
+          "CANCELLED",
+          "FULFILLED",
+          "EXPIRED"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Queued",
+          "Pending",
+          "Failed",
+          "Cancelled",
+          "Fulfilled",
+          "Expired"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Queued",
+          "Pending",
+          "Failed",
+          "Cancelled",
+          "Fulfilled",
+          "Expired"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "AnalyticsConversation": {
+        "type": "object",
+        "description": "AnalyticsConversation",
+        "additionalProperties": false,
+        "properties": {
+          "conversationInitiator": {
+            "description": "Indicates the participant purpose of the participant initiating a message conversation",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ConversationInitiatorEnum"
+              }
+            ]
+          },
+          "originatingDirection": {
+            "description": "The original direction of the conversation",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/OriginatingDirectionEnum"
+              }
+            ]
+          },
+          "conferenceStart": {
+            "type": "string",
+            "description": "The start time of a conference call. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "conversationEnd": {
+            "type": "string",
+            "description": "The end time of a conversation. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Unique identifier for the conversation",
+            "nullable": true
+          },
+          "conversationStart": {
+            "type": "string",
+            "description": "The start time of a conversation. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "customerParticipation": {
+            "type": "boolean",
+            "description": "Indicates a messaging conversation in which the customer participated by sending at least one message",
+            "nullable": true
+          },
+          "divisionIds": {
+            "type": "array",
+            "description": "Identifier(s) of division(s) associated with a conversation",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "externalTag": {
+            "type": "string",
+            "description": "External tag for the conversation",
+            "nullable": true
+          },
+          "inactivityTimeout": {
+            "type": "string",
+            "description": "The time in the future, after which this conversation would be considered inactive. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "knowledgeBaseIds": {
+            "type": "array",
+            "description": "The unique identifier(s) of the knowledge base(s) used",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "mediaStatsMinConversationMos": {
+            "type": "number",
+            "description": "The lowest estimated average MOS among all the audio streams belonging to this conversation",
+            "format": "double",
+            "nullable": true
+          },
+          "mediaStatsMinConversationRFactor": {
+            "type": "number",
+            "description": "The lowest R-factor value among all of the audio streams belonging to this conversation",
+            "format": "double",
+            "nullable": true
+          },
+          "originatingSocialMediaPublic": {
+            "type": "boolean",
+            "description": "Indicates that the conversation originated from a public message on social media",
+            "nullable": true
+          },
+          "selfServed": {
+            "type": "boolean",
+            "description": "Indicates whether all flow sessions were self serviced",
+            "nullable": true
+          },
+          "evaluations": {
+            "type": "array",
+            "description": "Evaluations associated with this conversation",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsEvaluation"
+            }
+          },
+          "surveys": {
+            "type": "array",
+            "description": "Surveys associated with this conversation",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsSurvey"
+            }
+          },
+          "resolutions": {
+            "type": "array",
+            "description": "Resolutions associated with this conversation",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsResolution"
+            }
+          },
+          "participants": {
+            "type": "array",
+            "description": "Participants in the conversation",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsParticipant"
+            }
+          }
+        }
+      },
+      "ConversationInitiatorEnum": {
+        "type": "string",
+        "description": "Indicates the participant purpose of the participant initiating a message conversation",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Acd",
+          "Agent",
+          "Api",
+          "Botflow",
+          "Campaign",
+          "Customer",
+          "Dialer",
+          "External",
+          "Fax",
+          "Group",
+          "Inbound",
+          "Ivr",
+          "Manual",
+          "Outbound",
+          "Station",
+          "User",
+          "Voicemail",
+          "Voicesurveyflow",
+          "Workflow"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "acd",
+          "agent",
+          "api",
+          "botflow",
+          "campaign",
+          "customer",
+          "dialer",
+          "external",
+          "fax",
+          "group",
+          "inbound",
+          "ivr",
+          "manual",
+          "outbound",
+          "station",
+          "user",
+          "voicemail",
+          "voicesurveyflow",
+          "workflow"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Acd",
+          "Agent",
+          "Api",
+          "Botflow",
+          "Campaign",
+          "Customer",
+          "Dialer",
+          "External",
+          "Fax",
+          "Group",
+          "Inbound",
+          "Ivr",
+          "Manual",
+          "Outbound",
+          "Station",
+          "User",
+          "Voicemail",
+          "Voicesurveyflow",
+          "Workflow"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Acd",
+          "Agent",
+          "Api",
+          "Botflow",
+          "Campaign",
+          "Customer",
+          "Dialer",
+          "External",
+          "Fax",
+          "Group",
+          "Inbound",
+          "Ivr",
+          "Manual",
+          "Outbound",
+          "Station",
+          "User",
+          "Voicemail",
+          "Voicesurveyflow",
+          "Workflow"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "OriginatingDirectionEnum": {
+        "type": "string",
+        "description": "The original direction of the conversation",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Inbound",
+          "Outbound"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "inbound",
+          "outbound"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Inbound",
+          "Outbound"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Inbound",
+          "Outbound"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null
+        ]
+      },
+      "AnalyticsEvaluation": {
+        "type": "object",
+        "description": "AnalyticsEvaluation",
+        "additionalProperties": false,
+        "properties": {
+          "evaluationStatus": {
+            "description": "Status of evaluation",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EvaluationStatusEnum"
+              }
+            ]
+          },
+          "assigneeApplicable": {
+            "type": "boolean",
+            "description": "Indicates whether an assignee is applicable for the evaluation. Set to false when assignee is not applicable",
+            "nullable": true
+          },
+          "assigneeId": {
+            "type": "string",
+            "description": "UserId of the assignee",
+            "nullable": true
+          },
+          "calibrationId": {
+            "type": "string",
+            "description": "The calibration ID used for the purpose of training evaluators",
+            "nullable": true
+          },
+          "contextId": {
+            "type": "string",
+            "description": "A unique identifier for an evaluation form, regardless of version",
+            "nullable": true
+          },
+          "deleted": {
+            "type": "boolean",
+            "description": "Whether the evaluation has been deleted",
+            "nullable": true
+          },
+          "evaluationId": {
+            "type": "string",
+            "description": "Unique identifier for the evaluation",
+            "nullable": true
+          },
+          "evaluatorId": {
+            "type": "string",
+            "description": "A unique identifier of the user who evaluated the interaction",
+            "nullable": true
+          },
+          "eventTime": {
+            "type": "string",
+            "description": "Specifies when an evaluation occurred. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "formId": {
+            "type": "string",
+            "description": "ID of the evaluation form used",
+            "nullable": true
+          },
+          "formName": {
+            "type": "string",
+            "description": "Name of the evaluation form used",
+            "nullable": true
+          },
+          "queueId": {
+            "type": "string",
+            "description": "The ID of the associated queue",
+            "nullable": true
+          },
+          "released": {
+            "type": "boolean",
+            "description": "Whether the evaluation has been released",
+            "nullable": true
+          },
+          "rescored": {
+            "type": "boolean",
+            "description": "Whether the evaluation has been rescored at least once",
+            "nullable": true
+          },
+          "systemSubmitted": {
+            "type": "boolean",
+            "description": "Whether the evaluation was auto submitted by the system",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID of the agent the evaluation was performed against",
+            "nullable": true
+          },
+          "oTotalCriticalScore": {
+            "type": "integer",
+            "description": "Gets or Sets OTotalCriticalScore",
+            "format": "int64",
+            "nullable": true
+          },
+          "oTotalScore": {
+            "type": "integer",
+            "description": "Gets or Sets OTotalScore",
+            "format": "int64",
+            "nullable": true
+          }
+        }
+      },
+      "EvaluationStatusEnum": {
+        "type": "string",
+        "description": "Status of evaluation",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Finished",
+          "Inprogress",
+          "Inreview",
+          "Pending",
+          "Retracted"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "Finished",
+          "InProgress",
+          "InReview",
+          "Pending",
+          "Retracted"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Finished",
+          "Inprogress",
+          "Inreview",
+          "Pending",
+          "Retracted"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Finished",
+          "Inprogress",
+          "Inreview",
+          "Pending",
+          "Retracted"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "AnalyticsSurvey": {
+        "type": "object",
+        "description": "AnalyticsSurvey",
+        "additionalProperties": false,
+        "properties": {
+          "surveyType": {
+            "description": "The type of the survey",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SurveyTypeEnum"
+              }
+            ]
+          },
+          "eventTime": {
+            "type": "string",
+            "description": "Specifies when an event occurred. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "queueId": {
+            "type": "string",
+            "description": "The ID of the associated queue",
+            "nullable": true
+          },
+          "surveyCompletedDate": {
+            "type": "string",
+            "description": "Completion datetime of the survey in ISO 8601 format",
+            "format": "date-time",
+            "nullable": true
+          },
+          "surveyFormContextId": {
+            "type": "string",
+            "description": "Unique identifier for the survey form, regardless of version",
+            "nullable": true
+          },
+          "surveyFormId": {
+            "type": "string",
+            "description": "ID of the survey form used",
+            "nullable": true
+          },
+          "surveyFormName": {
+            "type": "string",
+            "description": "Name of the survey form used",
+            "nullable": true
+          },
+          "surveyId": {
+            "type": "string",
+            "description": "ID of the survey",
+            "nullable": true
+          },
+          "surveyPartialResponse": {
+            "type": "boolean",
+            "description": "Whether the survey was completed with any required questions unanswered.",
+            "nullable": true
+          },
+          "surveyPromoterScore": {
+            "type": "integer",
+            "description": "Score of the survey used with NPS",
+            "format": "int32",
+            "nullable": true
+          },
+          "surveyStatus": {
+            "type": "string",
+            "description": "The status of the survey",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID of the agent the survey was performed against",
+            "nullable": true
+          },
+          "oSurveyTotalScore": {
+            "type": "integer",
+            "description": "Gets or Sets OSurveyTotalScore",
+            "format": "int64",
+            "nullable": true
+          }
+        }
+      },
+      "SurveyTypeEnum": {
+        "type": "string",
+        "description": "The type of the survey",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Web",
+          "Voice"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "Web",
+          "Voice"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Web",
+          "Voice"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Web",
+          "Voice"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null
+        ]
+      },
+      "AnalyticsResolution": {
+        "type": "object",
+        "description": "AnalyticsResolution",
+        "additionalProperties": false,
+        "properties": {
+          "eventTime": {
+            "type": "string",
+            "description": "Specifies when an event occurred. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "queueId": {
+            "type": "string",
+            "description": "The ID of the last queue on which the conversation was handled.",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "description": "The ID of the last user who handled the conversation.",
+            "nullable": true
+          },
+          "nNextContactAvoided": {
+            "type": "integer",
+            "description": "Gets or Sets NNextContactAvoided",
+            "format": "int64",
+            "nullable": true
+          }
+        }
+      },
+      "AnalyticsParticipant": {
+        "type": "object",
+        "description": "AnalyticsParticipant",
+        "additionalProperties": false,
+        "properties": {
+          "flaggedReason": {
+            "description": "Reason for which participant flagged conversation",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FlaggedReasonEnum"
+              }
+            ]
+          },
+          "purpose": {
+            "description": "The participant's purpose",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PurposeEnum"
+              }
+            ]
+          },
+          "externalContactId": {
+            "type": "string",
+            "description": "External contact identifier",
+            "nullable": true
+          },
+          "externalOrganizationId": {
+            "type": "string",
+            "description": "External organization identifier",
+            "nullable": true
+          },
+          "participantId": {
+            "type": "string",
+            "description": "Unique identifier for the participant",
+            "nullable": true
+          },
+          "participantName": {
+            "type": "string",
+            "description": "A human readable name identifying the participant",
+            "nullable": true
+          },
+          "screenRecording": {
+            "type": "boolean",
+            "description": "Flag determining if a screen recording was started or not",
+            "nullable": true
+          },
+          "teamId": {
+            "type": "string",
+            "description": "The team ID the user is a member of",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "description": "Unique identifier for the user",
+            "nullable": true
+          },
+          "sessions": {
+            "type": "array",
+            "description": "List of sessions associated to this participant",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsSession"
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "description": "List of attributes associated to this participant",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "FlaggedReasonEnum": {
+        "type": "string",
+        "description": "Reason for which participant flagged conversation",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "General"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "general"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "General"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "General"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null
+        ]
+      },
+      "PurposeEnum": {
+        "type": "string",
+        "description": "The participant's purpose",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Acd",
+          "Agent",
+          "Api",
+          "Botflow",
+          "Campaign",
+          "Customer",
+          "Dialer",
+          "External",
+          "Fax",
+          "Group",
+          "Inbound",
+          "Ivr",
+          "Manual",
+          "Outbound",
+          "Station",
+          "User",
+          "Voicemail",
+          "Voicesurveyflow",
+          "Workflow"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "acd",
+          "agent",
+          "api",
+          "botflow",
+          "campaign",
+          "customer",
+          "dialer",
+          "external",
+          "fax",
+          "group",
+          "inbound",
+          "ivr",
+          "manual",
+          "outbound",
+          "station",
+          "user",
+          "voicemail",
+          "voicesurveyflow",
+          "workflow"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Acd",
+          "Agent",
+          "Api",
+          "Botflow",
+          "Campaign",
+          "Customer",
+          "Dialer",
+          "External",
+          "Fax",
+          "Group",
+          "Inbound",
+          "Ivr",
+          "Manual",
+          "Outbound",
+          "Station",
+          "User",
+          "Voicemail",
+          "Voicesurveyflow",
+          "Workflow"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Acd",
+          "Agent",
+          "Api",
+          "Botflow",
+          "Campaign",
+          "Customer",
+          "Dialer",
+          "External",
+          "Fax",
+          "Group",
+          "Inbound",
+          "Ivr",
+          "Manual",
+          "Outbound",
+          "Station",
+          "User",
+          "Voicemail",
+          "Voicesurveyflow",
+          "Workflow"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "AnalyticsSession": {
+        "type": "object",
+        "description": "AnalyticsSession",
+        "additionalProperties": false,
+        "properties": {
+          "deliveryStatus": {
+            "description": "The email or SMS delivery status",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DeliveryStatusEnum"
+              }
+            ]
+          },
+          "direction": {
+            "description": "The direction of the communication",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DirectionEnum"
+              }
+            ]
+          },
+          "mediaType": {
+            "description": "The session media type",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MediaTypeEnum"
+              }
+            ]
+          },
+          "routingRuleType": {
+            "description": "Routing rule type",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RoutingRuleTypeEnum"
+              }
+            ]
+          },
+          "usedRouting": {
+            "description": "Complete routing method",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UsedRoutingEnum"
+              }
+            ]
+          },
+          "activeSkillIds": {
+            "type": "array",
+            "description": "ID(s) of Skill(s) that are active on the conversation",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "acwSkipped": {
+            "type": "boolean",
+            "description": "Marker for an agent that skipped after call work",
+            "nullable": true
+          },
+          "addressFrom": {
+            "type": "string",
+            "description": "The address that initiated an action",
+            "nullable": true
+          },
+          "addressOther": {
+            "type": "string",
+            "description": "The email address for the participant on the other side of the email conversation",
+            "nullable": true
+          },
+          "addressSelf": {
+            "type": "string",
+            "description": "The email address for the participant on this side of the email conversation",
+            "nullable": true
+          },
+          "addressTo": {
+            "type": "string",
+            "description": "The address receiving an action",
+            "nullable": true
+          },
+          "agentAssistantId": {
+            "type": "string",
+            "description": "Unique identifier of the active virtual agent assistant",
+            "nullable": true
+          },
+          "agentBullseyeRing": {
+            "type": "integer",
+            "description": "Bullseye ring of the targeted agent",
+            "format": "int32",
+            "nullable": true
+          },
+          "agentOwned": {
+            "type": "boolean",
+            "description": "Flag indicating an agent-owned callback",
+            "nullable": true
+          },
+          "ani": {
+            "type": "string",
+            "description": "Automatic Number Identification (caller's number)",
+            "nullable": true
+          },
+          "assignerId": {
+            "type": "string",
+            "description": "ID of the user that manually assigned a conversation",
+            "nullable": true
+          },
+          "authenticated": {
+            "type": "boolean",
+            "description": "Flag that indicates that the identity of the customer has been asserted as verified by the provider.",
+            "nullable": true
+          },
+          "bargedParticipantId": {
+            "type": "string",
+            "description": "The participantId being barged in on (if someone (e.g. an agent) is being barged in on, this would correspond to one of the other participantIds present in the conversation)",
+            "nullable": true
+          },
+          "bcc": {
+            "type": "array",
+            "description": "Blind carbon copy email address(es)",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "callbackNumbers": {
+            "type": "array",
+            "description": "Callback phone number(s)",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "callbackScheduledTime": {
+            "type": "string",
+            "description": "Scheduled callback date/time. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "callbackUserName": {
+            "type": "string",
+            "description": "The name of the user requesting a call back",
+            "nullable": true
+          },
+          "cc": {
+            "type": "array",
+            "description": "Carbon copy email address(es)",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "cleared": {
+            "type": "boolean",
+            "description": "Flag that indicates that the conversation has been cleared by the customer",
+            "nullable": true
+          },
+          "coachedParticipantId": {
+            "type": "string",
+            "description": "The participantId being coached (if someone (e.g. an agent) is being coached, this would correspond to one of the other participantIds present in the conversation)",
+            "nullable": true
+          },
+          "cobrowseRole": {
+            "type": "string",
+            "description": "Describes side of the cobrowse (sharer or viewer)",
+            "nullable": true
+          },
+          "cobrowseRoomId": {
+            "type": "string",
+            "description": "A unique identifier for a Genesys Cloud cobrowse room",
+            "nullable": true
+          },
+          "deliveryPushed": {
+            "type": "boolean",
+            "description": "Flag that indicates that the push delivery mechanism was used",
+            "nullable": true
+          },
+          "deliveryStatusChangeDate": {
+            "type": "string",
+            "description": "Date and time of the most recent delivery status change. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "destinationAddresses": {
+            "type": "array",
+            "description": "Destination address(es) of transfers or consults",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "detectedSpeechEnd": {
+            "type": "string",
+            "description": "Absolute time when the speech ended. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "detectedSpeechStart": {
+            "type": "string",
+            "description": "Absolute time when the speech started. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "dispositionAnalyzer": {
+            "type": "string",
+            "description": "(Dialer) Analyzer (for example speech.person)",
+            "nullable": true
+          },
+          "dispositionName": {
+            "type": "string",
+            "description": "(Dialer) Result of the analysis (for example disposition.classification.callable.machine)",
+            "nullable": true
+          },
+          "dnis": {
+            "type": "string",
+            "description": "Dialed number identification service (number dialed by the calling party)",
+            "nullable": true
+          },
+          "edgeId": {
+            "type": "string",
+            "description": "Unique identifier of the edge device",
+            "nullable": true
+          },
+          "eligibleAgentCounts": {
+            "type": "array",
+            "description": "Number of eligible agents for each predictive routing attempt",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          "extendedDeliveryStatus": {
+            "type": "string",
+            "description": "Extended delivery status",
+            "nullable": true
+          },
+          "flowInType": {
+            "type": "string",
+            "description": "Type of flow in that occurred when entering ACD.",
+            "nullable": true
+          },
+          "flowOutType": {
+            "type": "string",
+            "description": "Type of flow out that occurred when emitting tFlowOut.",
+            "nullable": true
+          },
+          "journeyActionId": {
+            "type": "string",
+            "description": "Identifier of the journey action.",
+            "nullable": true
+          },
+          "journeyActionMapId": {
+            "type": "string",
+            "description": "Identifier of the journey action map that triggered the action.",
+            "nullable": true
+          },
+          "journeyActionMapVersion": {
+            "type": "integer",
+            "description": "Version of the journey action map that triggered the action.",
+            "format": "int32",
+            "nullable": true
+          },
+          "journeyCustomerId": {
+            "type": "string",
+            "description": "Primary identifier of the journey customer in the source where the activities originate from.",
+            "nullable": true
+          },
+          "journeyCustomerIdType": {
+            "type": "string",
+            "description": "Type of primary identifier of the journey customer (e.g. cookie).",
+            "nullable": true
+          },
+          "journeyCustomerSessionId": {
+            "type": "string",
+            "description": "Unique identifier of the journey session.",
+            "nullable": true
+          },
+          "journeyCustomerSessionIdType": {
+            "type": "string",
+            "description": "Type or category of journey sessions (e.g. web, ticket, delivery, atm).",
+            "nullable": true
+          },
+          "mediaBridgeId": {
+            "type": "string",
+            "description": "Media bridge ID for the conference session consistent across all participants",
+            "nullable": true
+          },
+          "mediaCount": {
+            "type": "integer",
+            "description": "Count of any media (images, files, etc) included in this session",
+            "format": "int32",
+            "nullable": true
+          },
+          "messageType": {
+            "type": "string",
+            "description": "Message type for messaging services. E.g.: sms, facebook, twitter, line",
+            "nullable": true
+          },
+          "monitoredParticipantId": {
+            "type": "string",
+            "description": "The participantId being monitored (if someone (e.g. an agent) is being monitored, this would correspond to one of the other participantIds present in the conversation)",
+            "nullable": true
+          },
+          "outboundCampaignId": {
+            "type": "string",
+            "description": "(Dialer) Unique identifier of the outbound campaign",
+            "nullable": true
+          },
+          "outboundContactId": {
+            "type": "string",
+            "description": "(Dialer) Unique identifier of the contact",
+            "nullable": true
+          },
+          "outboundContactListId": {
+            "type": "string",
+            "description": "(Dialer) Unique identifier of the contact list that this contact belongs to",
+            "nullable": true
+          },
+          "peerId": {
+            "type": "string",
+            "description": "This identifies pairs of related sessions on a conversation. E.g. an external session’s peerId will be the session that the call originally connected to, e.g. if an IVR was dialed, the IVR session, which will also have the external session’s ID as its peer. After that point, any transfers of that session to other internal components (acd, agent, etc.) will all spawn new sessions whose peerIds point back to that original external session.",
+            "nullable": true
+          },
+          "protocolCallId": {
+            "type": "string",
+            "description": "The original voice protocol call ID, e.g. a SIP call ID",
+            "nullable": true
+          },
+          "provider": {
+            "type": "string",
+            "description": "The source provider for the communication.",
+            "nullable": true
+          },
+          "recording": {
+            "type": "boolean",
+            "description": "Flag determining if an audio recording was started or not",
+            "nullable": true
+          },
+          "remote": {
+            "type": "string",
+            "description": "Name, phone number, or email address of the remote party.",
+            "nullable": true
+          },
+          "remoteNameDisplayable": {
+            "type": "string",
+            "description": "Unique identifier for the remote party",
+            "nullable": true
+          },
+          "removedSkillIds": {
+            "type": "array",
+            "description": "ID(s) of Skill(s) that have been removed by bullseye routing",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "requestedRoutings": {
+            "type": "array",
+            "description": "Routing type(s) for requested/attempted routing methods.",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/RequestedRoutingsEnum"
+            }
+          },
+          "roomId": {
+            "type": "string",
+            "description": "Unique identifier for the room",
+            "nullable": true
+          },
+          "routingRing": {
+            "type": "integer",
+            "description": "Routing ring for bullseye or preferred agent routing",
+            "format": "int32",
+            "nullable": true
+          },
+          "routingRule": {
+            "type": "string",
+            "description": "Routing rule for preferred, conditional and predictive routing type",
+            "nullable": true
+          },
+          "screenShareAddressSelf": {
+            "type": "string",
+            "description": "Direct screen share address",
+            "nullable": true
+          },
+          "screenShareRoomId": {
+            "type": "string",
+            "description": "A unique identifier for a Genesys Cloud screen share room",
+            "nullable": true
+          },
+          "scriptId": {
+            "type": "string",
+            "description": "A unique identifier for a script",
+            "nullable": true
+          },
+          "selectedAgentId": {
+            "type": "string",
+            "description": "Selected agent ID",
+            "nullable": true
+          },
+          "selectedAgentRank": {
+            "type": "integer",
+            "description": "Selected agent GPR rank",
+            "format": "int32",
+            "nullable": true
+          },
+          "sessionDnis": {
+            "type": "string",
+            "description": "Dialed number for the current session; this can be different from dnis, e.g. if the call was transferred",
+            "nullable": true
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "The unique identifier of this session",
+            "nullable": true
+          },
+          "sharingScreen": {
+            "type": "boolean",
+            "description": "Flag determining if screen share is started or not (true/false)",
+            "nullable": true
+          },
+          "skipEnabled": {
+            "type": "boolean",
+            "description": "(Dialer) Whether the agent can skip the dialer contact",
+            "nullable": true
+          },
+          "timeoutSeconds": {
+            "type": "integer",
+            "description": "The number of seconds before Genesys Cloud begins the call for a call back (0 disables automatic calling)",
+            "format": "int32",
+            "nullable": true
+          },
+          "videoAddressSelf": {
+            "type": "string",
+            "description": "Direct Video address",
+            "nullable": true
+          },
+          "videoRoomId": {
+            "type": "string",
+            "description": "A unique identifier for a Genesys Cloud video room",
+            "nullable": true
+          },
+          "waitingInteractionCounts": {
+            "type": "array",
+            "description": "Number of waiting interactions for each predictive routing attempt",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          "agentGroups": {
+            "type": "array",
+            "description": "Conditional group routing agent groups",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsAgentGroup"
+            }
+          },
+          "proposedAgents": {
+            "type": "array",
+            "description": "Proposed agents",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsProposedAgent"
+            }
+          },
+          "mediaEndpointStats": {
+            "type": "array",
+            "description": "MediaEndpointStats associated with this session",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsMediaEndpointStat"
+            }
+          },
+          "flow": {
+            "description": "IVR flow execution associated with this session",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AnalyticsFlow"
+              }
+            ]
+          },
+          "metrics": {
+            "type": "array",
+            "description": "List of metrics for this session",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsSessionMetric"
+            }
+          },
+          "segments": {
+            "type": "array",
+            "description": "List of segments for this session",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsConversationSegment"
+            }
+          }
+        }
+      },
+      "DeliveryStatusEnum": {
+        "type": "string",
+        "description": "The email or SMS delivery status",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Deliveryfailed",
+          "Deliverypushed",
+          "Deliverysuccess",
+          "Failed",
+          "Published",
+          "Queued",
+          "Read",
+          "Received",
+          "Sent"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "DeliveryFailed",
+          "DeliveryPushed",
+          "DeliverySuccess",
+          "Failed",
+          "Published",
+          "Queued",
+          "Read",
+          "Received",
+          "Sent"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Deliveryfailed",
+          "Deliverypushed",
+          "Deliverysuccess",
+          "Failed",
+          "Published",
+          "Queued",
+          "Read",
+          "Received",
+          "Sent"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Deliveryfailed",
+          "Deliverypushed",
+          "Deliverysuccess",
+          "Failed",
+          "Published",
+          "Queued",
+          "Read",
+          "Received",
+          "Sent"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "DirectionEnum": {
+        "type": "string",
+        "description": "The direction of the communication",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Inbound",
+          "Outbound"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "inbound",
+          "outbound"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Inbound",
+          "Outbound"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Inbound",
+          "Outbound"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null
+        ]
+      },
+      "MediaTypeEnum": {
+        "type": "string",
+        "description": "The session media type",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Callback",
+          "Chat",
+          "Cobrowse",
+          "Email",
+          "Internalmessage",
+          "Message",
+          "Screenshare",
+          "Unknown",
+          "Video",
+          "Voice"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "callback",
+          "chat",
+          "cobrowse",
+          "email",
+          "internalmessage",
+          "message",
+          "screenshare",
+          "unknown",
+          "video",
+          "voice"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Callback",
+          "Chat",
+          "Cobrowse",
+          "Email",
+          "Internalmessage",
+          "Message",
+          "Screenshare",
+          "Unknown",
+          "Video",
+          "Voice"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Callback",
+          "Chat",
+          "Cobrowse",
+          "Email",
+          "Internalmessage",
+          "Message",
+          "Screenshare",
+          "Unknown",
+          "Video",
+          "Voice"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "RoutingRuleTypeEnum": {
+        "type": "string",
+        "description": "Routing rule type",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Bullseye",
+          "Conditional",
+          "Predictive",
+          "Preferred"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "Bullseye",
+          "Conditional",
+          "Predictive",
+          "Preferred"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Bullseye",
+          "Conditional",
+          "Predictive",
+          "Preferred"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Bullseye",
+          "Conditional",
+          "Predictive",
+          "Preferred"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "UsedRoutingEnum": {
+        "type": "string",
+        "description": "Complete routing method",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Bullseye",
+          "Conditional",
+          "Direct",
+          "Last",
+          "Manual",
+          "Predictive",
+          "Preferred",
+          "Standard",
+          "Vip"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "Bullseye",
+          "Conditional",
+          "Direct",
+          "Last",
+          "Manual",
+          "Predictive",
+          "Preferred",
+          "Standard",
+          "Vip"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Bullseye",
+          "Conditional",
+          "Direct",
+          "Last",
+          "Manual",
+          "Predictive",
+          "Preferred",
+          "Standard",
+          "Vip"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Bullseye",
+          "Conditional",
+          "Direct",
+          "Last",
+          "Manual",
+          "Predictive",
+          "Preferred",
+          "Standard",
+          "Vip"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "RequestedRoutingsEnum": {
+        "type": "string",
+        "description": "Gets or Sets RequestedRoutings",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Bullseye",
+          "Conditional",
+          "Direct",
+          "Last",
+          "Manual",
+          "Predictive",
+          "Preferred",
+          "Standard",
+          "Vip"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "Bullseye",
+          "Conditional",
+          "Direct",
+          "Last",
+          "Manual",
+          "Predictive",
+          "Preferred",
+          "Standard",
+          "Vip"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Bullseye",
+          "Conditional",
+          "Direct",
+          "Last",
+          "Manual",
+          "Predictive",
+          "Preferred",
+          "Standard",
+          "Vip"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Bullseye",
+          "Conditional",
+          "Direct",
+          "Last",
+          "Manual",
+          "Predictive",
+          "Preferred",
+          "Standard",
+          "Vip"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "AnalyticsAgentGroup": {
+        "type": "object",
+        "description": "AnalyticsAgentGroup",
+        "additionalProperties": false,
+        "properties": {
+          "agentGroupType": {
+            "description": "Conditional group routing agent group type",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AgentGroupTypeEnum"
+              }
+            ]
+          },
+          "agentGroupId": {
+            "type": "string",
+            "description": "Conditional group routing agent group identifier",
+            "nullable": true
+          }
+        }
+      },
+      "AgentGroupTypeEnum": {
+        "type": "string",
+        "description": "Conditional group routing agent group type",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Group",
+          "Skillgroup",
+          "Team"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "Group",
+          "SkillGroup",
+          "Team"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Group",
+          "Skillgroup",
+          "Team"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Group",
+          "Skillgroup",
+          "Team"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "AnalyticsProposedAgent": {
+        "type": "object",
+        "description": "AnalyticsProposedAgent",
+        "additionalProperties": false,
+        "properties": {
+          "agentRank": {
+            "type": "integer",
+            "description": "Proposed agent rank for this conversation from predictive routing (lower is better)",
+            "format": "int32",
+            "nullable": true
+          },
+          "proposedAgentId": {
+            "type": "string",
+            "description": "Unique identifier for the agent that was proposed by predictive routing",
+            "nullable": true
+          }
+        }
+      },
+      "AnalyticsMediaEndpointStat": {
+        "type": "object",
+        "description": "AnalyticsMediaEndpointStat",
+        "additionalProperties": false,
+        "properties": {
+          "codecs": {
+            "type": "array",
+            "description": "The MIME type(s) of the audio encodings used by the audio streams belonging to this endpoint",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "discardedPackets": {
+            "type": "integer",
+            "description": "The total number of packets received too late or too early, jitter queue overrun or underrun, for all audio streams belonging to this endpoint",
+            "format": "int64",
+            "nullable": true
+          },
+          "duplicatePackets": {
+            "type": "integer",
+            "description": "The total number of packets received with the same sequence number as another one recently received (window of 64 packets), for all audio streams belonging to this endpoint",
+            "format": "int64",
+            "nullable": true
+          },
+          "eventTime": {
+            "type": "string",
+            "description": "Specifies when an event occurred. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "invalidPackets": {
+            "type": "integer",
+            "description": "The total number of malformed or not RTP packets, unknown payload type, or discarded probation packets for all audio streams belonging to this endpoint",
+            "format": "int64",
+            "nullable": true
+          },
+          "maxLatencyMs": {
+            "type": "integer",
+            "description": "The maximum latency experienced by any audio stream belonging to this endpoint, in milliseconds",
+            "format": "int64",
+            "nullable": true
+          },
+          "minMos": {
+            "type": "number",
+            "description": "The lowest estimated average MOS among all the audio streams belonging to this endpoint",
+            "format": "double",
+            "nullable": true
+          },
+          "minRFactor": {
+            "type": "number",
+            "description": "The lowest R-factor value among all of the audio streams belonging to this endpoint",
+            "format": "double",
+            "nullable": true
+          },
+          "overrunPackets": {
+            "type": "integer",
+            "description": "The total number of packets for which there was no room in the jitter queue when it was received, for all audio streams belonging to this endpoint (also counted in discarded)",
+            "format": "int64",
+            "nullable": true
+          },
+          "receivedPackets": {
+            "type": "integer",
+            "description": "The total number of packets received for all audio streams belonging to this endpoint (includes invalid, duplicate, and discarded packets)",
+            "format": "int64",
+            "nullable": true
+          },
+          "underrunPackets": {
+            "type": "integer",
+            "description": "The total number of packets received after their timestamp/seqnum has been played out, for all audio streams belonging to this endpoint (also counted in discarded)",
+            "format": "int64",
+            "nullable": true
+          }
+        }
+      },
+      "AnalyticsFlow": {
+        "type": "object",
+        "description": "AnalyticsFlow",
+        "additionalProperties": false,
+        "properties": {
+          "entryType": {
+            "description": "The entry type for this flow, e.g. dnis, dialer, agent, flow, or direct",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EntryTypeEnum"
+              }
+            ]
+          },
+          "flowType": {
+            "description": "The type of this flow",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FlowTypeEnum"
+              }
+            ]
+          },
+          "endingLanguage": {
+            "type": "string",
+            "description": "Flow ending language, e.g. en-us",
+            "nullable": true
+          },
+          "entryReason": {
+            "type": "string",
+            "description": "The particular entry reason for this flow, e.g. an address, userId, or flowId",
+            "nullable": true
+          },
+          "exitReason": {
+            "type": "string",
+            "description": "The exit reason for this flow, e.g. DISCONNECT",
+            "nullable": true
+          },
+          "flowId": {
+            "type": "string",
+            "description": "The unique identifier of this flow",
+            "nullable": true
+          },
+          "flowName": {
+            "type": "string",
+            "description": "The name of this flow at the time of flow execution",
+            "nullable": true
+          },
+          "flowVersion": {
+            "type": "string",
+            "description": "The version of this flow",
+            "nullable": true
+          },
+          "issuedCallback": {
+            "type": "boolean",
+            "description": "Flag indicating whether the flow issued a callback",
+            "nullable": true
+          },
+          "recognitionFailureReason": {
+            "type": "string",
+            "description": "The recognition failure reason causing to exit/disconnect",
+            "nullable": true
+          },
+          "startingLanguage": {
+            "type": "string",
+            "description": "Flow starting language, e.g. en-us",
+            "nullable": true
+          },
+          "transferTargetAddress": {
+            "type": "string",
+            "description": "The address of a flow transfer target, e.g. a phone number, an email address, or a queueId",
+            "nullable": true
+          },
+          "transferTargetName": {
+            "type": "string",
+            "description": "The name of a flow transfer target",
+            "nullable": true
+          },
+          "transferType": {
+            "type": "string",
+            "description": "The type of transfer for flows that ended with a transfer",
+            "nullable": true
+          },
+          "outcomes": {
+            "type": "array",
+            "description": "Flow outcomes",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsFlowOutcome"
+            }
+          }
+        }
+      },
+      "EntryTypeEnum": {
+        "type": "string",
+        "description": "The entry type for this flow, e.g. dnis, dialer, agent, flow, or direct",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Agent",
+          "Direct",
+          "Dnis",
+          "Flow",
+          "Outbound"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "agent",
+          "direct",
+          "dnis",
+          "flow",
+          "outbound"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Agent",
+          "Direct",
+          "Dnis",
+          "Flow",
+          "Outbound"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Agent",
+          "Direct",
+          "Dnis",
+          "Flow",
+          "Outbound"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "FlowTypeEnum": {
+        "type": "string",
+        "description": "The type of this flow",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Bot",
+          "Commonmodule",
+          "Digitalbot",
+          "Inboundcall",
+          "Inboundchat",
+          "Inboundemail",
+          "Inboundshortmessage",
+          "Inqueuecall",
+          "Inqueueemail",
+          "Inqueueshortmessage",
+          "Outboundcall",
+          "Securecall",
+          "Speech",
+          "Surveyinvite",
+          "Voice",
+          "Voicemail",
+          "Voicesurvey",
+          "Workflow",
+          "Workitem"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "BOT",
+          "COMMONMODULE",
+          "DIGITALBOT",
+          "INBOUNDCALL",
+          "INBOUNDCHAT",
+          "INBOUNDEMAIL",
+          "INBOUNDSHORTMESSAGE",
+          "INQUEUECALL",
+          "INQUEUEEMAIL",
+          "INQUEUESHORTMESSAGE",
+          "OUTBOUNDCALL",
+          "SECURECALL",
+          "SPEECH",
+          "SURVEYINVITE",
+          "VOICE",
+          "VOICEMAIL",
+          "VOICESURVEY",
+          "WORKFLOW",
+          "WORKITEM"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Bot",
+          "Commonmodule",
+          "Digitalbot",
+          "Inboundcall",
+          "Inboundchat",
+          "Inboundemail",
+          "Inboundshortmessage",
+          "Inqueuecall",
+          "Inqueueemail",
+          "Inqueueshortmessage",
+          "Outboundcall",
+          "Securecall",
+          "Speech",
+          "Surveyinvite",
+          "Voice",
+          "Voicemail",
+          "Voicesurvey",
+          "Workflow",
+          "Workitem"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Bot",
+          "Commonmodule",
+          "Digitalbot",
+          "Inboundcall",
+          "Inboundchat",
+          "Inboundemail",
+          "Inboundshortmessage",
+          "Inqueuecall",
+          "Inqueueemail",
+          "Inqueueshortmessage",
+          "Outboundcall",
+          "Securecall",
+          "Speech",
+          "Surveyinvite",
+          "Voice",
+          "Voicemail",
+          "Voicesurvey",
+          "Workflow",
+          "Workitem"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "AnalyticsFlowOutcome": {
+        "type": "object",
+        "description": "AnalyticsFlowOutcome",
+        "additionalProperties": false,
+        "properties": {
+          "flowOutcome": {
+            "type": "string",
+            "description": "Combination of unique flow outcome identifier and its value separated by colon",
+            "nullable": true
+          },
+          "flowOutcomeEndTimestamp": {
+            "type": "string",
+            "description": "The outcome ending timestamp in ISO 8601 format. This may be null if the outcome did not succeed.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "flowOutcomeId": {
+            "type": "string",
+            "description": "Unique identifier of a flow outcome",
+            "nullable": true
+          },
+          "flowOutcomeStartTimestamp": {
+            "type": "string",
+            "description": "The outcome starting timestamp in ISO 8601 format",
+            "format": "date-time",
+            "nullable": true
+          },
+          "flowOutcomeValue": {
+            "type": "string",
+            "description": "Flow outcome value, e.g. SUCCESS",
+            "nullable": true
+          }
+        }
+      },
+      "AnalyticsSessionMetric": {
+        "type": "object",
+        "description": "AnalyticsSessionMetric",
+        "additionalProperties": false,
+        "properties": {
+          "emitDate": {
+            "type": "string",
+            "description": "Metric emission date. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Unique name of this metric",
+            "nullable": true
+          },
+          "value": {
+            "type": "integer",
+            "description": "The metric value",
+            "format": "int64",
+            "nullable": true
+          }
+        }
+      },
+      "AnalyticsConversationSegment": {
+        "type": "object",
+        "description": "AnalyticsConversationSegment",
+        "additionalProperties": false,
+        "properties": {
+          "disconnectType": {
+            "description": "The session disconnect type",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DisconnectTypeEnum"
+              }
+            ]
+          },
+          "segmentType": {
+            "description": "The activity that takes place in the segment, such as hold or interact",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SegmentTypeEnum"
+              }
+            ]
+          },
+          "audioMuted": {
+            "type": "boolean",
+            "description": "Flag indicating if audio is muted or not (true/false)",
+            "nullable": true
+          },
+          "conference": {
+            "type": "boolean",
+            "description": "Indicates whether the segment was a conference",
+            "nullable": true
+          },
+          "destinationConversationId": {
+            "type": "string",
+            "description": "The unique identifier of a new conversation when a conversation is ended for a conference",
+            "nullable": true
+          },
+          "destinationSessionId": {
+            "type": "string",
+            "description": "The unique identifier of a new session when a session is ended for a conference",
+            "nullable": true
+          },
+          "errorCode": {
+            "type": "string",
+            "description": "A code corresponding to the error that occurred",
+            "nullable": true
+          },
+          "groupId": {
+            "type": "string",
+            "description": "Unique identifier for a Genesys Cloud group",
+            "nullable": true
+          },
+          "q850ResponseCodes": {
+            "type": "array",
+            "description": "Q.850 response code(s)",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            }
+          },
+          "queueId": {
+            "type": "string",
+            "description": "Queue identifier",
+            "nullable": true
+          },
+          "requestedLanguageId": {
+            "type": "string",
+            "description": "Unique identifier for the language requested for an interaction",
+            "nullable": true
+          },
+          "requestedRoutingSkillIds": {
+            "type": "array",
+            "description": "Unique identifier(s) for skill(s) requested for an interaction",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "requestedRoutingUserIds": {
+            "type": "array",
+            "description": "Unique identifier(s) for agent(s) requested for an interaction",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "segmentEnd": {
+            "type": "string",
+            "description": "The end time of a segment. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "segmentStart": {
+            "type": "string",
+            "description": "The start time of a segment. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z",
+            "format": "date-time",
+            "nullable": true
+          },
+          "sipResponseCodes": {
+            "type": "array",
+            "description": "SIP response code(s)",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            }
+          },
+          "sourceConversationId": {
+            "type": "string",
+            "description": "The unique identifier of the previous conversation when a new conversation is created for a conference",
+            "nullable": true
+          },
+          "sourceSessionId": {
+            "type": "string",
+            "description": "The unique identifier of the previous session when a new session is created for a conference",
+            "nullable": true
+          },
+          "subject": {
+            "type": "string",
+            "description": "The subject for the initial email that started this conversation",
+            "nullable": true
+          },
+          "videoMuted": {
+            "type": "boolean",
+            "description": "Flag indicating if video is muted/paused or not (true/false)",
+            "nullable": true
+          },
+          "wrapUpCode": {
+            "type": "string",
+            "description": "Wrap up code",
+            "nullable": true
+          },
+          "wrapUpNote": {
+            "type": "string",
+            "description": "Note entered by an agent during after-call work",
+            "nullable": true
+          },
+          "wrapUpTags": {
+            "type": "array",
+            "description": "Tag(s) assigned during after-call work",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "scoredAgents": {
+            "type": "array",
+            "description": "Scored agents",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsScoredAgent"
+            }
+          },
+          "properties": {
+            "type": "array",
+            "description": "Additional segment properties",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsProperty"
+            }
+          }
+        }
+      },
+      "DisconnectTypeEnum": {
+        "type": "string",
+        "description": "The session disconnect type",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Client",
+          "Conferencetransfer",
+          "Consulttransfer",
+          "Dndendpoint",
+          "Dndtransfer",
+          "Endpoint",
+          "Error",
+          "Forwardtransfer",
+          "Noanswertransfer",
+          "Notavailabletransfer",
+          "Other",
+          "Peer",
+          "Spam",
+          "System",
+          "Timeout",
+          "Transfer",
+          "Transportfailure",
+          "Uncallable",
+          "Inactivity"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "client",
+          "conferenceTransfer",
+          "consultTransfer",
+          "dndEndpoint",
+          "dndTransfer",
+          "endpoint",
+          "error",
+          "forwardTransfer",
+          "noAnswerTransfer",
+          "notAvailableTransfer",
+          "other",
+          "peer",
+          "spam",
+          "system",
+          "timeout",
+          "transfer",
+          "transportFailure",
+          "uncallable",
+          "inactivity"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Client",
+          "Conferencetransfer",
+          "Consulttransfer",
+          "Dndendpoint",
+          "Dndtransfer",
+          "Endpoint",
+          "Error",
+          "Forwardtransfer",
+          "Noanswertransfer",
+          "Notavailabletransfer",
+          "Other",
+          "Peer",
+          "Spam",
+          "System",
+          "Timeout",
+          "Transfer",
+          "Transportfailure",
+          "Uncallable",
+          "Inactivity"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Client",
+          "Conferencetransfer",
+          "Consulttransfer",
+          "Dndendpoint",
+          "Dndtransfer",
+          "Endpoint",
+          "Error",
+          "Forwardtransfer",
+          "Noanswertransfer",
+          "Notavailabletransfer",
+          "Other",
+          "Peer",
+          "Spam",
+          "System",
+          "Timeout",
+          "Transfer",
+          "Transportfailure",
+          "Uncallable",
+          "Inactivity"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "SegmentTypeEnum": {
+        "type": "string",
+        "description": "The activity that takes place in the segment, such as hold or interact",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Alert",
+          "Barging",
+          "Callback",
+          "Coaching",
+          "Contacting",
+          "Converting",
+          "Delay",
+          "Dialing",
+          "Hold",
+          "Interact",
+          "Ivr",
+          "Monitoring",
+          "Parked",
+          "Scheduled",
+          "Sharing",
+          "System",
+          "Transmitting",
+          "Unknown",
+          "Uploading",
+          "Voicemail",
+          "Wrapup"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "alert",
+          "barging",
+          "callback",
+          "coaching",
+          "contacting",
+          "converting",
+          "delay",
+          "dialing",
+          "hold",
+          "interact",
+          "ivr",
+          "monitoring",
+          "parked",
+          "scheduled",
+          "sharing",
+          "system",
+          "transmitting",
+          "unknown",
+          "uploading",
+          "voicemail",
+          "wrapup"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Alert",
+          "Barging",
+          "Callback",
+          "Coaching",
+          "Contacting",
+          "Converting",
+          "Delay",
+          "Dialing",
+          "Hold",
+          "Interact",
+          "Ivr",
+          "Monitoring",
+          "Parked",
+          "Scheduled",
+          "Sharing",
+          "System",
+          "Transmitting",
+          "Unknown",
+          "Uploading",
+          "Voicemail",
+          "Wrapup"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Alert",
+          "Barging",
+          "Callback",
+          "Coaching",
+          "Contacting",
+          "Converting",
+          "Delay",
+          "Dialing",
+          "Hold",
+          "Interact",
+          "Ivr",
+          "Monitoring",
+          "Parked",
+          "Scheduled",
+          "Sharing",
+          "System",
+          "Transmitting",
+          "Unknown",
+          "Uploading",
+          "Voicemail",
+          "Wrapup"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "AnalyticsScoredAgent": {
+        "type": "object",
+        "description": "AnalyticsScoredAgent",
+        "additionalProperties": false,
+        "properties": {
+          "agentScore": {
+            "type": "integer",
+            "description": "Assigned agent score for this conversation (0 - 100, higher being better)",
+            "format": "int32",
+            "nullable": true
+          },
+          "scoredAgentId": {
+            "type": "string",
+            "description": "Unique identifier for the agent that was scored for this conversation",
+            "nullable": true
+          }
+        }
+      },
+      "AnalyticsProperty": {
+        "type": "object",
+        "description": "AnalyticsProperty",
+        "additionalProperties": false,
+        "properties": {
+          "propertyType": {
+            "description": "Indicates what the data type is (e.g. integer vs string) and therefore how to evaluate what would constitute a match",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyTypeEnum"
+              }
+            ]
+          },
+          "property": {
+            "type": "string",
+            "description": "User-defined rather than intrinsic system-observed values. These are tagged onto segments by other components within PureCloud or by API users directly.  This is the name of the user-defined property.",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "description": "What property value to match against",
+            "nullable": true
+          }
+        }
+      },
+      "PropertyTypeEnum": {
+        "type": "string",
+        "description": "Indicates what the data type is (e.g. integer vs string) and therefore how to evaluate what would constitute a match",
+        "x-enumNames": [
+          "OutdatedSdkVersion",
+          "Bool",
+          "Integer",
+          "Real",
+          "Date",
+          "String",
+          "Uuid"
+        ],
+        "enum": [
+          "OUTDATED_SDK_VERSION",
+          "bool",
+          "integer",
+          "real",
+          "date",
+          "string",
+          "uuid"
+        ],
+        "x-enum-names": [
+          "OutdatedSdkVersion",
+          "Bool",
+          "Integer",
+          "Real",
+          "Date",
+          "String",
+          "Uuid"
+        ],
+        "x-enum-varnames": [
+          "OutdatedSdkVersion",
+          "Bool",
+          "Integer",
+          "Real",
+          "Date",
+          "String",
+          "Uuid"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "PagedResultDTOOfConversationListItemDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConversationListItemDTO"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "firstUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "nextUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "previousUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "selfUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "ConversationListItemDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "conversationId": {
+            "type": "string",
+            "nullable": true
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "direction": {
+            "type": "string",
+            "nullable": true
+          },
+          "remoteDisplay": {
+            "type": "string",
+            "nullable": true
+          },
+          "queueId": {
+            "type": "string",
+            "nullable": true
+          },
+          "durationConnectedMs": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
       "PagedResultDTOOfDivisionDTO": {
         "type": "object",
         "additionalProperties": false,
@@ -544,43 +3755,6 @@
           },
           "homeDivision": {
             "type": "boolean",
-            "nullable": true
-          },
-          "objectCounts": {
-            "type": "object",
-            "nullable": true,
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        }
-      },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
             "nullable": true
           }
         }
@@ -765,11 +3939,33 @@
             "format": "date-time",
             "nullable": true
           },
+          "division": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DivisionSummaryDTO"
+              }
+            ]
+          },
           "listaUsuarios": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UserDTO"
             }
+          }
+        }
+      },
+      "DivisionSummaryDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -1140,7 +4336,7 @@
         }
       },
       "ScoringMethodEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The Scoring Method for the queue.",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -1148,9 +4344,9 @@
           "Priorityonly"
         ],
         "enum": [
-          0,
-          1,
-          2
+          "OUTDATED_SDK_VERSION",
+          "TimestampAndPriority",
+          "PriorityOnly"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -1174,7 +4370,7 @@
         ]
       },
       "LastAgentRoutingModeEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The Last Agent Routing Mode for the queue.",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -1183,10 +4379,10 @@
           "Anyagent"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "OUTDATED_SDK_VERSION",
+          "Disabled",
+          "QueueMembersOnly",
+          "AnyAgent"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -1214,7 +4410,7 @@
         ]
       },
       "SkillEvaluationMethodEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The skill evaluation method to use when routing conversations.",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -1223,10 +4419,10 @@
           "All"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "OUTDATED_SDK_VERSION",
+          "NONE",
+          "BEST",
+          "ALL"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -1505,7 +4701,7 @@
         }
       },
       "ModeEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The mode callbacks will use on this queue.",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -1513,9 +4709,9 @@
           "Customerfirst"
         ],
         "enum": [
-          0,
-          1,
-          2
+          "OUTDATED_SDK_VERSION",
+          "AgentFirst",
+          "CustomerFirst"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -1539,7 +4735,7 @@
         ]
       },
       "LiveVoiceReactionTypeEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The action to take if a live voice is detected during the outbound call of a customer first callback.",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -1548,10 +4744,10 @@
           "Transfertoflow"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "OUTDATED_SDK_VERSION",
+          "HangUp",
+          "TransferToQueue",
+          "TransferToFlow"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -1579,7 +4775,7 @@
         ]
       },
       "AnsweringMachineReactionTypeEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The action to take if an answering machine is detected during the outbound call of a customer first callback.",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -1588,10 +4784,10 @@
           "Transfertoflow"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "OUTDATED_SDK_VERSION",
+          "HangUp",
+          "TransferToQueue",
+          "TransferToFlow"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -1767,7 +4963,7 @@
         }
       },
       "OperatorEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "matching operator.  MEETS_THRESHOLD matches any agent with a score at or above the rule's threshold.  ANY matches all specified agents, regardless of score.",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -1775,9 +4971,9 @@
           "Any"
         ],
         "enum": [
-          0,
-          1,
-          2
+          "OUTDATED_SDK_VERSION",
+          "MEETS_THRESHOLD",
+          "ANY"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -1870,7 +5066,7 @@
         }
       },
       "MetricEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The queue metric being evaluated",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -1878,9 +5074,9 @@
           "Servicelevel"
         ],
         "enum": [
-          0,
-          1,
-          2
+          "OUTDATED_SDK_VERSION",
+          "EstimatedWaitTime",
+          "ServiceLevel"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -1904,7 +5100,7 @@
         ]
       },
       "OperatorEnum2": {
-        "type": "integer",
+        "type": "string",
         "description": "The operator that compares the actual value against the condition value",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -1914,11 +5110,11 @@
           "Lessthanorequalto"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4
+          "OUTDATED_SDK_VERSION",
+          "GreaterThan",
+          "GreaterThanOrEqualTo",
+          "LessThan",
+          "LessThanOrEqualTo"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -1996,7 +5192,7 @@
         }
       },
       "TypeEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The group type",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -2005,10 +5201,10 @@
           "Skillgroup"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "OUTDATED_SDK_VERSION",
+          "TEAM",
+          "GROUP",
+          "SKILLGROUP"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -2133,7 +5329,7 @@
         }
       },
       "OperatorEnum3": {
-        "type": "integer",
+        "type": "string",
         "description": "The operator used to compare the actual value against the threshold value",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -2145,13 +5341,13 @@
           "Notequalto"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
+          "OUTDATED_SDK_VERSION",
+          "GreaterThan",
+          "GreaterThanOrEqualTo",
+          "LessThan",
+          "LessThanOrEqualTo",
+          "EqualTo",
+          "NotEqualTo"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -2216,7 +5412,7 @@
         }
       },
       "MetricEnum2": {
-        "type": "integer",
+        "type": "string",
         "description": "The queue metric being evaluated",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -2225,10 +5421,10 @@
           "Servicelevel"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "OUTDATED_SDK_VERSION",
+          "EstimatedWaitTime",
+          "IdleAgentCount",
+          "ServiceLevel"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -2353,15 +5549,15 @@
         }
       },
       "TypeEnum2": {
-        "type": "integer",
+        "type": "string",
         "description": "Gets or Sets Type",
         "x-enumNames": [
           "OutdatedSdkVersion",
           "TimeoutSeconds"
         ],
         "enum": [
-          0,
-          1
+          "OUTDATED_SDK_VERSION",
+          "TIMEOUT_SECONDS"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -2440,7 +5636,7 @@
         }
       },
       "WrapupPromptEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "This field controls how the UI prompts the agent for a wrapup.",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -2451,12 +5647,12 @@
           "AgentRequested"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5
+          "OUTDATED_SDK_VERSION",
+          "MANDATORY",
+          "OPTIONAL",
+          "MANDATORY_TIMEOUT",
+          "MANDATORY_FORCED_TIMEOUT",
+          "AGENT_REQUESTED"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -2516,7 +5712,7 @@
         }
       },
       "ModeEnum2": {
-        "type": "integer",
+        "type": "string",
         "description": "The association mode of canned response libraries to queue",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -2525,10 +5721,10 @@
           "None"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "OUTDATED_SDK_VERSION",
+          "All",
+          "SelectedOnly",
+          "None"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -2969,7 +6165,7 @@
         }
       },
       "HistoryInclusionEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The configuration to indicate how the history of a conversation has to be included in a draft",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -2978,10 +6174,10 @@
           "Optional"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "OUTDATED_SDK_VERSION",
+          "Include",
+          "Exclude",
+          "Optional"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",
@@ -3057,7 +6253,7 @@
         }
       },
       "InclusionTypeEnum": {
-        "type": "integer",
+        "type": "string",
         "description": "The configuration to indicate when the signature of a conversation has to be included",
         "x-enumNames": [
           "OutdatedSdkVersion",
@@ -3066,10 +6262,10 @@
           "Sendonce"
         ],
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "OUTDATED_SDK_VERSION",
+          "Draft",
+          "Send",
+          "SendOnce"
         ],
         "x-enum-names": [
           "OutdatedSdkVersion",

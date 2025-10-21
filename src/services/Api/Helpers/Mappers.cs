@@ -140,5 +140,120 @@ namespace Api.Helpers
                 SelfUri = listing.SelfUri
             };
         }
+
+        // ===== Conversations (Analytics) =====
+
+        /// <summary>
+        /// Convertir en un item plano para listado.
+        /// </summary>
+        public static ConversationListItemDTO FromRaw(AnalyticsConversation conversation)
+        {
+            // 1) Elegimos una sesión de VOZ
+            var voiceSession = conversation.Participants?
+                .SelectMany(p => p?.Sessions ?? Enumerable.Empty<AnalyticsSession>())
+                .FirstOrDefault(s => IsVoice(s));
+
+            // 2) Dirección
+            var directionText =
+                voiceSession?.Direction?.ToString()?.ToLowerInvariant()
+                ?? conversation.OriginatingDirection?.ToString()?.ToLowerInvariant()
+                ?? "unknown";
+
+            // 3) Texto para mostrar quién es el remoto (cliente/ANI/DNIS)
+            var remoteDisplayText =
+                voiceSession?.RemoteNameDisplayable
+                ?? voiceSession?.Remote
+                ?? voiceSession?.Ani
+                ?? voiceSession?.Dnis;
+
+            // 4) Primera queueId que aparezca en los segmentos
+            var firstQueueId =
+                voiceSession?.Segments?
+                .Select(seg => seg?.QueueId)
+                .FirstOrDefault(id => !string.IsNullOrWhiteSpace(id));
+
+            // 5) tConnected (ms) desde las métricas de la sesión
+            int? tConnectedMs = (int?)voiceSession?.Metrics?
+                .FirstOrDefault(m => string.Equals(m?.Name, "tConnected", StringComparison.OrdinalIgnoreCase))
+                ?.Value;
+
+            return new ConversationListItemDTO
+            {
+                ConversationId = conversation.ConversationId,
+                Start = conversation.ConversationStart ?? DateTimeOffset.MinValue,
+                End = conversation.ConversationEnd,
+                Direction = directionText,
+                RemoteDisplay = remoteDisplayText,
+                QueueId = firstQueueId,
+                DurationConnectedMs = tConnectedMs
+            };
+        }
+
+        /// <summary>
+        /// Lista plana desde la lista cruda de conversaciones.
+        /// </summary>
+        public static List<ConversationListItemDTO> ToConversationList(List<AnalyticsConversation> conversations)
+            => (conversations ?? new List<AnalyticsConversation>())
+               .Select(FromRaw)
+               .ToList();
+
+        /// <summary>
+        /// Paginación para devolver PagedResultDTO.
+        /// </summary>
+        public static PagedResultDTO<ConversationListItemDTO> ToPagedResult(
+            List<ConversationListItemDTO> allItems,
+            int pageNumber,
+            int pageSize,
+            string? routeBase = null
+        )
+        {
+            var total = allItems?.Count ?? 0;
+            var safePageSize = pageSize <= 0 ? 25 : pageSize;
+            var pageCount = Math.Max(1, (int)Math.Ceiling(total / (double)safePageSize));
+            var page = pageNumber <= 0 ? 1 : Math.Min(pageNumber, pageCount);
+
+            var items = (allItems ?? new List<ConversationListItemDTO>())
+                        .Skip((page - 1) * safePageSize)
+                        .Take(safePageSize)
+                        .ToList();
+
+            string? MakeUri(int p) => string.IsNullOrWhiteSpace(routeBase)
+                ? null
+                : $"{routeBase}?pageNumber={p}&pageSize={safePageSize}";
+
+            return new PagedResultDTO<ConversationListItemDTO>
+            {
+                Entities = items,
+                Total = total,
+                PageCount = pageCount,
+                PageNumber = page,
+                PageSize = safePageSize,
+                FirstUri = MakeUri(1),
+                LastUri = MakeUri(pageCount),
+                SelfUri = MakeUri(page),
+                NextUri = page < pageCount ? MakeUri(page + 1) : null,
+                PreviousUri = page > 1 ? MakeUri(page - 1) : null
+            };
+        }
+
+        /// <summary>
+        /// Conversaciones crudas a PagedResultDTO.
+        /// </summary>
+        public static PagedResultDTO<ConversationListItemDTO> FromRaw(
+            List<AnalyticsConversation> conversations,
+            int pageNumber,
+            int pageSize,
+            string? routeBase = null)
+        {
+            var list = ToConversationList(conversations);
+            return ToPagedResult(list, pageNumber, pageSize, routeBase);
+        }
+
+        // -------- Helpers internos --------
+        private static bool IsVoice(AnalyticsSession? session)
+        {
+            var mediaType = session?.MediaType?.ToString();
+            return string.Equals(mediaType, "voice", StringComparison.OrdinalIgnoreCase);
+        }
     }
 }

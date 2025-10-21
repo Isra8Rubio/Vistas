@@ -55,6 +55,411 @@ namespace API.APIService
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<JobIdResponse> Conversations_CreateJobAsync(string from)
+        {
+            return Conversations_CreateJobAsync(from, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<JobIdResponse> Conversations_CreateJobAsync(string from, System.Threading.CancellationToken cancellationToken)
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/Conversations/jobs"
+                    urlBuilder_.Append("api/Conversations/jobs");
+                    urlBuilder_.Append('?');
+                    if (from != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("from")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(from, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<JobIdResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 502)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("A server side error occurred.", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 500)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("A server side error occurred.", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<AsyncQueryStatus> Conversations_GetJobStatusAsync(string jobId)
+        {
+            return Conversations_GetJobStatusAsync(jobId, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<AsyncQueryStatus> Conversations_GetJobStatusAsync(string jobId, System.Threading.CancellationToken cancellationToken)
+        {
+            if (jobId == null)
+                throw new System.ArgumentNullException("jobId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/Conversations/jobs/{jobId}"
+                    urlBuilder_.Append("api/Conversations/jobs/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(jobId, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<AsyncQueryStatus>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 500)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("A server side error occurred.", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AnalyticsConversation>> Conversations_GetJobResultsAsync(string jobId)
+        {
+            return Conversations_GetJobResultsAsync(jobId, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AnalyticsConversation>> Conversations_GetJobResultsAsync(string jobId, System.Threading.CancellationToken cancellationToken)
+        {
+            if (jobId == null)
+                throw new System.ArgumentNullException("jobId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/Conversations/jobs/{jobId}/results"
+                    urlBuilder_.Append("api/Conversations/jobs/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(jobId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/results");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<AnalyticsConversation>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 500)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("A server side error occurred.", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<PagedResultDTOOfConversationListItemDTO> Conversations_GetJobResultsSummaryAsync(string jobId, int? pageNumber, int? pageSize)
+        {
+            return Conversations_GetJobResultsSummaryAsync(jobId, pageNumber, pageSize, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<PagedResultDTOOfConversationListItemDTO> Conversations_GetJobResultsSummaryAsync(string jobId, int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
+        {
+            if (jobId == null)
+                throw new System.ArgumentNullException("jobId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/Conversations/jobs/{jobId}/summary"
+                    urlBuilder_.Append("api/Conversations/jobs/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(jobId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/summary");
+                    urlBuilder_.Append('?');
+                    if (pageNumber != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("pageNumber")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageNumber, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (pageSize != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("pageSize")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageSize, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedResultDTOOfConversationListItemDTO>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 500)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("A server side error occurred.", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<PagedResultDTOOfDivisionDTO> Divisions_GetDivisionsAsync(int? pageNumber, int? pageSize)
         {
             return Divisions_GetDivisionsAsync(pageNumber, pageSize, System.Threading.CancellationToken.None);
@@ -1047,6 +1452,2580 @@ namespace API.APIService
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class JobIdResponse
+    {
+        [Newtonsoft.Json.JsonProperty("jobId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string JobId { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static JobIdResponse FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<JobIdResponse>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ProblemDetails
+    {
+        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Type { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Title { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Status { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("detail", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Detail { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("instance", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Instance { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static ProblemDetails FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ProblemDetails>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// AsyncQueryStatus
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AsyncQueryStatus
+    {
+        /// <summary>
+        /// The current state of the asynchronous query
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("state", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public StateEnum? State { get; set; }
+
+        /// <summary>
+        /// The error associated with the current query, if the state is FAILED
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("errorMessage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// The time at which results for this query will expire. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("expirationDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? ExpirationDate { get; set; }
+
+        /// <summary>
+        /// The time at which the query was submitted. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("submissionDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? SubmissionDate { get; set; }
+
+        /// <summary>
+        /// The time at which the query completed. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("completionDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? CompletionDate { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AsyncQueryStatus FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AsyncQueryStatus>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// The current state of the asynchronous query
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum StateEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"QUEUED")]
+        Queued = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"PENDING")]
+        Pending = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"FAILED")]
+        Failed = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"CANCELLED")]
+        Cancelled = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"FULFILLED")]
+        Fulfilled = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"EXPIRED")]
+        Expired = 6,
+
+    }
+
+    /// <summary>
+    /// AnalyticsConversation
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsConversation
+    {
+        /// <summary>
+        /// Indicates the participant purpose of the participant initiating a message conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("conversationInitiator", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public ConversationInitiatorEnum? ConversationInitiator { get; set; }
+
+        /// <summary>
+        /// The original direction of the conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("originatingDirection", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public OriginatingDirectionEnum? OriginatingDirection { get; set; }
+
+        /// <summary>
+        /// The start time of a conference call. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("conferenceStart", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? ConferenceStart { get; set; }
+
+        /// <summary>
+        /// The end time of a conversation. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("conversationEnd", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? ConversationEnd { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("conversationId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ConversationId { get; set; }
+
+        /// <summary>
+        /// The start time of a conversation. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("conversationStart", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? ConversationStart { get; set; }
+
+        /// <summary>
+        /// Indicates a messaging conversation in which the customer participated by sending at least one message
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("customerParticipation", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? CustomerParticipation { get; set; }
+
+        /// <summary>
+        /// Identifier(s) of division(s) associated with a conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("divisionIds", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> DivisionIds { get; set; }
+
+        /// <summary>
+        /// External tag for the conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("externalTag", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ExternalTag { get; set; }
+
+        /// <summary>
+        /// The time in the future, after which this conversation would be considered inactive. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("inactivityTimeout", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? InactivityTimeout { get; set; }
+
+        /// <summary>
+        /// The unique identifier(s) of the knowledge base(s) used
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("knowledgeBaseIds", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> KnowledgeBaseIds { get; set; }
+
+        /// <summary>
+        /// The lowest estimated average MOS among all the audio streams belonging to this conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("mediaStatsMinConversationMos", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? MediaStatsMinConversationMos { get; set; }
+
+        /// <summary>
+        /// The lowest R-factor value among all of the audio streams belonging to this conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("mediaStatsMinConversationRFactor", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? MediaStatsMinConversationRFactor { get; set; }
+
+        /// <summary>
+        /// Indicates that the conversation originated from a public message on social media
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("originatingSocialMediaPublic", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? OriginatingSocialMediaPublic { get; set; }
+
+        /// <summary>
+        /// Indicates whether all flow sessions were self serviced
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("selfServed", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? SelfServed { get; set; }
+
+        /// <summary>
+        /// Evaluations associated with this conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("evaluations", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsEvaluation> Evaluations { get; set; }
+
+        /// <summary>
+        /// Surveys associated with this conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveys", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsSurvey> Surveys { get; set; }
+
+        /// <summary>
+        /// Resolutions associated with this conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("resolutions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsResolution> Resolutions { get; set; }
+
+        /// <summary>
+        /// Participants in the conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("participants", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsParticipant> Participants { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsConversation FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsConversation>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// Indicates the participant purpose of the participant initiating a message conversation
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum ConversationInitiatorEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"acd")]
+        Acd = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"agent")]
+        Agent = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"api")]
+        Api = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"botflow")]
+        Botflow = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"campaign")]
+        Campaign = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"customer")]
+        Customer = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"dialer")]
+        Dialer = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"external")]
+        External = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"fax")]
+        Fax = 9,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"group")]
+        Group = 10,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"inbound")]
+        Inbound = 11,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ivr")]
+        Ivr = 12,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"manual")]
+        Manual = 13,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"outbound")]
+        Outbound = 14,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"station")]
+        Station = 15,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"user")]
+        User = 16,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"voicemail")]
+        Voicemail = 17,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"voicesurveyflow")]
+        Voicesurveyflow = 18,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"workflow")]
+        Workflow = 19,
+
+    }
+
+    /// <summary>
+    /// The original direction of the conversation
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum OriginatingDirectionEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"inbound")]
+        Inbound = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"outbound")]
+        Outbound = 2,
+
+    }
+
+    /// <summary>
+    /// AnalyticsEvaluation
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsEvaluation
+    {
+        /// <summary>
+        /// Status of evaluation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("evaluationStatus", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public EvaluationStatusEnum? EvaluationStatus { get; set; }
+
+        /// <summary>
+        /// Indicates whether an assignee is applicable for the evaluation. Set to false when assignee is not applicable
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("assigneeApplicable", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? AssigneeApplicable { get; set; }
+
+        /// <summary>
+        /// UserId of the assignee
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("assigneeId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AssigneeId { get; set; }
+
+        /// <summary>
+        /// The calibration ID used for the purpose of training evaluators
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("calibrationId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CalibrationId { get; set; }
+
+        /// <summary>
+        /// A unique identifier for an evaluation form, regardless of version
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("contextId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ContextId { get; set; }
+
+        /// <summary>
+        /// Whether the evaluation has been deleted
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("deleted", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Deleted { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the evaluation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("evaluationId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EvaluationId { get; set; }
+
+        /// <summary>
+        /// A unique identifier of the user who evaluated the interaction
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("evaluatorId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EvaluatorId { get; set; }
+
+        /// <summary>
+        /// Specifies when an evaluation occurred. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("eventTime", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? EventTime { get; set; }
+
+        /// <summary>
+        /// ID of the evaluation form used
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("formId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FormId { get; set; }
+
+        /// <summary>
+        /// Name of the evaluation form used
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("formName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FormName { get; set; }
+
+        /// <summary>
+        /// The ID of the associated queue
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("queueId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string QueueId { get; set; }
+
+        /// <summary>
+        /// Whether the evaluation has been released
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("released", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Released { get; set; }
+
+        /// <summary>
+        /// Whether the evaluation has been rescored at least once
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("rescored", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Rescored { get; set; }
+
+        /// <summary>
+        /// Whether the evaluation was auto submitted by the system
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("systemSubmitted", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? SystemSubmitted { get; set; }
+
+        /// <summary>
+        /// ID of the agent the evaluation was performed against
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// Gets or Sets OTotalCriticalScore
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("oTotalCriticalScore", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? OTotalCriticalScore { get; set; }
+
+        /// <summary>
+        /// Gets or Sets OTotalScore
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("oTotalScore", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? OTotalScore { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsEvaluation FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsEvaluation>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// Status of evaluation
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum EvaluationStatusEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Finished")]
+        Finished = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"InProgress")]
+        Inprogress = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"InReview")]
+        Inreview = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Pending")]
+        Pending = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Retracted")]
+        Retracted = 5,
+
+    }
+
+    /// <summary>
+    /// AnalyticsSurvey
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsSurvey
+    {
+        /// <summary>
+        /// The type of the survey
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveyType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public SurveyTypeEnum? SurveyType { get; set; }
+
+        /// <summary>
+        /// Specifies when an event occurred. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("eventTime", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? EventTime { get; set; }
+
+        /// <summary>
+        /// The ID of the associated queue
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("queueId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string QueueId { get; set; }
+
+        /// <summary>
+        /// Completion datetime of the survey in ISO 8601 format
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveyCompletedDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? SurveyCompletedDate { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the survey form, regardless of version
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveyFormContextId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SurveyFormContextId { get; set; }
+
+        /// <summary>
+        /// ID of the survey form used
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveyFormId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SurveyFormId { get; set; }
+
+        /// <summary>
+        /// Name of the survey form used
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveyFormName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SurveyFormName { get; set; }
+
+        /// <summary>
+        /// ID of the survey
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveyId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SurveyId { get; set; }
+
+        /// <summary>
+        /// Whether the survey was completed with any required questions unanswered.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveyPartialResponse", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? SurveyPartialResponse { get; set; }
+
+        /// <summary>
+        /// Score of the survey used with NPS
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveyPromoterScore", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? SurveyPromoterScore { get; set; }
+
+        /// <summary>
+        /// The status of the survey
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("surveyStatus", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SurveyStatus { get; set; }
+
+        /// <summary>
+        /// ID of the agent the survey was performed against
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// Gets or Sets OSurveyTotalScore
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("oSurveyTotalScore", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? OSurveyTotalScore { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsSurvey FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsSurvey>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// The type of the survey
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum SurveyTypeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Web")]
+        Web = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Voice")]
+        Voice = 2,
+
+    }
+
+    /// <summary>
+    /// AnalyticsResolution
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsResolution
+    {
+        /// <summary>
+        /// Specifies when an event occurred. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("eventTime", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? EventTime { get; set; }
+
+        /// <summary>
+        /// The ID of the last queue on which the conversation was handled.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("queueId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string QueueId { get; set; }
+
+        /// <summary>
+        /// The ID of the last user who handled the conversation.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// Gets or Sets NNextContactAvoided
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("nNextContactAvoided", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? NNextContactAvoided { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsResolution FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsResolution>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// AnalyticsParticipant
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsParticipant
+    {
+        /// <summary>
+        /// Reason for which participant flagged conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flaggedReason", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public FlaggedReasonEnum? FlaggedReason { get; set; }
+
+        /// <summary>
+        /// The participant's purpose
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("purpose", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public PurposeEnum? Purpose { get; set; }
+
+        /// <summary>
+        /// External contact identifier
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("externalContactId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ExternalContactId { get; set; }
+
+        /// <summary>
+        /// External organization identifier
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("externalOrganizationId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ExternalOrganizationId { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the participant
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("participantId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ParticipantId { get; set; }
+
+        /// <summary>
+        /// A human readable name identifying the participant
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("participantName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ParticipantName { get; set; }
+
+        /// <summary>
+        /// Flag determining if a screen recording was started or not
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("screenRecording", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? ScreenRecording { get; set; }
+
+        /// <summary>
+        /// The team ID the user is a member of
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("teamId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string TeamId { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the user
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// List of sessions associated to this participant
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("sessions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsSession> Sessions { get; set; }
+
+        /// <summary>
+        /// List of attributes associated to this participant
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("attributes", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.IDictionary<string, string> Attributes { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsParticipant FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsParticipant>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// Reason for which participant flagged conversation
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum FlaggedReasonEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"general")]
+        General = 1,
+
+    }
+
+    /// <summary>
+    /// The participant's purpose
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum PurposeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"acd")]
+        Acd = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"agent")]
+        Agent = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"api")]
+        Api = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"botflow")]
+        Botflow = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"campaign")]
+        Campaign = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"customer")]
+        Customer = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"dialer")]
+        Dialer = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"external")]
+        External = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"fax")]
+        Fax = 9,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"group")]
+        Group = 10,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"inbound")]
+        Inbound = 11,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ivr")]
+        Ivr = 12,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"manual")]
+        Manual = 13,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"outbound")]
+        Outbound = 14,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"station")]
+        Station = 15,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"user")]
+        User = 16,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"voicemail")]
+        Voicemail = 17,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"voicesurveyflow")]
+        Voicesurveyflow = 18,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"workflow")]
+        Workflow = 19,
+
+    }
+
+    /// <summary>
+    /// AnalyticsSession
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsSession
+    {
+        /// <summary>
+        /// The email or SMS delivery status
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("deliveryStatus", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public DeliveryStatusEnum? DeliveryStatus { get; set; }
+
+        /// <summary>
+        /// The direction of the communication
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("direction", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public DirectionEnum? Direction { get; set; }
+
+        /// <summary>
+        /// The session media type
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("mediaType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public MediaTypeEnum? MediaType { get; set; }
+
+        /// <summary>
+        /// Routing rule type
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("routingRuleType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public RoutingRuleTypeEnum? RoutingRuleType { get; set; }
+
+        /// <summary>
+        /// Complete routing method
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("usedRouting", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public UsedRoutingEnum? UsedRouting { get; set; }
+
+        /// <summary>
+        /// ID(s) of Skill(s) that are active on the conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("activeSkillIds", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> ActiveSkillIds { get; set; }
+
+        /// <summary>
+        /// Marker for an agent that skipped after call work
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("acwSkipped", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? AcwSkipped { get; set; }
+
+        /// <summary>
+        /// The address that initiated an action
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("addressFrom", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AddressFrom { get; set; }
+
+        /// <summary>
+        /// The email address for the participant on the other side of the email conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("addressOther", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AddressOther { get; set; }
+
+        /// <summary>
+        /// The email address for the participant on this side of the email conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("addressSelf", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AddressSelf { get; set; }
+
+        /// <summary>
+        /// The address receiving an action
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("addressTo", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AddressTo { get; set; }
+
+        /// <summary>
+        /// Unique identifier of the active virtual agent assistant
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("agentAssistantId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AgentAssistantId { get; set; }
+
+        /// <summary>
+        /// Bullseye ring of the targeted agent
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("agentBullseyeRing", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? AgentBullseyeRing { get; set; }
+
+        /// <summary>
+        /// Flag indicating an agent-owned callback
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("agentOwned", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? AgentOwned { get; set; }
+
+        /// <summary>
+        /// Automatic Number Identification (caller's number)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("ani", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Ani { get; set; }
+
+        /// <summary>
+        /// ID of the user that manually assigned a conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("assignerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AssignerId { get; set; }
+
+        /// <summary>
+        /// Flag that indicates that the identity of the customer has been asserted as verified by the provider.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("authenticated", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Authenticated { get; set; }
+
+        /// <summary>
+        /// The participantId being barged in on (if someone (e.g. an agent) is being barged in on, this would correspond to one of the other participantIds present in the conversation)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("bargedParticipantId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string BargedParticipantId { get; set; }
+
+        /// <summary>
+        /// Blind carbon copy email address(es)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("bcc", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> Bcc { get; set; }
+
+        /// <summary>
+        /// Callback phone number(s)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("callbackNumbers", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> CallbackNumbers { get; set; }
+
+        /// <summary>
+        /// Scheduled callback date/time. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("callbackScheduledTime", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? CallbackScheduledTime { get; set; }
+
+        /// <summary>
+        /// The name of the user requesting a call back
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("callbackUserName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CallbackUserName { get; set; }
+
+        /// <summary>
+        /// Carbon copy email address(es)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("cc", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> Cc { get; set; }
+
+        /// <summary>
+        /// Flag that indicates that the conversation has been cleared by the customer
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("cleared", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Cleared { get; set; }
+
+        /// <summary>
+        /// The participantId being coached (if someone (e.g. an agent) is being coached, this would correspond to one of the other participantIds present in the conversation)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("coachedParticipantId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CoachedParticipantId { get; set; }
+
+        /// <summary>
+        /// Describes side of the cobrowse (sharer or viewer)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("cobrowseRole", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CobrowseRole { get; set; }
+
+        /// <summary>
+        /// A unique identifier for a Genesys Cloud cobrowse room
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("cobrowseRoomId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CobrowseRoomId { get; set; }
+
+        /// <summary>
+        /// Flag that indicates that the push delivery mechanism was used
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("deliveryPushed", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? DeliveryPushed { get; set; }
+
+        /// <summary>
+        /// Date and time of the most recent delivery status change. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("deliveryStatusChangeDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? DeliveryStatusChangeDate { get; set; }
+
+        /// <summary>
+        /// Destination address(es) of transfers or consults
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("destinationAddresses", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> DestinationAddresses { get; set; }
+
+        /// <summary>
+        /// Absolute time when the speech ended. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("detectedSpeechEnd", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? DetectedSpeechEnd { get; set; }
+
+        /// <summary>
+        /// Absolute time when the speech started. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("detectedSpeechStart", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? DetectedSpeechStart { get; set; }
+
+        /// <summary>
+        /// (Dialer) Analyzer (for example speech.person)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("dispositionAnalyzer", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string DispositionAnalyzer { get; set; }
+
+        /// <summary>
+        /// (Dialer) Result of the analysis (for example disposition.classification.callable.machine)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("dispositionName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string DispositionName { get; set; }
+
+        /// <summary>
+        /// Dialed number identification service (number dialed by the calling party)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("dnis", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Dnis { get; set; }
+
+        /// <summary>
+        /// Unique identifier of the edge device
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("edgeId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EdgeId { get; set; }
+
+        /// <summary>
+        /// Number of eligible agents for each predictive routing attempt
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("eligibleAgentCounts", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<int?> EligibleAgentCounts { get; set; }
+
+        /// <summary>
+        /// Extended delivery status
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("extendedDeliveryStatus", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ExtendedDeliveryStatus { get; set; }
+
+        /// <summary>
+        /// Type of flow in that occurred when entering ACD.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowInType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FlowInType { get; set; }
+
+        /// <summary>
+        /// Type of flow out that occurred when emitting tFlowOut.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowOutType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FlowOutType { get; set; }
+
+        /// <summary>
+        /// Identifier of the journey action.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("journeyActionId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string JourneyActionId { get; set; }
+
+        /// <summary>
+        /// Identifier of the journey action map that triggered the action.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("journeyActionMapId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string JourneyActionMapId { get; set; }
+
+        /// <summary>
+        /// Version of the journey action map that triggered the action.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("journeyActionMapVersion", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? JourneyActionMapVersion { get; set; }
+
+        /// <summary>
+        /// Primary identifier of the journey customer in the source where the activities originate from.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("journeyCustomerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string JourneyCustomerId { get; set; }
+
+        /// <summary>
+        /// Type of primary identifier of the journey customer (e.g. cookie).
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("journeyCustomerIdType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string JourneyCustomerIdType { get; set; }
+
+        /// <summary>
+        /// Unique identifier of the journey session.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("journeyCustomerSessionId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string JourneyCustomerSessionId { get; set; }
+
+        /// <summary>
+        /// Type or category of journey sessions (e.g. web, ticket, delivery, atm).
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("journeyCustomerSessionIdType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string JourneyCustomerSessionIdType { get; set; }
+
+        /// <summary>
+        /// Media bridge ID for the conference session consistent across all participants
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("mediaBridgeId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string MediaBridgeId { get; set; }
+
+        /// <summary>
+        /// Count of any media (images, files, etc) included in this session
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("mediaCount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? MediaCount { get; set; }
+
+        /// <summary>
+        /// Message type for messaging services. E.g.: sms, facebook, twitter, line
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("messageType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string MessageType { get; set; }
+
+        /// <summary>
+        /// The participantId being monitored (if someone (e.g. an agent) is being monitored, this would correspond to one of the other participantIds present in the conversation)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("monitoredParticipantId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string MonitoredParticipantId { get; set; }
+
+        /// <summary>
+        /// (Dialer) Unique identifier of the outbound campaign
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("outboundCampaignId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string OutboundCampaignId { get; set; }
+
+        /// <summary>
+        /// (Dialer) Unique identifier of the contact
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("outboundContactId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string OutboundContactId { get; set; }
+
+        /// <summary>
+        /// (Dialer) Unique identifier of the contact list that this contact belongs to
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("outboundContactListId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string OutboundContactListId { get; set; }
+
+        /// <summary>
+        /// This identifies pairs of related sessions on a conversation. E.g. an external session’s peerId will be the session that the call originally connected to, e.g. if an IVR was dialed, the IVR session, which will also have the external session’s ID as its peer. After that point, any transfers of that session to other internal components (acd, agent, etc.) will all spawn new sessions whose peerIds point back to that original external session.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("peerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PeerId { get; set; }
+
+        /// <summary>
+        /// The original voice protocol call ID, e.g. a SIP call ID
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("protocolCallId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ProtocolCallId { get; set; }
+
+        /// <summary>
+        /// The source provider for the communication.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("provider", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Provider { get; set; }
+
+        /// <summary>
+        /// Flag determining if an audio recording was started or not
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("recording", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Recording { get; set; }
+
+        /// <summary>
+        /// Name, phone number, or email address of the remote party.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("remote", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Remote { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the remote party
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("remoteNameDisplayable", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string RemoteNameDisplayable { get; set; }
+
+        /// <summary>
+        /// ID(s) of Skill(s) that have been removed by bullseye routing
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("removedSkillIds", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> RemovedSkillIds { get; set; }
+
+        /// <summary>
+        /// Routing type(s) for requested/attempted routing methods.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("requestedRoutings", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public System.Collections.Generic.ICollection<RequestedRoutingsEnum> RequestedRoutings { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the room
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("roomId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string RoomId { get; set; }
+
+        /// <summary>
+        /// Routing ring for bullseye or preferred agent routing
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("routingRing", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? RoutingRing { get; set; }
+
+        /// <summary>
+        /// Routing rule for preferred, conditional and predictive routing type
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("routingRule", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string RoutingRule { get; set; }
+
+        /// <summary>
+        /// Direct screen share address
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("screenShareAddressSelf", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ScreenShareAddressSelf { get; set; }
+
+        /// <summary>
+        /// A unique identifier for a Genesys Cloud screen share room
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("screenShareRoomId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ScreenShareRoomId { get; set; }
+
+        /// <summary>
+        /// A unique identifier for a script
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("scriptId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ScriptId { get; set; }
+
+        /// <summary>
+        /// Selected agent ID
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("selectedAgentId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SelectedAgentId { get; set; }
+
+        /// <summary>
+        /// Selected agent GPR rank
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("selectedAgentRank", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? SelectedAgentRank { get; set; }
+
+        /// <summary>
+        /// Dialed number for the current session; this can be different from dnis, e.g. if the call was transferred
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("sessionDnis", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SessionDnis { get; set; }
+
+        /// <summary>
+        /// The unique identifier of this session
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("sessionId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SessionId { get; set; }
+
+        /// <summary>
+        /// Flag determining if screen share is started or not (true/false)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("sharingScreen", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? SharingScreen { get; set; }
+
+        /// <summary>
+        /// (Dialer) Whether the agent can skip the dialer contact
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("skipEnabled", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? SkipEnabled { get; set; }
+
+        /// <summary>
+        /// The number of seconds before Genesys Cloud begins the call for a call back (0 disables automatic calling)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("timeoutSeconds", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? TimeoutSeconds { get; set; }
+
+        /// <summary>
+        /// Direct Video address
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("videoAddressSelf", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string VideoAddressSelf { get; set; }
+
+        /// <summary>
+        /// A unique identifier for a Genesys Cloud video room
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("videoRoomId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string VideoRoomId { get; set; }
+
+        /// <summary>
+        /// Number of waiting interactions for each predictive routing attempt
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("waitingInteractionCounts", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<int?> WaitingInteractionCounts { get; set; }
+
+        /// <summary>
+        /// Conditional group routing agent groups
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("agentGroups", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsAgentGroup> AgentGroups { get; set; }
+
+        /// <summary>
+        /// Proposed agents
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("proposedAgents", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsProposedAgent> ProposedAgents { get; set; }
+
+        /// <summary>
+        /// MediaEndpointStats associated with this session
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("mediaEndpointStats", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsMediaEndpointStat> MediaEndpointStats { get; set; }
+
+        /// <summary>
+        /// IVR flow execution associated with this session
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flow", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public AnalyticsFlow Flow { get; set; }
+
+        /// <summary>
+        /// List of metrics for this session
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("metrics", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsSessionMetric> Metrics { get; set; }
+
+        /// <summary>
+        /// List of segments for this session
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("segments", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsConversationSegment> Segments { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsSession FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsSession>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// The email or SMS delivery status
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum DeliveryStatusEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DeliveryFailed")]
+        Deliveryfailed = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DeliveryPushed")]
+        Deliverypushed = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DeliverySuccess")]
+        Deliverysuccess = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Failed")]
+        Failed = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Published")]
+        Published = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Queued")]
+        Queued = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Read")]
+        Read = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Received")]
+        Received = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Sent")]
+        Sent = 9,
+
+    }
+
+    /// <summary>
+    /// The direction of the communication
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum DirectionEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"inbound")]
+        Inbound = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"outbound")]
+        Outbound = 2,
+
+    }
+
+    /// <summary>
+    /// The session media type
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum MediaTypeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"callback")]
+        Callback = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"chat")]
+        Chat = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"cobrowse")]
+        Cobrowse = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"email")]
+        Email = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"internalmessage")]
+        Internalmessage = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"message")]
+        Message = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"screenshare")]
+        Screenshare = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"unknown")]
+        Unknown = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"video")]
+        Video = 9,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"voice")]
+        Voice = 10,
+
+    }
+
+    /// <summary>
+    /// Routing rule type
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RoutingRuleTypeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Bullseye")]
+        Bullseye = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Conditional")]
+        Conditional = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Predictive")]
+        Predictive = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Preferred")]
+        Preferred = 4,
+
+    }
+
+    /// <summary>
+    /// Complete routing method
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum UsedRoutingEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Bullseye")]
+        Bullseye = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Conditional")]
+        Conditional = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Direct")]
+        Direct = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Last")]
+        Last = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Manual")]
+        Manual = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Predictive")]
+        Predictive = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Preferred")]
+        Preferred = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Standard")]
+        Standard = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Vip")]
+        Vip = 9,
+
+    }
+
+    /// <summary>
+    /// Gets or Sets RequestedRoutings
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RequestedRoutingsEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Bullseye")]
+        Bullseye = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Conditional")]
+        Conditional = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Direct")]
+        Direct = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Last")]
+        Last = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Manual")]
+        Manual = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Predictive")]
+        Predictive = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Preferred")]
+        Preferred = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Standard")]
+        Standard = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Vip")]
+        Vip = 9,
+
+    }
+
+    /// <summary>
+    /// AnalyticsAgentGroup
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsAgentGroup
+    {
+        /// <summary>
+        /// Conditional group routing agent group type
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("agentGroupType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public AgentGroupTypeEnum? AgentGroupType { get; set; }
+
+        /// <summary>
+        /// Conditional group routing agent group identifier
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("agentGroupId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AgentGroupId { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsAgentGroup FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsAgentGroup>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// Conditional group routing agent group type
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum AgentGroupTypeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Group")]
+        Group = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"SkillGroup")]
+        Skillgroup = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Team")]
+        Team = 3,
+
+    }
+
+    /// <summary>
+    /// AnalyticsProposedAgent
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsProposedAgent
+    {
+        /// <summary>
+        /// Proposed agent rank for this conversation from predictive routing (lower is better)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("agentRank", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? AgentRank { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the agent that was proposed by predictive routing
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("proposedAgentId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ProposedAgentId { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsProposedAgent FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsProposedAgent>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// AnalyticsMediaEndpointStat
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsMediaEndpointStat
+    {
+        /// <summary>
+        /// The MIME type(s) of the audio encodings used by the audio streams belonging to this endpoint
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("codecs", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> Codecs { get; set; }
+
+        /// <summary>
+        /// The total number of packets received too late or too early, jitter queue overrun or underrun, for all audio streams belonging to this endpoint
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("discardedPackets", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? DiscardedPackets { get; set; }
+
+        /// <summary>
+        /// The total number of packets received with the same sequence number as another one recently received (window of 64 packets), for all audio streams belonging to this endpoint
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("duplicatePackets", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? DuplicatePackets { get; set; }
+
+        /// <summary>
+        /// Specifies when an event occurred. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("eventTime", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? EventTime { get; set; }
+
+        /// <summary>
+        /// The total number of malformed or not RTP packets, unknown payload type, or discarded probation packets for all audio streams belonging to this endpoint
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("invalidPackets", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? InvalidPackets { get; set; }
+
+        /// <summary>
+        /// The maximum latency experienced by any audio stream belonging to this endpoint, in milliseconds
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("maxLatencyMs", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? MaxLatencyMs { get; set; }
+
+        /// <summary>
+        /// The lowest estimated average MOS among all the audio streams belonging to this endpoint
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("minMos", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? MinMos { get; set; }
+
+        /// <summary>
+        /// The lowest R-factor value among all of the audio streams belonging to this endpoint
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("minRFactor", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? MinRFactor { get; set; }
+
+        /// <summary>
+        /// The total number of packets for which there was no room in the jitter queue when it was received, for all audio streams belonging to this endpoint (also counted in discarded)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("overrunPackets", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? OverrunPackets { get; set; }
+
+        /// <summary>
+        /// The total number of packets received for all audio streams belonging to this endpoint (includes invalid, duplicate, and discarded packets)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("receivedPackets", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? ReceivedPackets { get; set; }
+
+        /// <summary>
+        /// The total number of packets received after their timestamp/seqnum has been played out, for all audio streams belonging to this endpoint (also counted in discarded)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("underrunPackets", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? UnderrunPackets { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsMediaEndpointStat FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsMediaEndpointStat>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// AnalyticsFlow
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsFlow
+    {
+        /// <summary>
+        /// The entry type for this flow, e.g. dnis, dialer, agent, flow, or direct
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("entryType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public EntryTypeEnum? EntryType { get; set; }
+
+        /// <summary>
+        /// The type of this flow
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public FlowTypeEnum? FlowType { get; set; }
+
+        /// <summary>
+        /// Flow ending language, e.g. en-us
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("endingLanguage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EndingLanguage { get; set; }
+
+        /// <summary>
+        /// The particular entry reason for this flow, e.g. an address, userId, or flowId
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("entryReason", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EntryReason { get; set; }
+
+        /// <summary>
+        /// The exit reason for this flow, e.g. DISCONNECT
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("exitReason", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ExitReason { get; set; }
+
+        /// <summary>
+        /// The unique identifier of this flow
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FlowId { get; set; }
+
+        /// <summary>
+        /// The name of this flow at the time of flow execution
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FlowName { get; set; }
+
+        /// <summary>
+        /// The version of this flow
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowVersion", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FlowVersion { get; set; }
+
+        /// <summary>
+        /// Flag indicating whether the flow issued a callback
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("issuedCallback", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? IssuedCallback { get; set; }
+
+        /// <summary>
+        /// The recognition failure reason causing to exit/disconnect
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("recognitionFailureReason", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string RecognitionFailureReason { get; set; }
+
+        /// <summary>
+        /// Flow starting language, e.g. en-us
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("startingLanguage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string StartingLanguage { get; set; }
+
+        /// <summary>
+        /// The address of a flow transfer target, e.g. a phone number, an email address, or a queueId
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("transferTargetAddress", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string TransferTargetAddress { get; set; }
+
+        /// <summary>
+        /// The name of a flow transfer target
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("transferTargetName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string TransferTargetName { get; set; }
+
+        /// <summary>
+        /// The type of transfer for flows that ended with a transfer
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("transferType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string TransferType { get; set; }
+
+        /// <summary>
+        /// Flow outcomes
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("outcomes", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsFlowOutcome> Outcomes { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsFlow FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsFlow>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// The entry type for this flow, e.g. dnis, dialer, agent, flow, or direct
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum EntryTypeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"agent")]
+        Agent = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"direct")]
+        Direct = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"dnis")]
+        Dnis = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"flow")]
+        Flow = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"outbound")]
+        Outbound = 5,
+
+    }
+
+    /// <summary>
+    /// The type of this flow
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum FlowTypeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BOT")]
+        Bot = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"COMMONMODULE")]
+        Commonmodule = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DIGITALBOT")]
+        Digitalbot = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"INBOUNDCALL")]
+        Inboundcall = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"INBOUNDCHAT")]
+        Inboundchat = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"INBOUNDEMAIL")]
+        Inboundemail = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"INBOUNDSHORTMESSAGE")]
+        Inboundshortmessage = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"INQUEUECALL")]
+        Inqueuecall = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"INQUEUEEMAIL")]
+        Inqueueemail = 9,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"INQUEUESHORTMESSAGE")]
+        Inqueueshortmessage = 10,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTBOUNDCALL")]
+        Outboundcall = 11,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"SECURECALL")]
+        Securecall = 12,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"SPEECH")]
+        Speech = 13,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"SURVEYINVITE")]
+        Surveyinvite = 14,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"VOICE")]
+        Voice = 15,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"VOICEMAIL")]
+        Voicemail = 16,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"VOICESURVEY")]
+        Voicesurvey = 17,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"WORKFLOW")]
+        Workflow = 18,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"WORKITEM")]
+        Workitem = 19,
+
+    }
+
+    /// <summary>
+    /// AnalyticsFlowOutcome
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsFlowOutcome
+    {
+        /// <summary>
+        /// Combination of unique flow outcome identifier and its value separated by colon
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowOutcome", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FlowOutcome { get; set; }
+
+        /// <summary>
+        /// The outcome ending timestamp in ISO 8601 format. This may be null if the outcome did not succeed.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowOutcomeEndTimestamp", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? FlowOutcomeEndTimestamp { get; set; }
+
+        /// <summary>
+        /// Unique identifier of a flow outcome
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowOutcomeId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FlowOutcomeId { get; set; }
+
+        /// <summary>
+        /// The outcome starting timestamp in ISO 8601 format
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowOutcomeStartTimestamp", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? FlowOutcomeStartTimestamp { get; set; }
+
+        /// <summary>
+        /// Flow outcome value, e.g. SUCCESS
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("flowOutcomeValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FlowOutcomeValue { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsFlowOutcome FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsFlowOutcome>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// AnalyticsSessionMetric
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsSessionMetric
+    {
+        /// <summary>
+        /// Metric emission date. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("emitDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? EmitDate { get; set; }
+
+        /// <summary>
+        /// Unique name of this metric
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The metric value
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("value", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? Value { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsSessionMetric FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsSessionMetric>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// AnalyticsConversationSegment
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsConversationSegment
+    {
+        /// <summary>
+        /// The session disconnect type
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("disconnectType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public DisconnectTypeEnum? DisconnectType { get; set; }
+
+        /// <summary>
+        /// The activity that takes place in the segment, such as hold or interact
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("segmentType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public SegmentTypeEnum? SegmentType { get; set; }
+
+        /// <summary>
+        /// Flag indicating if audio is muted or not (true/false)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("audioMuted", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? AudioMuted { get; set; }
+
+        /// <summary>
+        /// Indicates whether the segment was a conference
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("conference", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? Conference { get; set; }
+
+        /// <summary>
+        /// The unique identifier of a new conversation when a conversation is ended for a conference
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("destinationConversationId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string DestinationConversationId { get; set; }
+
+        /// <summary>
+        /// The unique identifier of a new session when a session is ended for a conference
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("destinationSessionId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string DestinationSessionId { get; set; }
+
+        /// <summary>
+        /// A code corresponding to the error that occurred
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("errorCode", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ErrorCode { get; set; }
+
+        /// <summary>
+        /// Unique identifier for a Genesys Cloud group
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("groupId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string GroupId { get; set; }
+
+        /// <summary>
+        /// Q.850 response code(s)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("q850ResponseCodes", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<long?> Q850ResponseCodes { get; set; }
+
+        /// <summary>
+        /// Queue identifier
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("queueId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string QueueId { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the language requested for an interaction
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("requestedLanguageId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string RequestedLanguageId { get; set; }
+
+        /// <summary>
+        /// Unique identifier(s) for skill(s) requested for an interaction
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("requestedRoutingSkillIds", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> RequestedRoutingSkillIds { get; set; }
+
+        /// <summary>
+        /// Unique identifier(s) for agent(s) requested for an interaction
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("requestedRoutingUserIds", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> RequestedRoutingUserIds { get; set; }
+
+        /// <summary>
+        /// The end time of a segment. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("segmentEnd", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? SegmentEnd { get; set; }
+
+        /// <summary>
+        /// The start time of a segment. Date time is represented as an ISO-8601 string. For example: yyyy-MM-ddTHH:mm:ss[.mmm]Z
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("segmentStart", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? SegmentStart { get; set; }
+
+        /// <summary>
+        /// SIP response code(s)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("sipResponseCodes", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<long?> SipResponseCodes { get; set; }
+
+        /// <summary>
+        /// The unique identifier of the previous conversation when a new conversation is created for a conference
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("sourceConversationId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SourceConversationId { get; set; }
+
+        /// <summary>
+        /// The unique identifier of the previous session when a new session is created for a conference
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("sourceSessionId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SourceSessionId { get; set; }
+
+        /// <summary>
+        /// The subject for the initial email that started this conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("subject", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Subject { get; set; }
+
+        /// <summary>
+        /// Flag indicating if video is muted/paused or not (true/false)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("videoMuted", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? VideoMuted { get; set; }
+
+        /// <summary>
+        /// Wrap up code
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("wrapUpCode", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string WrapUpCode { get; set; }
+
+        /// <summary>
+        /// Note entered by an agent during after-call work
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("wrapUpNote", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string WrapUpNote { get; set; }
+
+        /// <summary>
+        /// Tag(s) assigned during after-call work
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("wrapUpTags", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> WrapUpTags { get; set; }
+
+        /// <summary>
+        /// Scored agents
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("scoredAgents", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsScoredAgent> ScoredAgents { get; set; }
+
+        /// <summary>
+        /// Additional segment properties
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("properties", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<AnalyticsProperty> Properties { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsConversationSegment FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsConversationSegment>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// The session disconnect type
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum DisconnectTypeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"client")]
+        Client = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"conferenceTransfer")]
+        Conferencetransfer = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"consultTransfer")]
+        Consulttransfer = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"dndEndpoint")]
+        Dndendpoint = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"dndTransfer")]
+        Dndtransfer = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"endpoint")]
+        Endpoint = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"error")]
+        Error = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"forwardTransfer")]
+        Forwardtransfer = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"noAnswerTransfer")]
+        Noanswertransfer = 9,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"notAvailableTransfer")]
+        Notavailabletransfer = 10,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"other")]
+        Other = 11,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"peer")]
+        Peer = 12,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"spam")]
+        Spam = 13,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"system")]
+        System = 14,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"timeout")]
+        Timeout = 15,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"transfer")]
+        Transfer = 16,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"transportFailure")]
+        Transportfailure = 17,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"uncallable")]
+        Uncallable = 18,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"inactivity")]
+        Inactivity = 19,
+
+    }
+
+    /// <summary>
+    /// The activity that takes place in the segment, such as hold or interact
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum SegmentTypeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"alert")]
+        Alert = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"barging")]
+        Barging = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"callback")]
+        Callback = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"coaching")]
+        Coaching = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"contacting")]
+        Contacting = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"converting")]
+        Converting = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"delay")]
+        Delay = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"dialing")]
+        Dialing = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"hold")]
+        Hold = 9,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"interact")]
+        Interact = 10,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ivr")]
+        Ivr = 11,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"monitoring")]
+        Monitoring = 12,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"parked")]
+        Parked = 13,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"scheduled")]
+        Scheduled = 14,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"sharing")]
+        Sharing = 15,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"system")]
+        System = 16,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"transmitting")]
+        Transmitting = 17,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"unknown")]
+        Unknown = 18,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"uploading")]
+        Uploading = 19,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"voicemail")]
+        Voicemail = 20,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"wrapup")]
+        Wrapup = 21,
+
+    }
+
+    /// <summary>
+    /// AnalyticsScoredAgent
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsScoredAgent
+    {
+        /// <summary>
+        /// Assigned agent score for this conversation (0 - 100, higher being better)
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("agentScore", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? AgentScore { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the agent that was scored for this conversation
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("scoredAgentId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ScoredAgentId { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsScoredAgent FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsScoredAgent>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// AnalyticsProperty
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AnalyticsProperty
+    {
+        /// <summary>
+        /// Indicates what the data type is (e.g. integer vs string) and therefore how to evaluate what would constitute a match
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("propertyType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public PropertyTypeEnum? PropertyType { get; set; }
+
+        /// <summary>
+        /// User-defined rather than intrinsic system-observed values. These are tagged onto segments by other components within PureCloud or by API users directly.  This is the name of the user-defined property.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("property", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Property { get; set; }
+
+        /// <summary>
+        /// What property value to match against
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("value", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Value { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static AnalyticsProperty FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<AnalyticsProperty>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    /// <summary>
+    /// Indicates what the data type is (e.g. integer vs string) and therefore how to evaluate what would constitute a match
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum PropertyTypeEnum
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
+        OutdatedSdkVersion = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"bool")]
+        Bool = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"integer")]
+        Integer = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"real")]
+        Real = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"date")]
+        Date = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"string")]
+        String = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"uuid")]
+        Uuid = 6,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PagedResultDTOOfConversationListItemDTO
+    {
+        [Newtonsoft.Json.JsonProperty("entities", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<ConversationListItemDTO> Entities { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("pageNumber", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? PageNumber { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("pageSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? PageSize { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("total", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? Total { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("firstUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FirstUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("nextUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string NextUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("previousUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PreviousUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("lastUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string LastUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("selfUri", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SelfUri { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("pageCount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? PageCount { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static PagedResultDTOOfConversationListItemDTO FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<PagedResultDTOOfConversationListItemDTO>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ConversationListItemDTO
+    {
+        [Newtonsoft.Json.JsonProperty("conversationId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ConversationId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("start", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset Start { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("end", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset? End { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("direction", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Direction { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("remoteDisplay", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string RemoteDisplay { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("queueId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string QueueId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("durationConnectedMs", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? DurationConnectedMs { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static ConversationListItemDTO FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ConversationListItemDTO>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class PagedResultDTOOfDivisionDTO
     {
         [Newtonsoft.Json.JsonProperty("entities", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -1109,9 +4088,6 @@ namespace API.APIService
         [Newtonsoft.Json.JsonProperty("homeDivision", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool? HomeDivision { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("objectCounts", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.IDictionary<string, long> ObjectCounts { get; set; }
-
         public string ToJson()
         {
 
@@ -1122,48 +4098,6 @@ namespace API.APIService
         {
 
             return Newtonsoft.Json.JsonConvert.DeserializeObject<DivisionDTO>(data, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ProblemDetails
-    {
-        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Type { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Title { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? Status { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("detail", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Detail { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("instance", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Instance { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [Newtonsoft.Json.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-        public string ToJson()
-        {
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-        public static ProblemDetails FromJson(string data)
-        {
-
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<ProblemDetails>(data, new Newtonsoft.Json.JsonSerializerSettings());
 
         }
 
@@ -1343,6 +4277,9 @@ namespace API.APIService
         [Newtonsoft.Json.JsonProperty("dateModified", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTimeOffset? DateModified { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("division", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public DivisionSummaryDTO Division { get; set; }
+
         [Newtonsoft.Json.JsonProperty("listaUsuarios", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<UserDTO> ListaUsuarios { get; set; }
 
@@ -1356,6 +4293,30 @@ namespace API.APIService
         {
 
             return Newtonsoft.Json.JsonConvert.DeserializeObject<QueueDTO>(data, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class DivisionSummaryDTO
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Id { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+
+        public string ToJson()
+        {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+
+        }
+        public static DivisionSummaryDTO FromJson(string data)
+        {
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<DivisionSummaryDTO>(data, new Newtonsoft.Json.JsonSerializerSettings());
 
         }
 
@@ -1452,18 +4413,21 @@ namespace API.APIService
         /// The Scoring Method for the queue.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("scoringMethod", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public ScoringMethodEnum? ScoringMethod { get; set; }
 
         /// <summary>
         /// The Last Agent Routing Mode for the queue.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("lastAgentRoutingMode", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public LastAgentRoutingModeEnum? LastAgentRoutingMode { get; set; }
 
         /// <summary>
         /// The skill evaluation method to use when routing conversations.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("skillEvaluationMethod", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public SkillEvaluationMethodEnum? SkillEvaluationMethod { get; set; }
 
         /// <summary>
@@ -1716,10 +4680,13 @@ namespace API.APIService
     public enum ScoringMethodEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"TimestampAndPriority")]
         Timestampandpriority = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"PriorityOnly")]
         Priorityonly = 2,
 
     }
@@ -1731,12 +4698,16 @@ namespace API.APIService
     public enum LastAgentRoutingModeEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"Disabled")]
         Disabled = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"QueueMembersOnly")]
         Queuemembersonly = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"AnyAgent")]
         Anyagent = 3,
 
     }
@@ -1748,12 +4719,16 @@ namespace API.APIService
     public enum SkillEvaluationMethodEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"NONE")]
         None = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"BEST")]
         Best = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"ALL")]
         All = 3,
 
     }
@@ -1942,18 +4917,21 @@ namespace API.APIService
         /// The mode callbacks will use on this queue.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("mode", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public ModeEnum? Mode { get; set; }
 
         /// <summary>
         /// The action to take if a live voice is detected during the outbound call of a customer first callback.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("liveVoiceReactionType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public LiveVoiceReactionTypeEnum? LiveVoiceReactionType { get; set; }
 
         /// <summary>
         /// The action to take if an answering machine is detected during the outbound call of a customer first callback.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("answeringMachineReactionType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public AnsweringMachineReactionTypeEnum? AnsweringMachineReactionType { get; set; }
 
         /// <summary>
@@ -2056,10 +5034,13 @@ namespace API.APIService
     public enum ModeEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"AgentFirst")]
         Agentfirst = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"CustomerFirst")]
         Customerfirst = 2,
 
     }
@@ -2071,12 +5052,16 @@ namespace API.APIService
     public enum LiveVoiceReactionTypeEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"HangUp")]
         Hangup = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"TransferToQueue")]
         Transfertoqueue = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"TransferToFlow")]
         Transfertoflow = 3,
 
     }
@@ -2088,12 +5073,16 @@ namespace API.APIService
     public enum AnsweringMachineReactionTypeEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"HangUp")]
         Hangup = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"TransferToQueue")]
         Transfertoqueue = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"TransferToFlow")]
         Transfertoflow = 3,
 
     }
@@ -2282,6 +5271,7 @@ namespace API.APIService
         /// matching operator.  MEETS_THRESHOLD matches any agent with a score at or above the rule's threshold.  ANY matches all specified agents, regardless of score.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("operator", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public OperatorEnum? Operator { get; set; }
 
         /// <summary>
@@ -2318,10 +5308,13 @@ namespace API.APIService
     public enum OperatorEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"MEETS_THRESHOLD")]
         MeetsThreshold = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"ANY")]
         Any = 2,
 
     }
@@ -2363,12 +5356,14 @@ namespace API.APIService
         /// The queue metric being evaluated
         /// </summary>
         [Newtonsoft.Json.JsonProperty("metric", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public MetricEnum? Metric { get; set; }
 
         /// <summary>
         /// The operator that compares the actual value against the condition value
         /// </summary>
         [Newtonsoft.Json.JsonProperty("operator", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public OperatorEnum2? Operator { get; set; }
 
         /// <summary>
@@ -2417,10 +5412,13 @@ namespace API.APIService
     public enum MetricEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"EstimatedWaitTime")]
         Estimatedwaittime = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"ServiceLevel")]
         Servicelevel = 2,
 
     }
@@ -2432,14 +5430,19 @@ namespace API.APIService
     public enum OperatorEnum2
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"GreaterThan")]
         Greaterthan = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"GreaterThanOrEqualTo")]
         Greaterthanorequalto = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"LessThan")]
         Lessthan = 3,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"LessThanOrEqualTo")]
         Lessthanorequalto = 4,
 
     }
@@ -2454,6 +5457,7 @@ namespace API.APIService
         /// The group type
         /// </summary>
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public TypeEnum? Type { get; set; }
 
         /// <summary>
@@ -2508,12 +5512,16 @@ namespace API.APIService
     public enum TypeEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"TEAM")]
         Team = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"GROUP")]
         Group = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"SKILLGROUP")]
         Skillgroup = 3,
 
     }
@@ -2633,6 +5641,7 @@ namespace API.APIService
         /// The operator used to compare the actual value against the threshold value
         /// </summary>
         [Newtonsoft.Json.JsonProperty("operator", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public OperatorEnum3? Operator { get; set; }
 
         /// <summary>
@@ -2669,18 +5678,25 @@ namespace API.APIService
     public enum OperatorEnum3
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"GreaterThan")]
         Greaterthan = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"GreaterThanOrEqualTo")]
         Greaterthanorequalto = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"LessThan")]
         Lessthan = 3,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"LessThanOrEqualTo")]
         Lessthanorequalto = 4,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"EqualTo")]
         Equalto = 5,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"NotEqualTo")]
         Notequalto = 6,
 
     }
@@ -2695,6 +5711,7 @@ namespace API.APIService
         /// The queue metric being evaluated
         /// </summary>
         [Newtonsoft.Json.JsonProperty("metric", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public MetricEnum2? Metric { get; set; }
 
         /// <summary>
@@ -2725,12 +5742,16 @@ namespace API.APIService
     public enum MetricEnum2
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"EstimatedWaitTime")]
         Estimatedwaittime = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"IdleAgentCount")]
         Idleagentcount = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"ServiceLevel")]
         Servicelevel = 3,
 
     }
@@ -2850,6 +5871,7 @@ namespace API.APIService
         /// Gets or Sets Type
         /// </summary>
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public TypeEnum2? Type { get; set; }
 
         /// <summary>
@@ -2880,8 +5902,10 @@ namespace API.APIService
     public enum TypeEnum2
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"TIMEOUT_SECONDS")]
         TimeoutSeconds = 1,
 
     }
@@ -2962,6 +5986,7 @@ namespace API.APIService
         /// This field controls how the UI prompts the agent for a wrapup.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("wrapupPrompt", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public WrapupPromptEnum? WrapupPrompt { get; set; }
 
         /// <summary>
@@ -2992,16 +6017,22 @@ namespace API.APIService
     public enum WrapupPromptEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"MANDATORY")]
         Mandatory = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OPTIONAL")]
         Optional = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"MANDATORY_TIMEOUT")]
         MandatoryTimeout = 3,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"MANDATORY_FORCED_TIMEOUT")]
         MandatoryForcedTimeout = 4,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"AGENT_REQUESTED")]
         AgentRequested = 5,
 
     }
@@ -3016,6 +6047,7 @@ namespace API.APIService
         /// The association mode of canned response libraries to queue
         /// </summary>
         [Newtonsoft.Json.JsonProperty("mode", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public ModeEnum2? Mode { get; set; }
 
         /// <summary>
@@ -3046,12 +6078,16 @@ namespace API.APIService
     public enum ModeEnum2
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"All")]
         All = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"SelectedOnly")]
         Selectedonly = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"None")]
         None = 3,
 
     }
@@ -3441,6 +6477,7 @@ namespace API.APIService
         /// The configuration to indicate how the history of a conversation has to be included in a draft
         /// </summary>
         [Newtonsoft.Json.JsonProperty("historyInclusion", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public HistoryInclusionEnum? HistoryInclusion { get; set; }
 
         /// <summary>
@@ -3561,12 +6598,16 @@ namespace API.APIService
     public enum HistoryInclusionEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"Include")]
         Include = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"Exclude")]
         Exclude = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"Optional")]
         Optional = 3,
 
     }
@@ -3614,6 +6655,7 @@ namespace API.APIService
         /// The configuration to indicate when the signature of a conversation has to be included
         /// </summary>
         [Newtonsoft.Json.JsonProperty("inclusionType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public InclusionTypeEnum? InclusionType { get; set; }
 
         /// <summary>
@@ -3656,12 +6698,16 @@ namespace API.APIService
     public enum InclusionTypeEnum
     {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"OUTDATED_SDK_VERSION")]
         OutdatedSdkVersion = 0,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"Draft")]
         Draft = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"Send")]
         Send = 2,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"SendOnce")]
         Sendonce = 3,
 
     }

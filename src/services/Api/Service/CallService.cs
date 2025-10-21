@@ -1,4 +1,5 @@
 ﻿using Api.DTO;
+using Api.Helpers;
 using Api.Service.GenesysAPI;
 using Microsoft.AspNetCore.Authorization;
 using PureCloudPlatform.Client.V2.Api;
@@ -80,5 +81,13 @@ namespace Api.Service
         public Task<List<AnalyticsConversation>> Conversations_GetJobResultsAsync(string jobId)
             => _conversationService.Analytics_ConversationsDetails_GetJobResultsAsync(jobId);
 
+        public async Task<PagedResultDTO<ConversationListItemDTO>> Conversations_GetJobResultsSummaryAsync(
+            string jobId, int pageNumber, int pageSize, string? routeBase = null)
+        {
+            var raw = await Conversations_GetJobResultsAsync(jobId);
+                                                                     
+            var list = raw ?? new List<AnalyticsConversation>();
+            return Mappers.FromRaw(list, pageNumber, pageSize, routeBase);
+        }
     }
 }

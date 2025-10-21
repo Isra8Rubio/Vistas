@@ -1,4 +1,6 @@
-﻿using Api.Service;
+﻿using Api.DTO;
+using Api.Helpers;
+using Api.Service;
 using Microsoft.AspNetCore.Mvc;
 using PureCloudPlatform.Client.V2.Model;
 using System.Globalization;
@@ -20,17 +22,13 @@ namespace Api.Controllers
             this.callService = callService;
         }
 
-        /// <summary>
-        /// Crea un job de Analytics Conversations Details para el día indicado (from -> [yyyy-MM-dd]).
-        /// El intervalo se fija como [from 00:00:00, from+1d 00:00:00).
-        /// </summary>
-        /// <param name="from">Fecha base (formato recomendado: yyyy-MM-dd). Ej: 2025-10-08</param>
+        // Crea un job de Analytics Conversations Details para el día indicado (yyyy-MM-dd).
         [HttpPost("jobs")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(object))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobIdResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status502BadGateway)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<object>> CreateJobAsync(string from)
+        public async Task<ActionResult<JobIdResponse>> CreateJobAsync(string from)
         {
             var traceId = httpContext.HttpContext?.TraceIdentifier.Split(':')[0] ?? "";
             try
@@ -59,12 +57,11 @@ namespace Api.Controllers
                 // Fijamos el intervalo en el servicio y pedimos el job
                 callService.Conversations_SetIntervalExtract(start);
                 var jobId = await callService.Conversations_RequestJobAsync();
-
                 if (string.IsNullOrWhiteSpace(jobId))
                     return StatusCode(502, new { Message = "No se pudo crear el job en Genesys (sin JobId)." });
 
                 logger.LogInformation("[{TraceId}] FinishCall: CreateJobAsync -> JobId={JobId}", traceId, jobId);
-                return Ok(new { JobId = jobId });
+                return Ok(new JobIdResponse { JobId = jobId });
             }
             catch (Exception ex)
             {
@@ -124,6 +121,43 @@ namespace Api.Controllers
             {
                 logger.LogError(ex, "[{TraceId}] GetJobResultsAsync error", traceId);
                 return StatusCode(500, new { Message = "Error obteniendo resultados del job", Detail = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Devuelve un listado plano (paginado) de conversaciones del job indicado.
+        /// </summary>
+        [HttpGet("jobs/{jobId}/summary")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResultDTO<ConversationListItemDTO>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<PagedResultDTO<ConversationListItemDTO>>> GetJobResultsSummaryAsync(
+            string jobId,int pageNumber = 1,int pageSize = 25)
+        {
+            var traceId = httpContext.HttpContext?.TraceIdentifier.Split(':')[0] ?? "";
+            try
+            {
+                logger.LogInformation("[{TraceId}] Call: GetJobResultsSummaryAsync(jobId={JobId}, page={Page}, size={Size})",
+                    traceId, jobId, pageNumber, pageSize);
+
+                var routeBase = $"{Request.PathBase}{Request.Path.Value}";
+                var paged = await callService.Conversations_GetJobResultsSummaryAsync(jobId, pageNumber, pageSize, routeBase);
+
+                if (paged.Total == 0)
+                {
+                    logger.LogWarning("[{TraceId}] No data for jobId={JobId}", traceId, jobId);
+                    return NotFound();
+                }
+
+                logger.LogInformation("[{TraceId}] Finish: {Count} items (page {Page}/{Pages})",
+                    traceId, paged.Entities.Count, paged.PageNumber, paged.PageCount);
+
+                return Ok(paged);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "[{TraceId}] GetJobResultsSummaryAsync error", traceId);
+                return StatusCode(500, new { Message = "Error obteniendo el resumen del job", Detail = ex.Message });
             }
         }
     }
