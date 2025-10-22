@@ -9,10 +9,11 @@
 
         <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
             <MudDatePicker @bind-Date="FromDate"
-                           Label="Fecha"
-                           DateFormat="dd/MM/yyyy" />
+                           DateFormat="dd/MM/yyyy"
+                           Placeholder="Seleccione una fecha"/>
 
             <MudButton OnClick="CreateAndLoadJob"
+                       Disabled="@(!FromDate.HasValue)"
                        Variant="Variant.Filled"
                        Color="Color.Primary"
                        StartIcon="@Icons.Material.Filled.PlayArrow">

@@ -30,16 +30,13 @@ namespace WebBlazor.Components.Pages
 
         // jobId y fecha
         private string? JobId;
-        private DateTime? FromDate { get; set; } = DateTime.Today;
+        private DateTime? FromDate { get; set; }
 
         protected override void OnInitialized()
         {
             var uri = Nav.ToAbsoluteUri(Nav.Uri);
             if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("jobId", out var v))
                 JobId = v.ToString();
-
-            if (string.IsNullOrWhiteSpace(JobId))
-                Snackbar.Add("Falta ?jobId=... en la URL /conversaciones. Puedes crear un job arriba.", Severity.Info);
         }
 
         private Task ClearFilters()
